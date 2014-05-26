@@ -34,3 +34,6 @@ LIBS += -lopencv_flann
 
 HEADERS += \
     camera.h
+
+OTHER_FILES += \
+    README

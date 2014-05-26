@@ -43,8 +43,8 @@ void camera::createGaussianEdgeWindow()
         Mat frame;
         camera::cameraDefault >> frame; // get a new frame from camera
         cvtColor(frame, camera::mat1, CV_BGR2GRAY);
-        GaussianBlur(camera::mat1, camera::mat1, Size(7,7), 1.5, 1.5);
-        Canny(camera::mat1, camera::mat1, 0, 30, 3);
+        //GaussianBlur(camera::mat1, camera::mat1, Size(7,7), 1.5, 1.5);
+        //Canny(camera::mat1, camera::mat1, 0, 30, 3);
         imshow("Edges", camera::mat1);
         if(waitKey(30) >= 0) break;
     }
