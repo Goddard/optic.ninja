@@ -17,6 +17,7 @@ public:
     int getCameraCount();
     void countCameras();
     void createMat();
+    void createColorWindow();
     void createGaussianEdgeWindow();
 
 private:

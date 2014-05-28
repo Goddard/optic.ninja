@@ -19,7 +19,7 @@ void camera::countCameras()
     camera::cameraCount = 0;
     for(;;)
     {
-        VideoCapture cap(cameraCount);
+        VideoCapture cap(camera::cameraCount);
         if(!cap.isOpened())
             break;
 
@@ -35,17 +35,30 @@ void camera::createMat()
         camera::mat1 = matDefault;
 }
 
+void camera::createColorWindow()
+{
+    namedWindow("color",1);
+    for(;;)
+    {
+        Mat frame;
+        camera::cameraDefault >> frame; // get a new frame from camera
+        cvtColor(frame, camera::mat1, 0);
+        imshow("color", camera::mat1);
+        if(waitKey(30) >= 0) break;
+    }
+}
+
 void camera::createGaussianEdgeWindow()
 {
-    namedWindow("Edges",1);
+    namedWindow("gaussian edge",1);
     for(;;)
     {
         Mat frame;
         camera::cameraDefault >> frame; // get a new frame from camera
         cvtColor(frame, camera::mat1, CV_BGR2GRAY);
-        //GaussianBlur(camera::mat1, camera::mat1, Size(7,7), 1.5, 1.5);
-        //Canny(camera::mat1, camera::mat1, 0, 30, 3);
-        imshow("Edges", camera::mat1);
+        GaussianBlur(camera::mat1, camera::mat1, Size(7,7), 1.5, 1.5);
+        Canny(camera::mat1, camera::mat1, 0, 30, 3);
+        imshow("gaussian edge", camera::mat1);
         if(waitKey(30) >= 0) break;
     }
 }

@@ -36,9 +36,10 @@ int main(int argc, char *argv[])
 
      cameraZero->countCameras();
 
-     qDebug() << "Camera Count : " << cameraZero->getCameraCount();
+     qDebug() << "Camera Count : " << cameraZero->getCameraCount() + 1;
 
      cameraZero->createMat();
+     cameraZero->createColorWindow();
      cameraZero->createGaussianEdgeWindow();
 //    QString userInput;
 //    cout << "Enter your command: ";
