@@ -15,7 +15,11 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    camera.cpp
+    camera.cpp \
+    mainwindow.cpp \
+    capture.cpp \
+    process.cpp \
+    buffer.cpp
 
 INCLUDEPATH += /usr/local/include/opencv2
 LIBS += -L/usr/local/lib
@@ -33,7 +37,14 @@ LIBS += -lopencv_flann
 #LIBS += -lopencv_nonfree
 
 HEADERS += \
-    camera.h
+    camera.h \
+    mainwindow.h \
+    capture.h \
+    process.h \
+    buffer.h
 
 OTHER_FILES += \
     README
+
+FORMS += \
+    mainwindow.ui
