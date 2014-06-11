@@ -43,7 +43,7 @@ template<class T> tbuffer<T>::tbuffer(int size)
 
 template<class T> void tbuffer<T>::add(const T& data, bool dropIfFull)
 {
-    // Acquire semaphore``````
+    // Acquire semaphore
     clearBuffer_add->acquire();
     // If dropping is enabled, do not block if buffer is full
     if(dropIfFull)
@@ -149,6 +149,5 @@ template<class T> bool tbuffer<T>::isEmpty()
 {
     return queue.size()==0;
 }
-
 
 #endif // TBUFFER_H

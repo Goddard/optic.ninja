@@ -7,10 +7,12 @@
 QT       += core gui widgets
 
 TARGET = vision-core
-CONFIG   += console
-CONFIG   -= app_bundle
 
 TEMPLATE = app
+
+QT_CONFIG -= no-pkg-config
+CONFIG += link_pkgconfig
+PKGCONFIG += opencv
 
 SOURCES += main.cpp \
     camera.cpp \
@@ -19,19 +21,19 @@ SOURCES += main.cpp \
     process.cpp \
     buffer.cpp
 
-INCLUDEPATH += /usr/local/include/opencv2
-LIBS += -L/usr/local/lib
-LIBS += -lopencv_core
-LIBS += -lopencv_imgproc
-LIBS += -lopencv_highgui
-LIBS += -lopencv_ml
-LIBS += -lopencv_video
-LIBS += -lopencv_features2d
-LIBS += -lopencv_calib3d
-LIBS += -lopencv_objdetect
-LIBS += -lopencv_contrib
-LIBS += -lopencv_legacy
-LIBS += -lopencv_flann
+#INCLUDEPATH += /usr/local/include/opencv2
+#LIBS += -L/usr/local/lib
+#LIBS += -lopencv_core
+#LIBS += -lopencv_imgproc
+#LIBS += -lopencv_highgui
+#LIBS += -lopencv_ml
+#LIBS += -lopencv_video
+#LIBS += -lopencv_features2d
+#LIBS += -lopencv_calib3d
+#LIBS += -lopencv_objdetect
+#LIBS += -lopencv_contrib
+#LIBS += -lopencv_legacy
+#LIBS += -lopencv_flann
 #LIBS += -lopencv_nonfree
 
 HEADERS += \
@@ -41,10 +43,13 @@ HEADERS += \
     process.h \
     buffer.h \
     structures.h \
-    tbuffer.h
+    tbuffer.h \
+    config.h
 
 OTHER_FILES += \
     README
 
 FORMS += \
     mainwindow.ui
+
+QMAKE_CXXFLAGS += -Wall
