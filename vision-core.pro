@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
-
-QT       -= gui
+QT       += core gui widgets
 
 TARGET = vision-core
 CONFIG   += console
@@ -41,7 +39,9 @@ HEADERS += \
     mainwindow.h \
     capture.h \
     process.h \
-    buffer.h
+    buffer.h \
+    structures.h \
+    tbuffer.h
 
 OTHER_FILES += \
     README
