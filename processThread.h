@@ -13,25 +13,26 @@
 #include "structures.h"
 #include "config.h"
 #include "tbuffer.h"
-#include "buffer.h"
+#include "MatToQImage.h"
+#include "bufferThread.h"
 
 using namespace cv;
 
-class process : public QThread
+class processThread : public QThread
 {
     Q_OBJECT
 
     public:
-        process(buffer *sharedImageBuffer, int deviceNumber);
+        processThread(bufferThread *sharedImageBuffer, int deviceNumber);
         QRect getCurrentROI();
         void stop();
-        QImage MatToQImage(const Mat& mat);
+        //QImage MatToQImage(const Mat& mat);
 
     private:
         void updateFPS(int);
         void setROI();
         void resetROI();
-        buffer *sharedImageBuffer;
+        bufferThread *sharedImageBuffer;
         Mat currentFrame;
         Mat currentFrameGrayscale;
         Rect currentROI;

@@ -3,9 +3,10 @@
 # Project created by QtCreator 2014-04-18T12:49:33
 #
 #-------------------------------------------------
+DEFINES += APP_VERSION=\\\"1.0.0\\\"
 
-QT       += core gui widgets
-
+QT       += core gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = vision-core
 
 TEMPLATE = app
@@ -17,39 +18,37 @@ PKGCONFIG += opencv
 SOURCES += main.cpp \
     camera.cpp \
     mainwindow.cpp \
-    capture.cpp \
-    process.cpp \
-    buffer.cpp
-
-#INCLUDEPATH += /usr/local/include/opencv2
-#LIBS += -L/usr/local/lib
-#LIBS += -lopencv_core
-#LIBS += -lopencv_imgproc
-#LIBS += -lopencv_highgui
-#LIBS += -lopencv_ml
-#LIBS += -lopencv_video
-#LIBS += -lopencv_features2d
-#LIBS += -lopencv_calib3d
-#LIBS += -lopencv_objdetect
-#LIBS += -lopencv_contrib
-#LIBS += -lopencv_legacy
-#LIBS += -lopencv_flann
-#LIBS += -lopencv_nonfree
+    cameraConnectDialog.cpp \
+    CameraView.cpp \
+    ImageProcessingSettingsDialog.cpp \
+    MatToQImage.cpp \
+    FrameLabel.cpp \
+    processThread.cpp \
+    bufferThread.cpp \
+    captureThread.cpp
 
 HEADERS += \
     camera.h \
     mainwindow.h \
-    capture.h \
-    process.h \
-    buffer.h \
     structures.h \
     tbuffer.h \
-    config.h
+    config.h \
+    cameraConnectDialog.h \
+    CameraView.h \
+    ImageProcessingSettingsDialog.h \
+    MatToQImage.h \
+    FrameLabel.h \
+    processThread.h \
+    bufferThread.h \
+    captureThread.h
 
 OTHER_FILES += \
     README
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    cameraConnectDialog.ui \
+    CameraView.ui \
+    ImageProcessingSettingsDialog.ui
 
 QMAKE_CXXFLAGS += -Wall

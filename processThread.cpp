@@ -1,6 +1,6 @@
-#include "process.h"
+#include "processThread.h"
 
-process::process(buffer *sharedImageBuffer, int deviceNumber) : QThread(), sharedImageBuffer(sharedImageBuffer)
+processThread::processThread(bufferThread *sharedImageBuffer, int deviceNumber) : QThread(), sharedImageBuffer(sharedImageBuffer)
 {
     // Save Device Number
     this->deviceNumber=deviceNumber;
@@ -13,7 +13,7 @@ process::process(buffer *sharedImageBuffer, int deviceNumber) : QThread(), share
     statsData.nFramesProcessed=0;
 }
 
-void process::run()
+void processThread::run()
 {
     while(1)
     {
@@ -127,7 +127,7 @@ void process::run()
     qDebug() << "Stopping processing thread...";
 }
 
-void process::updateFPS(int timeElapsed)
+void processThread::updateFPS(int timeElapsed)
 {
     // Add instantaneous FPS value to queue
     if(timeElapsed>0)
@@ -156,13 +156,13 @@ void process::updateFPS(int timeElapsed)
     }
 }
 
-void process::stop()
+void processThread::stop()
 {
     QMutexLocker locker(&doStopMutex);
     doStop=true;
 }
 
-void process::updateImageProcessingFlags(struct ImageProcessingFlags imgProcFlags)
+void processThread::updateImageProcessingFlags(struct ImageProcessingFlags imgProcFlags)
 {
     QMutexLocker locker(&processingMutex);
     this->imgProcFlags.grayscaleOn=imgProcFlags.grayscaleOn;
@@ -173,7 +173,7 @@ void process::updateImageProcessingFlags(struct ImageProcessingFlags imgProcFlag
     this->imgProcFlags.cannyOn=imgProcFlags.cannyOn;
 }
 
-void process::updateImageProcessingSettings(struct ImageProcessingSettings imgProcSettings)
+void processThread::updateImageProcessingSettings(struct ImageProcessingSettings imgProcSettings)
 {
     QMutexLocker locker(&processingMutex);
     this->imgProcSettings.smoothType=imgProcSettings.smoothType;
@@ -190,7 +190,7 @@ void process::updateImageProcessingSettings(struct ImageProcessingSettings imgPr
     this->imgProcSettings.cannyL2gradient=imgProcSettings.cannyL2gradient;
 }
 
-void process::setROI(QRect roi)
+void processThread::setROI(QRect roi)
 {
     QMutexLocker locker(&processingMutex);
     currentROI.x = roi.x();
@@ -199,41 +199,41 @@ void process::setROI(QRect roi)
     currentROI.height = roi.height();
 }
 
-QRect process::getCurrentROI()
+QRect processThread::getCurrentROI()
 {
     return QRect(currentROI.x, currentROI.y, currentROI.width, currentROI.height);
 }
 
-QImage process::MatToQImage(const Mat& mat)
-{
-    // 8-bits unsigned, NO. OF CHANNELS=1
-    if(mat.type()==CV_8UC1)
-    {
-        // Set the color table (used to translate colour indexes to qRgb values)
-        QVector<QRgb> colorTable;
-        for (int i=0; i<256; i++)
-            colorTable.push_back(qRgb(i,i,i));
-        // Copy input Mat
-        const uchar *qImageBuffer = (const uchar*)mat.data;
-        // Create QImage with same dimensions as input Mat
-        QImage img(qImageBuffer, mat.cols, mat.rows, mat.step, QImage::Format_Indexed8);
-        img.setColorTable(colorTable);
-        return img;
-    }
+//QImage process::MatToQImage(const Mat& mat)
+//{
+//    // 8-bits unsigned, NO. OF CHANNELS=1
+//    if(mat.type()==CV_8UC1)
+//    {
+//        // Set the color table (used to translate colour indexes to qRgb values)
+//        QVector<QRgb> colorTable;
+//        for (int i=0; i<256; i++)
+//            colorTable.push_back(qRgb(i,i,i));
+//        // Copy input Mat
+//        const uchar *qImageBuffer = (const uchar*)mat.data;
+//        // Create QImage with same dimensions as input Mat
+//        QImage img(qImageBuffer, mat.cols, mat.rows, mat.step, QImage::Format_Indexed8);
+//        img.setColorTable(colorTable);
+//        return img;
+//    }
 
-    // 8-bits unsigned, NO. OF CHANNELS=3
-    else if(mat.type()==CV_8UC3)
-    {
-        // Copy input Mat
-        const uchar *qImageBuffer = (const uchar*)mat.data;
-        // Create QImage with same dimensions as input Mat
-        QImage img(qImageBuffer, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
-        return img.rgbSwapped();
-    }
+//    // 8-bits unsigned, NO. OF CHANNELS=3
+//    else if(mat.type()==CV_8UC3)
+//    {
+//        // Copy input Mat
+//        const uchar *qImageBuffer = (const uchar*)mat.data;
+//        // Create QImage with same dimensions as input Mat
+//        QImage img(qImageBuffer, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+//        return img.rgbSwapped();
+//    }
 
-    else
-    {
-        qDebug() << "ERROR: Mat could not be converted to QImage.";
-        return QImage();
-    }
-}
+//    else
+//    {
+//        qDebug() << "ERROR: Mat could not be converted to QImage.";
+//        return QImage();
+//    }
+//}

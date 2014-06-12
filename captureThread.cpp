@@ -1,6 +1,6 @@
-#include "capture.h"
+#include "captureThread.h"
 
-capture::capture(buffer *sharedImageBuffer, int deviceNumber, bool dropFrameIfBufferFull, int width, int height) : QThread(), sharedImageBuffer(sharedImageBuffer)
+captureThread::captureThread(bufferThread *sharedImageBuffer, int deviceNumber, bool dropFrameIfBufferFull, int width, int height) : QThread(), sharedImageBuffer(sharedImageBuffer)
 {
     // Save passed parameters
     this->dropFrameIfBufferFull=dropFrameIfBufferFull;
@@ -16,7 +16,7 @@ capture::capture(buffer *sharedImageBuffer, int deviceNumber, bool dropFrameIfBu
     statsData.nFramesProcessed=0;
 }
 
-void capture::run()
+void captureThread::run()
 {
     while(1)
     {
@@ -60,7 +60,7 @@ void capture::run()
     qDebug() << "Stopping capture thread...";
 }
 
-bool capture::connectToCamera()
+bool captureThread::connectToCamera()
 {
     // Open camera
     bool camOpenResult = cap.open(deviceNumber);
@@ -73,7 +73,7 @@ bool capture::connectToCamera()
     return camOpenResult;
 }
 
-bool capture::disconnectCamera()
+bool captureThread::disconnectCamera()
 {
     // Camera is connected
     if(cap.isOpened())
@@ -87,7 +87,7 @@ bool capture::disconnectCamera()
         return false;
 }
 
-void capture::updateFPS(int timeElapsed)
+void captureThread::updateFPS(int timeElapsed)
 {
     // Add instantaneous FPS value to queue
     if(timeElapsed>0)
@@ -114,23 +114,23 @@ void capture::updateFPS(int timeElapsed)
     }
 }
 
-void capture::stop()
+void captureThread::stop()
 {
     QMutexLocker locker(&doStopMutex);
     doStop=true;
 }
 
-bool capture::isCameraConnected()
+bool captureThread::isCameraConnected()
 {
     return cap.isOpened();
 }
 
-int capture::getInputSourceWidth()
+int captureThread::getInputSourceWidth()
 {
     return cap.get(CV_CAP_PROP_FRAME_WIDTH);
 }
 
-int capture::getInputSourceHeight()
+int captureThread::getInputSourceHeight()
 {
     return cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 }

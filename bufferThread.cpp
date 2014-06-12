@@ -1,13 +1,13 @@
-#include "buffer.h"
+#include "bufferThread.h"
 
-buffer::buffer()
+bufferThread::bufferThread()
 {
     // Initialize variables(s)
     nArrived=0;
     doSync=false;
 }
 
-void buffer::add(int deviceNumber, tbuffer<Mat>* imageBuffer, bool sync)
+void bufferThread::add(int deviceNumber, tbuffer<Mat>* imageBuffer, bool sync)
 {
     // Device stream is to be synchronized
     if(sync)
@@ -20,12 +20,12 @@ void buffer::add(int deviceNumber, tbuffer<Mat>* imageBuffer, bool sync)
     imageBufferMap[deviceNumber]=imageBuffer;
 }
 
-tbuffer<Mat>* buffer::getByDeviceNumber(int deviceNumber)
+tbuffer<Mat>* bufferThread::getByDeviceNumber(int deviceNumber)
 {
     return imageBufferMap[deviceNumber];
 }
 
-void buffer::removeByDeviceNumber(int deviceNumber)
+void bufferThread::removeByDeviceNumber(int deviceNumber)
 {
     // Remove buffer for device from imageBufferMap
     imageBufferMap.remove(deviceNumber);
@@ -40,7 +40,7 @@ void buffer::removeByDeviceNumber(int deviceNumber)
     mutex.unlock();
 }
 
-void buffer::sync(int deviceNumber)
+void bufferThread::sync(int deviceNumber)
 {
     // Only perform sync if enabled for specified device/stream
     mutex.lock();
@@ -60,28 +60,28 @@ void buffer::sync(int deviceNumber)
     mutex.unlock();
 }
 
-void buffer::wakeAll()
+void bufferThread::wakeAll()
 {
     QMutexLocker locker(&mutex);
     wc.wakeAll();
 }
 
-void buffer::setSyncEnabled(bool enable)
+void bufferThread::setSyncEnabled(bool enable)
 {
     doSync=enable;
 }
 
-bool buffer::isSyncEnabledForDeviceNumber(int deviceNumber)
+bool bufferThread::isSyncEnabledForDeviceNumber(int deviceNumber)
 {
     return syncSet.contains(deviceNumber);
 }
 
-bool buffer::getSyncEnabled()
+bool bufferThread::getSyncEnabled()
 {
     return doSync;
 }
 
-bool buffer::containsImageBufferForDeviceNumber(int deviceNumber)
+bool bufferThread::containsImageBufferForDeviceNumber(int deviceNumber)
 {
     return imageBufferMap.contains(deviceNumber);
 }

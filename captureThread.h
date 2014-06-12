@@ -8,7 +8,7 @@
 // OpenCV
 #include <opencv2/highgui/highgui.hpp>
 // Local
-#include "buffer.h"
+#include "bufferThread.h"
 #include "config.h"
 #include "structures.h"
 
@@ -16,12 +16,12 @@ using namespace cv;
 
 class ImageBuffer;
 
-class capture : public QThread
+class captureThread : public QThread
 {
     Q_OBJECT
 
     public:
-        capture(buffer *sharedImageBuffer, int deviceNumber, bool dropFrameIfBufferFull, int width, int height);
+        captureThread(bufferThread *sharedImageBuffer, int deviceNumber, bool dropFrameIfBufferFull, int width, int height);
         void stop();
         bool connectToCamera();
         bool disconnectCamera();
@@ -31,7 +31,7 @@ class capture : public QThread
 
     private:
         void updateFPS(int);
-        buffer *sharedImageBuffer;
+        bufferThread *sharedImageBuffer;
         VideoCapture cap;
         Mat grabbedFrame;
         QTime t;

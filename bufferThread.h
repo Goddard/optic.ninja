@@ -14,10 +14,10 @@
 
 using namespace cv;
 
-class buffer
+class bufferThread
 {
     public:
-        buffer();
+        bufferThread();
         void add(int deviceNumber, tbuffer<Mat> *imageBuffer, bool sync=false);
         tbuffer<Mat>* getByDeviceNumber(int deviceNumber);
         void removeByDeviceNumber(int deviceNumber);
