@@ -11,6 +11,10 @@ processThread::processThread(bufferThread *sharedImageBuffer, int deviceNumber) 
     fps.clear();
     statsData.averageFPS=0;
     statsData.nFramesProcessed=0;
+
+    objDet = new objectDetection();
+    b = cv::imread("/home/goddard/Pictures/Webcam/2014-06-15-201148.jpg");
+//    cv::imshow("b", b);
 }
 
 void processThread::run()
@@ -58,6 +62,8 @@ void processThread::run()
         // Grayscale conversion (in-place operation)
         if(imgProcFlags.grayscaleOn && (currentFrame.channels() == 3 || currentFrame.channels() == 4))
             cvtColor(currentFrame, currentFrame, CV_BGR2GRAY);
+
+        objDet->intruderAlarm(currentFrame, b);
 
         // Smooth (in-place operations)
         if(imgProcFlags.smoothOn)

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>qt-opencv-multithreaded</string>
+   <string>Vision</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -123,4 +123,3 @@
  <resources/>
  <connections/>
 </ui>
-

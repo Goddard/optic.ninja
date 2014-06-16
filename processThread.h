@@ -16,6 +16,8 @@
 #include "MatToQImage.h"
 #include "bufferThread.h"
 
+#include "objectdetection.h"
+
 using namespace cv;
 
 class processThread : public QThread
@@ -27,6 +29,8 @@ class processThread : public QThread
         QRect getCurrentROI();
         void stop();
         //QImage MatToQImage(const Mat& mat);
+        objectDetection *objDet;
+        cv::Mat b;
 
     private:
         void updateFPS(int);
@@ -52,6 +56,7 @@ class processThread : public QThread
         int sampleNumber;
         int deviceNumber;
         bool enableFrameProcessing;
+        Mat newFrameTest;
 
     protected:
         void run();

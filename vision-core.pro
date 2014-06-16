@@ -25,7 +25,9 @@ SOURCES += main.cpp \
     FrameLabel.cpp \
     processThread.cpp \
     bufferThread.cpp \
-    captureThread.cpp
+    captureThread.cpp \
+    objectdetection.cpp \
+    utility.cpp
 
 HEADERS += \
     camera.h \
@@ -40,7 +42,9 @@ HEADERS += \
     FrameLabel.h \
     processThread.h \
     bufferThread.h \
-    captureThread.h
+    captureThread.h \
+    objectdetection.h \
+    utility.h
 
 OTHER_FILES += \
     README

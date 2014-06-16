@@ -4,6 +4,8 @@
 #include <QLabel>
 #include <QMessageBox>
 
+#include "objectdetection.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -75,7 +77,7 @@ void MainWindow::connectToCamera()
                 if(ui->actionSynchronizeStreams->isChecked())
                 {
                     // Prompt user
-                    int ret = QMessageBox::question(this, tr("qt-opencv-multithreaded"),
+                    int ret = QMessageBox::question(this, tr("Vision"),
                                                     tr("Stream synchronization is enabled.\n\n"
                                                        "Do you want to start processing?\n\n"
                                                        "Choose 'No' if you would like to open additional streams."),
