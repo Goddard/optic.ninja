@@ -118,7 +118,7 @@ int CameraConnectDialog::getImageBufferSize()
     else if(ui->imageBufferSizeEdit->text().toInt()==0)
     {
         QMessageBox::warning(this->parentWidget(), "WARNING:","Image Buffer Size cannot be zero.\nAutomatically set to default value.");
-        return DEFAULT_IMAGE_BUFFER_SIZE;;
+        return DEFAULT_IMAGE_BUFFER_SIZE;
     }
     // Use image buffer size specified by user
     else

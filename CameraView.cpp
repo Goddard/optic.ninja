@@ -67,7 +67,7 @@ CameraView::~CameraView()
     delete ui;
 }
 
-bool CameraView::connectToCamera(bool dropFrameIfBufferFull, int capThreadPrio, int procThreadPrio, bool enableFrameProcessing, int width, int height)
+bool CameraView::connectToCamera(bool dropFrameIfBufferFull, int capThreadPrio, int procThreadPrio, bool enableFrameProcessing, int width, int height, QString videoFile)
 {
     // Set frame label text
     if(sharedImageBuffer->isSyncEnabledForDeviceNumber(deviceNumber))
@@ -78,7 +78,7 @@ bool CameraView::connectToCamera(bool dropFrameIfBufferFull, int capThreadPrio, 
     // Create capture thread
     capturingThread = new captureThread(sharedImageBuffer, deviceNumber, dropFrameIfBufferFull, width, height);
     // Attempt to connect to camera
-    if(capturingThread->connectToCamera())
+    if(capturingThread->connectToCamera(videoFile))
     {
         // Create processing thread
         processingThread = new processThread(sharedImageBuffer, deviceNumber);

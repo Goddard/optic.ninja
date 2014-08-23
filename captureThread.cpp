@@ -60,15 +60,31 @@ void captureThread::run()
     qDebug() << "Stopping capture thread...";
 }
 
-bool captureThread::connectToCamera()
+bool captureThread::connectToCamera(QString videoFile)
 {
-    // Open camera
-    bool camOpenResult = cap.open(deviceNumber);
-    // Set resolution
-    if(width != -1)
-        cap.set(CV_CAP_PROP_FRAME_WIDTH, width);
-    if(height != -1)
-        cap.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    bool camOpenResult = false;
+    if(videoFile == NULL)
+    {
+        // Open camera
+        camOpenResult = cap.open(deviceNumber);
+
+        // Set resolution
+        if(width != -1)
+            cap.set(CV_CAP_PROP_FRAME_WIDTH, width);
+        if(height != -1)
+            cap.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    }
+
+    else
+    {
+        //cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('D','I','V','X'));
+        //cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('D','I','V','4'));
+        //cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('D','I','V','4'));
+        camOpenResult = cap.open(videoFile.toStdString());
+        //camOpenResult = cap.open("C:/Users/Ryein/Documents/vision-core/test/2014_08_16_16_00_09.avi");
+        qDebug() << videoFile << " : " << camOpenResult;
+    }
+
     // Return result
     return camOpenResult;
 }

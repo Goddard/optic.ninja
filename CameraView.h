@@ -1,6 +1,9 @@
 #ifndef CAMERAVIEW_H
 #define CAMERAVIEW_H
 
+//QT
+#include <QtCore/QString>
+
 // Local
 #include "captureThread.h"
 #include "processThread.h"
@@ -19,7 +22,7 @@ class CameraView : public QWidget
     public:
         explicit CameraView(QWidget *parent, int deviceNumber, bufferThread *sharedImageBuffer);
         ~CameraView();
-        bool connectToCamera(bool dropFrame, int capThreadPrio, int procThreadPrio, bool createProcThread, int width, int height);
+        bool connectToCamera(bool dropFrame, int capThreadPrio, int procThreadPrio, bool createProcThread, int width, int height, QString videoPath = NULL);
 
     private:
         Ui::CameraView *ui;

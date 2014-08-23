@@ -20,9 +20,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->setTabsClosable(false);
     // Add "Connect to Camera" button to tab
     connectToCameraButton = new QPushButton();
-    connectToCameraButton->setText("Connect to Camera...");
+    connectToCameraButton->setText("Connect to Camera");
     ui->tabWidget->setCornerWidget(connectToCameraButton, Qt::TopLeftCorner);
     connect(connectToCameraButton,SIGNAL(released()),this, SLOT(connectToCamera()));
+
+    // Add "Play Video" button to tab
+    playVideoButton = new QPushButton();
+    playVideoButton->setText("Play Video");
+    ui->tabWidget->setCornerWidget(playVideoButton, Qt::TopRightCorner);
+    connect(playVideoButton,SIGNAL(released()),this, SLOT(playVideoFile()));
+
     connect(ui->tabWidget,SIGNAL(tabCloseRequested(int)),this, SLOT(disconnectCamera(int)));
     // Set focus on button
     connectToCameraButton->setFocus();
@@ -32,13 +39,104 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionFullScreen, SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
     // Create SharedImageBuffer object
     sharedImageBuffer = new bufferThread();
-
-    connectToCamera();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::playVideoFile()
+{
+    // We cannot connect to a camera if devices are already connected and stream synchronization is in progress
+    if(ui->actionSynchronizeStreams->isChecked() && deviceNumberMap.size()>0 && sharedImageBuffer->getSyncEnabled())
+    {
+        // Prompt user
+        QMessageBox::warning(this, tr("qt-opencv-multithreaded"),
+                                    tr("Stream synchronization is in progress.\n\n"
+                                       "Please close all currently open streams before attempting to open a new stream."),
+                                        QMessageBox::Ok);
+    }
+    // Attempt to connect to camera
+    else
+    {
+        // Get next tab index
+        int nextTabIndex = (deviceNumberMap.size()==0) ? 0 : ui->tabWidget->count();
+        playVideoDialog *playVideoFileDialog = new playVideoDialog(this);
+        if(playVideoFileDialog->exec()==QDialog::Accepted)
+        {
+            // Save user-defined device number (currently fake) add in reverse counter here starting from 999
+            int deviceNumber = 999;//cameraConnectDialog->getDeviceNumber();
+            // Check if this camera is already connected
+            if(!deviceNumberMap.contains(deviceNumber))
+            {
+                // Create ImageBuffer with user-defined size
+                tbuffer<Mat> *imageBuffer = new tbuffer<Mat>(999);
+                // Add created ImageBuffer to SharedImageBuffer object
+                sharedImageBuffer->add(deviceNumber, imageBuffer, ui->actionSynchronizeStreams->isChecked());
+                // Create CameraView
+                cameraViewMap[deviceNumber] = new CameraView(ui->tabWidget, deviceNumber, sharedImageBuffer);
+
+                // Check if stream synchronization is enabled
+                if(ui->actionSynchronizeStreams->isChecked())
+                {
+                    // Prompt user
+                    int ret = QMessageBox::question(this, tr("Vision"),
+                                                    tr("Stream synchronization is enabled.\n\n"
+                                                       "Do you want to start processing?\n\n"
+                                                       "Choose 'No' if you would like to open additional streams."),
+                                                    QMessageBox::Yes | QMessageBox::No,
+                                                    QMessageBox::Yes);
+                    // Start processing
+                    if(ret==QMessageBox::Yes)
+                        sharedImageBuffer->setSyncEnabled(true);
+                    // Defer processing
+                    else
+                        sharedImageBuffer->setSyncEnabled(false);
+                }
+
+                // Attempt to connect to camera
+                if(cameraViewMap[deviceNumber]->connectToCamera(false, 6, 6, true, 1920, 1080, playVideoFileDialog->getFileSelected()))
+                {
+                    // Add to map
+                    deviceNumberMap[deviceNumber] = nextTabIndex;
+                    // Save tab label
+                    QString tabLabel = "video";
+                    // Allow tabs to be closed
+                    ui->tabWidget->setTabsClosable(true);
+                    // If start tab, remove
+                    if(nextTabIndex==0)
+                        ui->tabWidget->removeTab(0);
+                    // Add tab
+                    ui->tabWidget->addTab(cameraViewMap[deviceNumber], tabLabel + " [" + QString::number(deviceNumber) + "]");
+                    ui->tabWidget->setCurrentWidget(cameraViewMap[deviceNumber]);
+                    // Set tooltips
+                    setTabCloseToolTips(ui->tabWidget, "Disconnect Camera");
+                    // Prevent user from enabling/disabling stream synchronization after a camera has been connected
+                    ui->actionSynchronizeStreams->setEnabled(false);
+                }
+
+                // Could not connect to camera
+                else
+                {
+                    // Display error message
+                    QMessageBox::warning(this,"ERROR:","Could not connect to camera. Please check device number.");
+                    // Explicitly delete widget
+                    delete cameraViewMap[deviceNumber];
+                    cameraViewMap.remove(deviceNumber);
+                    // Remove from shared buffer
+                    sharedImageBuffer->removeByDeviceNumber(deviceNumber);
+                    // Explicitly delete ImageBuffer object
+                    delete imageBuffer;
+                }
+            }
+            // Display error message
+            else
+                QMessageBox::warning(this,"ERROR:","Could not connect to camera. Already connected.");
+        }
+        // Delete dialog
+        delete playVideoFileDialog;
+    }
 }
 
 void MainWindow::connectToCamera()

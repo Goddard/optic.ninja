@@ -2,11 +2,13 @@
 #define CAPTURE_H
 
 // Qt
-// Qt
 #include <QtCore/QTime>
 #include <QtCore/QThread>
+#include <QtCore/QString>
+
 // OpenCV
 #include <opencv2/highgui/highgui.hpp>
+
 // Local
 #include "bufferThread.h"
 #include "config.h"
@@ -23,7 +25,7 @@ class captureThread : public QThread
     public:
         captureThread(bufferThread *sharedImageBuffer, int deviceNumber, bool dropFrameIfBufferFull, int width, int height);
         void stop();
-        bool connectToCamera();
+        bool connectToCamera(QString videoFile = NULL);
         bool disconnectCamera();
         bool isCameraConnected();
         int getInputSourceWidth();
@@ -46,6 +48,7 @@ class captureThread : public QThread
         int deviceNumber;
         int width;
         int height;
+        QString videoFilePath;
 
     protected:
         void run();

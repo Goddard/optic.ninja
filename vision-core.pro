@@ -11,9 +11,23 @@ TARGET = vision-core
 
 TEMPLATE = app
 
-QT_CONFIG -= no-pkg-config
-CONFIG += link_pkgconfig
-PKGCONFIG += opencv
+unix {
+    QT_CONFIG -= no-pkg-config
+    CONFIG += link_pkgconfig
+    PKGCONFIG += opencv
+}
+
+win32 {
+    INCLUDEPATH += C:\opencv\opencv\build\install\include
+    #LIBS += -L C:\opencv\opencv\build\bin
+    #LIBS += "C:\opencv\opencv\build\lib\/*.dll.a"
+    LIBS += -LC:\\opencv\\opencv\\build\\bin \
+        libopencv_core249 \
+        libopencv_highgui249 \
+        libopencv_imgproc249 \
+        libopencv_features2d249 \
+        libopencv_calib3d249 \
+}
 
 SOURCES += main.cpp \
     camera.cpp \
@@ -27,7 +41,8 @@ SOURCES += main.cpp \
     bufferThread.cpp \
     captureThread.cpp \
     objectdetection.cpp \
-    utility.cpp
+    utility.cpp \
+    playvideodialog.cpp
 
 HEADERS += \
     camera.h \
@@ -44,7 +59,8 @@ HEADERS += \
     bufferThread.h \
     captureThread.h \
     objectdetection.h \
-    utility.h
+    utility.h \
+    playvideodialog.h
 
 OTHER_FILES += \
     README
@@ -53,6 +69,7 @@ FORMS += \
     mainwindow.ui \
     cameraConnectDialog.ui \
     CameraView.ui \
-    ImageProcessingSettingsDialog.ui
+    ImageProcessingSettingsDialog.ui \
+    playvideodialog.ui
 
 QMAKE_CXXFLAGS += -Wall
