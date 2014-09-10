@@ -7,6 +7,7 @@
 #include <QFileDialog>
 
 // OpenCV
+#include <opencv2/ocl/ocl.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 // Local
@@ -15,6 +16,8 @@
 #include "CameraView.h"
 #include "tbuffer.h"
 #include "bufferThread.h"
+
+using namespace cv::ocl;
 
 namespace Ui {
     class MainWindow;

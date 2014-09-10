@@ -3,6 +3,8 @@
 # Project created by QtCreator 2014-04-18T12:49:33
 #
 #-------------------------------------------------
+USECV3 = "FALSE"
+
 DEFINES += APP_VERSION=\\\"1.0.0\\\"
 
 QT       += core gui
@@ -12,21 +14,28 @@ TARGET = vision-core
 TEMPLATE = app
 
 unix {
+    message("Linux Build")
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
     PKGCONFIG += opencv
 }
 
 win32 {
-    INCLUDEPATH += C:\opencv\opencv\build\install\include
-    #LIBS += -L C:\opencv\opencv\build\bin
-    #LIBS += "C:\opencv\opencv\build\lib\/*.dll.a"
-    LIBS += -LC:\\opencv\\opencv\\build\\bin \
-        libopencv_core249 \
-        libopencv_highgui249 \
-        libopencv_imgproc249 \
-        libopencv_features2d249 \
-        libopencv_calib3d249 \
+    message("Windows Build")
+    equals(USECV3, "TRUE") {
+        message("Using OpenCV 3")
+    } else {
+        message("Using OpenCV 2")
+        INCLUDEPATH += C:\opencv\opencv\build\install\include
+        #LIBS += -L C:\opencv\opencv\build\bin
+        #LIBS += "C:\opencv\opencv\build\lib\/*.dll.a"
+        LIBS += -LC:\\opencv\\opencv\\build\\bin \
+            libopencv_core249 \
+            libopencv_highgui249 \
+            libopencv_imgproc249 \
+            libopencv_features2d249 \
+            libopencv_calib3d249
+    }
 }
 
 SOURCES += main.cpp \
