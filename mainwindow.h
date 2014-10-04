@@ -7,8 +7,10 @@
 #include <QFileDialog>
 
 // OpenCV
-#include <opencv2/ocl/ocl.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#if USECV3 == 0
+    #include <opencv2/ocl/ocl.hpp>
+    #include <opencv2/highgui/highgui.hpp>
+#endif
 
 // Local
 #include "CameraConnectDialog.h"
@@ -17,7 +19,9 @@
 #include "tbuffer.h"
 #include "bufferThread.h"
 
-using namespace cv::ocl;
+#if USECV3 == 0
+    using namespace cv::ocl;
+#endif
 
 namespace Ui {
     class MainWindow;
@@ -38,6 +42,7 @@ class MainWindow : public QMainWindow
     VideoCapture *capture;
     Mat RGBframe;
     QImage img;
+    int currentPageIndex;
 
         Ui::MainWindow *ui;
         QPushButton *connectToCameraButton;
@@ -55,6 +60,8 @@ class MainWindow : public QMainWindow
         void disconnectCamera(int index);
         void showAboutDialog();
         void setFullScreen(bool);
+private slots:
+        void on_pushButton_clicked();
 };
 
 

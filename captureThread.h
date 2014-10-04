@@ -7,7 +7,21 @@
 #include <QtCore/QString>
 
 // OpenCV
+#if USECV3 == 0
+    #include <opencv2/ocl/ocl.hpp>
+#endif
+
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include "opencv2/core.hpp"
+#include "opencv2/core/ocl.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/highgui/highgui_c.h>
 
 // Local
 #include "bufferThread.h"

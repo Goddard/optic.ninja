@@ -15,6 +15,8 @@ processThread::processThread(bufferThread *sharedImageBuffer, int deviceNumber) 
 //    objDet = new objectDetection();
 //    b = cv::imread("/home/goddard/Pictures/Webcam/2014-06-15-201148.jpg");
 //    cv::imshow("b", b);
+
+    ocl::setUseOpenCL(true);
 }
 
 void processThread::run()

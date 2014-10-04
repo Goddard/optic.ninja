@@ -26,7 +26,13 @@ void objectDetection::intruderAlarm(cv::Mat& a, cv::Mat& b)
     for (int i = 0; i < channels.size(); i++)
     {
         cv::Mat thresh;
-        cv::threshold(channels[i], thresh, 45, 255, CV_THRESH_BINARY);
+        #if USECV3 == 1
+            cv::threshold(channels[i], thresh, 45, 255, THRESH_BINARY);
+        #endif
+
+        #if USECV3 == 0
+            cv::threshold(channels[i], thresh, 45, 255, CV_THRESH_BINARY);
+        #endif
         d |= thresh;
     }
 
@@ -37,7 +43,14 @@ void objectDetection::intruderAlarm(cv::Mat& a, cv::Mat& b)
 
     // Find all contours
     std::vector<std::vector<cv::Point> > contours;
-    cv::findContours(e.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+    #if USECV3 == 1
+        cv::findContours(e.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    #endif
+
+    #if USECV3 == 0
+        cv::findContours(e.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+    #endif
 
     // Select only large enough contours
     std::vector<std::vector<cv::Point> > intruders;
@@ -51,12 +64,24 @@ void objectDetection::intruderAlarm(cv::Mat& a, cv::Mat& b)
     // Use the filtered blobs above to create a mask image to
     // extract the foreground object
     cv::Mat mask = cv::Mat::zeros(a.size(), CV_8UC3);
-    cv::drawContours(mask, intruders, -1, CV_RGB(255,255,255), -1);
 
+    #if USECV3 == 1
+        cv::drawContours(mask, intruders, -1, QColor(255, 255, 255, 255).value(), -1); //QColor(255, 255, 255, 127)
+    #endif
+
+    #if USECV3 == 0
+        cv::drawContours(mask, intruders, -1, CV_RGB(255,255,255), -1);
+    #endif
     // Highlight the foreground object by darken the rest of the image
     if (intruders.size())
     {
         a = (a/4 & ~mask) + (a & mask);
-        cv::drawContours(a, intruders, -1, CV_RGB(255,255,255), 2);
+        #if USECV3 == 1
+            cv::drawContours(a, intruders, -1, QColor(255, 255, 255, 255).value(), 2);
+        #endif
+
+        #if USECV3 == 0
+            cv::drawContours(a, intruders, -1, CV_RGB(255,255,255), 2);
+        #endif
     }
 }

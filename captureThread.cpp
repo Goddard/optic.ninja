@@ -10,10 +10,14 @@ captureThread::captureThread(bufferThread *sharedImageBuffer, int deviceNumber, 
     // Initialize variables(s)
     doStop=false;
     sampleNumber=0;
+
     fpsSum=0;
     fps.clear();
     statsData.averageFPS=0;
     statsData.nFramesProcessed=0;
+
+
+    //ocl::setUseOpenCL(true);
 }
 
 void captureThread::run()
@@ -40,7 +44,7 @@ void captureThread::run()
         t.start();
 
         // Synchronize with other streams (if enabled for this stream)
-        sharedImageBuffer->sync(deviceNumber);
+        //sharedImageBuffer->sync(deviceNumber);
 
         // Capture frame (if available)
         if (!cap.grab())
@@ -105,13 +109,67 @@ bool captureThread::disconnectCamera()
 
 void captureThread::updateFPS(int timeElapsed)
 {
+//    // Add instantaneous FPS value to queue
+//    if(timeElapsed>0)
+//    {
+//        fps.enqueue((int)1000/timeElapsed);
+
+//        // Increment sample number
+//        sampleNumber++;
+//    }
+
+//    // Maximum size of queue is DEFAULT_CAPTURE_FPS_STAT_QUEUE_LENGTH
+//    if(fps.size()>CAPTURE_FPS_STAT_QUEUE_LENGTH)
+//        fps.dequeue();
+
+//    //qDebug() << "Time Elapsed : " << timeElapsed;
+//    qDebug() << "FPS Size : " << fps.size();
+//    // Update FPS value every DEFAULT_CAPTURE_FPS_STAT_QUEUE_LENGTH samples
+//    //if((fps.size()==CAPTURE_FPS_STAT_QUEUE_LENGTH) && (sampleNumber==CAPTURE_FPS_STAT_QUEUE_LENGTH) && (timeElapsed >= 100))
+//    if(timeElapsed >= 100)
+//    {
+//        qDebug() << "FPS Sum : " << fpsSum;
+//        qDebug() << "Average FPS : " << statsData.averageFPS;
+
+//        if((fps.size()==CAPTURE_FPS_STAT_QUEUE_LENGTH) && (sampleNumber==CAPTURE_FPS_STAT_QUEUE_LENGTH))
+//        {
+//            // Empty queue and store sum
+//            while(!fps.empty())
+//                fpsSum+=fps.dequeue();
+//            // Calculate average FPS
+//            statsData.averageFPS=fpsSum/CAPTURE_FPS_STAT_QUEUE_LENGTH;
+
+//            // Reset sum
+//            fpsSum = 0;
+//            // Reset sample number
+//            sampleNumber = 0;
+//        }
+
+//        qDebug() << "Sample : " << sampleNumber;
+//        qDebug() << "Calc : " << (int)1000/timeElapsed;
+//        qDebug() << "Frame Count : " << statsData.nFramesProcessed;
+//        qDebug() << "Time Elapsed : " << timeElapsed;
+//    }
+
+//    else if((fps.size()==CAPTURE_FPS_STAT_QUEUE_LENGTH) && (sampleNumber==CAPTURE_FPS_STAT_QUEUE_LENGTH) && (timeElapsed < 100))
+//    {
+//        // Reset sum
+//        fpsSum = 0;
+//        // Reset sample number
+//        sampleNumber = 0;
+//    }
     // Add instantaneous FPS value to queue
     if(timeElapsed>0)
     {
         fps.enqueue((int)1000/timeElapsed);
         // Increment sample number
         sampleNumber++;
+
+        qDebug() << "Calc : " << (int)(1000/timeElapsed);
     }
+
+    qDebug() << "FPS Size : " << fps.size();
+
     // Maximum size of queue is DEFAULT_CAPTURE_FPS_STAT_QUEUE_LENGTH
     if(fps.size()>CAPTURE_FPS_STAT_QUEUE_LENGTH)
         fps.dequeue();
@@ -128,6 +186,8 @@ void captureThread::updateFPS(int timeElapsed)
         // Reset sample number
         sampleNumber=0;
     }
+
+    qDebug() << "Average FPS : " << statsData.averageFPS;
 }
 
 void captureThread::stop()
