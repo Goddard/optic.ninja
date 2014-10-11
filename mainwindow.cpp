@@ -1,8 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 // Qt
-#include <QLabel>
-#include <QMessageBox>
+
 
 #include "objectdetection.h"
 
@@ -39,6 +38,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionFullScreen, SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
     // Create SharedImageBuffer object
     sharedImageBuffer = new bufferThread();
+
+    //set settings
+    this->settings = new QSettings("C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\settings.ini", QSettings::IniFormat);
+    qDebug() << settings->value("setDirectory").toString();
+
+    //this->qDir = new QDir();
+
+    ui->setDirectoryTextEdit->setText(settings->value("setDirectory").toString());
+
+    path = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets";
+    QDir dir(path);
+    dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+    //qDebug() << dir.filter();
+    QStringList files = dir.entryList();
+    ui->setComboBox->addItems(files);
 }
 
 MainWindow::~MainWindow()
@@ -341,3 +355,117 @@ void MainWindow::setFullScreen(bool input)
         this->showNormal();
 }
 
+
+void MainWindow::on_listWidget_clicked(const QModelIndex &index)
+{
+    //currentPageIndex = (currentPageIndex + 1) % 3;
+    ui->stackedWidget->setCurrentIndex(index.row());
+    qDebug() << index.row();
+}
+
+void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
+{
+//    ui->stackedWidget->setCurrentIndex(item->type());
+}
+
+void MainWindow::on_saveSetDirectoryButton_clicked()
+{
+//    QSettings settings;
+    //QSettings settings ("C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\settings.ini", QSettings::IniFormat);
+    qDebug() << ui->setDirectoryTextEdit->text();
+    QString test = ui->setDirectoryTextEdit->text();
+    settings->setValue("setDirectory", test);
+    settings->sync();
+    qDebug() << settings->value("setDirectory").toString();
+}
+
+void MainWindow::on_createSetButton_clicked()
+{
+    //QString writeDirectory = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets\\";
+    //qDir->mkdir(writeDirectory.append( "test"));
+    //QDir().mkdir(writeDirectory.append( "test"));
+
+    createSetDialog *setDialog = new createSetDialog(this);
+    connect(setDialog, SIGNAL(sendString(QString)), this, SLOT(recieveSetText(QString)));
+    setDialog->show();
+}
+
+void MainWindow::recieveSetText(const QString &newText)
+{
+    qDebug() << newText;
+    ui->imageListWidget->clear();
+    ui->setComboBox->clear();
+    QDir dir(path);
+    dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+    //qDebug() << dir.filter();
+    QStringList files = dir.entryList();
+    ui->setComboBox->addItems(files);
+}
+
+void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
+{
+    qDebug() << arg1;
+    ui->imageListWidget->clear();
+    //populate listview
+    QDirModel model;
+    model.setFilter(QDir::Files);
+    //ui->imageListWidget->setModel(&model);
+    //qDebug() << path.append("\\").append(arg1);
+    QString newPath = path + "\\" + arg1;
+    qDebug() << newPath;
+//    ui->imageListWidget->setRootIndex(model.index(newPath));
+//    ui->imageListWidget->addItems(model.index(newPath));
+
+    QDir dir(newPath);
+    dir.setFilter(QDir::Files);
+    //qDebug() << dir.filter();
+    QStringList files = dir.entryList();
+//    ui->imageListWidget->addItems(files);
+//    ui->imageListWidget->
+
+    QStringList::const_iterator constIterator;
+    for (constIterator = files.constBegin(); constIterator != files.constEnd(); ++constIterator)
+    {
+        //QListWidgetItem *item = new QListWidgetItem(ui->imageListWidget);
+        QFileInfo fi(newPath + "\\" + *constIterator);
+        QString name = fi.fileName();
+        //item->setText(name);
+        //QFileIconProvider iconSource;
+        //QIcon icon = iconSource.icon(fi);
+        //item->setIcon(icon);
+        //ui->imageListWidget->addItem(item);
+        ui->imageListWidget->addItem(new QListWidgetItem(QIcon(newPath + "\\" + *constIterator), name, ui->imageListWidget));
+
+        //QPixmap pix ("C:/images/wallpaper1.jpg") ;
+        //QPixmap* pix2 =  pix.scaled(80,80, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+}
+
+void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
+{
+    //get set path
+    //get current set name
+    //get item->icon name
+    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + item->text();
+    qDebug() << iconPath;
+    Mat image;
+    image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);   // Read the file
+    cvtColor(image, image, CV_BGR2GRAY);
+
+    QImage qImageMod;
+    qImageMod = MatToQImage(image);
+
+    QPixmap qPixmapMod;
+    qPixmapMod = QPixmap::fromImage(qImageMod);
+
+    //QGraphicsPixmapItem itemS(&qPixmapMod);
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    ui->selectedImageGraphicsView->setScene(scene);
+    scene->addPixmap(qPixmapMod);
+    //ui->selectedImageGraphicsView->scene(*scene);
+}
+
+void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
+{
+    qDebug() << "Context Menu Test";
+}

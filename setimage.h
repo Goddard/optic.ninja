@@ -8,6 +8,7 @@ class setImage : public QObject
     Q_OBJECT
 public:
     explicit setImage(QObject *parent = 0);
+    void getImageIcon();
 
 
 signals:

@@ -3,4 +3,5 @@
 setImage::setImage(QObject *parent) :
     QObject(parent)
 {
+
 }

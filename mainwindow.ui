@@ -33,6 +33,21 @@
     </sizepolicy>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="horizontalSpacing">
+     <number>0</number>
+    </property>
     <item row="0" column="2">
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="topMargin">
@@ -53,7 +68,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="sizePolicy">
@@ -84,8 +99,164 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_2"/>
-        <widget class="QWidget" name="page_3"/>
+        <widget class="QWidget" name="page_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="createSetButton">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>0</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Create Set</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="setComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="0">
+           <widget class="QListWidget" name="imageListWidget">
+            <property name="iconSize">
+             <size>
+              <width>150</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="layoutMode">
+             <enum>QListView::SinglePass</enum>
+            </property>
+            <property name="viewMode">
+             <enum>QListView::IconMode</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QGraphicsView" name="selectedImageGraphicsView"/>
+          </item>
+          <item row="0" column="2">
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="deleteImageButton">
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QRadioButton" name="positiveImageRadioButton">
+              <property name="text">
+               <string>Positive</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="saveImageButton">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QRadioButton" name="negativeImageRadioButton">
+              <property name="text">
+               <string>Negative</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="3">
+           <widget class="FrameLabel" name="label_2">
+            <property name="text">
+             <string>No Image Selected</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="page_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QScrollArea" name="scrollArea">
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="scrollAreaWidgetContents">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>1417</width>
+               <height>1051</height>
+              </rect>
+             </property>
+             <widget class="QLabel" name="label">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>20</y>
+                <width>146</width>
+                <height>34</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Default Set Directory</string>
+              </property>
+             </widget>
+             <widget class="QLineEdit" name="setDirectoryTextEdit">
+              <property name="geometry">
+               <rect>
+                <x>180</x>
+                <y>20</y>
+                <width>1081</width>
+                <height>41</height>
+               </rect>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="saveSetDirectoryButton">
+              <property name="geometry">
+               <rect>
+                <x>1270</x>
+                <y>21</y>
+                <width>112</width>
+                <height>41</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Save Location</string>
+              </property>
+             </widget>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="page_4"/>
        </widget>
       </item>
      </layout>
@@ -106,9 +277,15 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>90</width>
+        <width>95</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">QListWidget 
@@ -133,6 +310,96 @@ border-bottom: 2px groove gray;
 padding: 10px; color: white; 
 }</string>
       </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>70</width>
+        <height>70</height>
+       </size>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideMiddle</enum>
+      </property>
+      <property name="isWrapping" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="viewMode">
+       <enum>QListView::IconMode</enum>
+      </property>
+      <item>
+       <property name="text">
+        <string>Analyze</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="irconresource.qrc">
+         <normaloff>:/icons/Clapper-icon.png</normaloff>:/icons/Clapper-icon.png</iconset>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Train</string>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="irconresource.qrc">
+         <normaloff>:/icons/main/icons/Atlas-icon.png</normaloff>:/icons/main/icons/Atlas-icon.png</iconset>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Options</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="irconresource.qrc">
+         <normaloff>:/icons/Flatline-icon.png</normaloff>:/icons/Flatline-icon.png</iconset>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>About</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="irconresource.qrc">
+         <normaloff>:/icons/Star-icon.png</normaloff>:/icons/Star-icon.png</iconset>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEnabled</set>
+       </property>
+      </item>
      </widget>
     </item>
    </layout>
@@ -175,11 +442,6 @@ padding: 10px; color: white;
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-  </widget>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
@@ -216,6 +478,15 @@ padding: 10px; color: white;
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>FrameLabel</class>
+   <extends>QLabel</extends>
+   <header>FrameLabel.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="irconresource.qrc"/>
+ </resources>
  <connections/>
 </ui>

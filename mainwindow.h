@@ -5,6 +5,14 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QSettings>
+#include <QDir>
+#include <QLabel>
+#include <QMessageBox>
+#include <QDirModel>
+#include <QListWidgetItem>
 
 // OpenCV
 #if USECV3 == 0
@@ -18,6 +26,8 @@
 #include "CameraView.h"
 #include "tbuffer.h"
 #include "bufferThread.h"
+#include "createSetDialog.h"
+#include "MatToQImage.h"
 
 #if USECV3 == 0
     using namespace cv::ocl;
@@ -43,6 +53,8 @@ class MainWindow : public QMainWindow
     Mat RGBframe;
     QImage img;
     int currentPageIndex;
+    QSettings *settings;
+    QString path;
 
         Ui::MainWindow *ui;
         QPushButton *connectToCameraButton;
@@ -60,8 +72,16 @@ class MainWindow : public QMainWindow
         void disconnectCamera(int index);
         void showAboutDialog();
         void setFullScreen(bool);
-private slots:
-        void on_pushButton_clicked();
+        void recieveSetText(const QString &newText);
+
+    private slots:
+        void on_listWidget_clicked(const QModelIndex &index);
+        void on_listWidget_itemClicked(QListWidgetItem *item);
+        void on_saveSetDirectoryButton_clicked();
+        void on_createSetButton_clicked();
+        void on_setComboBox_currentIndexChanged(const QString &arg1);
+        void on_imageListWidget_itemClicked(QListWidgetItem *item);
+        void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
 };
 
 

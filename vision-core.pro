@@ -68,7 +68,8 @@ SOURCES += main.cpp \
     utility.cpp \
     playvideodialog.cpp \
     detectionThread.cpp \
-    setimage.cpp
+    setimage.cpp \
+    createSetDialog.cpp
 
 HEADERS += \
     camera.h \
@@ -88,7 +89,8 @@ HEADERS += \
     utility.h \
     playvideodialog.h \
     detectionThread.h \
-    setimage.h
+    setimage.h \
+    createSetDialog.h
 
 OTHER_FILES += \
     README
@@ -98,6 +100,10 @@ FORMS += \
     cameraConnectDialog.ui \
     CameraView.ui \
     ImageProcessingSettingsDialog.ui \
-    playvideodialog.ui
+    playvideodialog.ui \
+    createsetdialog.ui
 
 QMAKE_CXXFLAGS += -Wall
+
+RESOURCES += \
+    irconresource.qrc

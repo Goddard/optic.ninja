@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/icons/main">
+        <file>icons/Atlas-icon.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>icons/Clapper-icon.png</file>
+        <file>icons/Flatline-icon.png</file>
+        <file>icons/Star-icon.png</file>
+    </qresource>
+</RCC>
