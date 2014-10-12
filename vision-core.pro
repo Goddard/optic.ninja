@@ -69,7 +69,8 @@ SOURCES += main.cpp \
     playvideodialog.cpp \
     detectionThread.cpp \
     setimage.cpp \
-    createSetDialog.cpp
+    createSetDialog.cpp \
+    imageview.cpp
 
 HEADERS += \
     camera.h \
@@ -90,7 +91,8 @@ HEADERS += \
     playvideodialog.h \
     detectionThread.h \
     setimage.h \
-    createSetDialog.h
+    createSetDialog.h \
+    imageview.h
 
 OTHER_FILES += \
     README
@@ -101,7 +103,8 @@ FORMS += \
     CameraView.ui \
     ImageProcessingSettingsDialog.ui \
     playvideodialog.ui \
-    createsetdialog.ui
+    createsetdialog.ui \
+    imageview.ui
 
 QMAKE_CXXFLAGS += -Wall
 

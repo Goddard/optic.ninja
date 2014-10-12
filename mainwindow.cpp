@@ -450,20 +450,67 @@ void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
     qDebug() << iconPath;
     Mat image;
     image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);   // Read the file
-    cvtColor(image, image, CV_BGR2GRAY);
+    //cvtColor(image, image, CV_BGR2GRAY);
 
     QImage qImageMod;
     qImageMod = MatToQImage(image);
 
-    QPixmap qPixmapMod;
-    qPixmapMod = QPixmap::fromImage(qImageMod);
+//    QPixmap qPixmapMod;
+//    qPixmapMod = QPixmap::fromImage(qImageMod);
+
+//    ui->frameLabel->width(qImageMod.width());
+//    ui->frameLabel->height(qImageMod.height());
+    ui->frameLabel->setFixedHeight(qImageMod.height());
+    ui->frameLabel->setFixedWidth(qImageMod.width());
+    ui->frameLabel->setPixmap(QPixmap::fromImage(qImageMod));
+    //.scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio)
 
     //QGraphicsPixmapItem itemS(&qPixmapMod);
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    ui->selectedImageGraphicsView->setScene(scene);
-    scene->addPixmap(qPixmapMod);
+//    QGraphicsScene *scene = new QGraphicsScene(this);
+//    ui->selectedImageGraphicsView->setScene(scene);
+//    scene->addPixmap(qPixmapMod);
     //ui->selectedImageGraphicsView->scene(*scene);
 }
+
+//void MainWindow::handleContextMenuAction(QAction *action)
+//{
+//    if(action->text()=="Reset ROI")
+//        emit setROI(QRect(0, 0, capturingThread->getInputSourceWidth(), capturingThread->getInputSourceHeight()));
+//    else if(action->text()=="Scale to Fit Frame")
+//        ui->frameLabel->setScaledContents(action->isChecked());
+//    else if(action->text()=="Grayscale")
+//    {
+//        imageProcessingFlags.grayscaleOn=action->isChecked();
+//        emit newImageProcessingFlags(imageProcessingFlags);
+//    }
+//    else if(action->text()=="Smooth")
+//    {
+//        imageProcessingFlags.smoothOn=action->isChecked();
+//        emit newImageProcessingFlags(imageProcessingFlags);
+//    }
+//    else if(action->text()=="Dilate")
+//    {
+//        imageProcessingFlags.dilateOn=action->isChecked();
+//        emit newImageProcessingFlags(imageProcessingFlags);
+//    }
+//    else if(action->text()=="Erode")
+//    {
+//        imageProcessingFlags.erodeOn=action->isChecked();
+//        emit newImageProcessingFlags(imageProcessingFlags);
+//    }
+//    else if(action->text()=="Flip")
+//    {
+//        imageProcessingFlags.flipOn=action->isChecked();
+//        emit newImageProcessingFlags(imageProcessingFlags);
+//    }
+//    else if(action->text()=="Canny")
+//    {
+//        imageProcessingFlags.cannyOn=action->isChecked();
+//        emit newImageProcessingFlags(imageProcessingFlags);
+//    }
+//    else if(action->text()=="Settings...")
+//        setImageProcessingSettings();
+//}
 
 void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
 {
