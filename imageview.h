@@ -5,11 +5,14 @@
 //QT
 #include <QtCore/QString>
 #include <QMessageBox>
+#include <QtCore/QObject>
+#include <QRect>
 
 #include "ImageProcessingSettingsDialog.h"
 #include "structures.h"
 #include "bufferThread.h"
 #include "processThread.h"
+#include "MatToQImage.h"
 
 namespace Ui {
     class ImageView;
@@ -21,18 +24,20 @@ class ImageView : public QWidget
 
 private:
     Ui::ImageView *ui;
-    bufferThread *sharedImageBuffer;
     ImageProcessingSettingsDialog *imageProcessingSettingsDialog;
     ImageProcessingFlags imageProcessingFlags;
-    processThread *processingThread;
+    Mat currentMatImage;
+    QImage currentQImage;
+    Rect currentROI;
 
 public:
     explicit ImageView(QWidget *parent = 0);
     ~ImageView();
+    QRect getCurrentROI();
+    void setROI(QRect roi);
 
 signals:
     void newImageProcessingFlags(struct ImageProcessingFlags imageProcessingFlags);
-    void setROI(QRect roi);
 
 public slots:
     void setImageProcessingSettings();
@@ -41,7 +46,7 @@ public slots:
     void clearImageBuffer();
 
 private slots:
-    void updateFrame(const QImage &frame);
+    void updateFrame(const Mat &matFrame);
     void handleContextMenuAction(QAction *action);
 };
 

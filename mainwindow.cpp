@@ -53,6 +53,13 @@ MainWindow::MainWindow(QWidget *parent) :
     //qDebug() << dir.filter();
     QStringList files = dir.entryList();
     ui->setComboBox->addItems(files);
+
+//    qDebug() << "Width" << ui->ImageViewLayout->width();
+//    qDebug() << "Height" << ui->ImageViewLayout->height();
+    imgView = new ImageView(); //ui->ImageViewLayout
+    ui->ImageViewLayout->addWidget(imgView);
+    //const Mat &matFrame
+    connect(this, SIGNAL(newFrame(Mat)), imgView, SLOT(updateFrame(Mat)));
 }
 
 MainWindow::~MainWindow()
@@ -360,7 +367,6 @@ void MainWindow::on_listWidget_clicked(const QModelIndex &index)
 {
     //currentPageIndex = (currentPageIndex + 1) % 3;
     ui->stackedWidget->setCurrentIndex(index.row());
-    qDebug() << index.row();
 }
 
 void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
@@ -447,22 +453,27 @@ void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
     //get current set name
     //get item->icon name
     QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + item->text();
-    qDebug() << iconPath;
-    Mat image;
-    image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);   // Read the file
-    //cvtColor(image, image, CV_BGR2GRAY);
+    Mat image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);   // Read the file
+//    QImage qImageMod = MatToQImage(image);
 
-    QImage qImageMod;
-    qImageMod = MatToQImage(image);
+    emit newFrame(image);
+    //ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
+
 
 //    QPixmap qPixmapMod;
 //    qPixmapMod = QPixmap::fromImage(qImageMod);
 
 //    ui->frameLabel->width(qImageMod.width());
 //    ui->frameLabel->height(qImageMod.height());
-    ui->frameLabel->setFixedHeight(qImageMod.height());
-    ui->frameLabel->setFixedWidth(qImageMod.width());
-    ui->frameLabel->setPixmap(QPixmap::fromImage(qImageMod));
+
+
+    //good stuff here
+//    ui->frameLabel->setFixedHeight(qImageMod.height());
+//    ui->frameLabel->setFixedWidth(qImageMod.width());
+//    ui->frameLabel->setPixmap(QPixmap::fromImage(qImageMod));
+
+
+
     //.scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio)
 
     //QGraphicsPixmapItem itemS(&qPixmapMod);
@@ -471,46 +482,6 @@ void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
 //    scene->addPixmap(qPixmapMod);
     //ui->selectedImageGraphicsView->scene(*scene);
 }
-
-//void MainWindow::handleContextMenuAction(QAction *action)
-//{
-//    if(action->text()=="Reset ROI")
-//        emit setROI(QRect(0, 0, capturingThread->getInputSourceWidth(), capturingThread->getInputSourceHeight()));
-//    else if(action->text()=="Scale to Fit Frame")
-//        ui->frameLabel->setScaledContents(action->isChecked());
-//    else if(action->text()=="Grayscale")
-//    {
-//        imageProcessingFlags.grayscaleOn=action->isChecked();
-//        emit newImageProcessingFlags(imageProcessingFlags);
-//    }
-//    else if(action->text()=="Smooth")
-//    {
-//        imageProcessingFlags.smoothOn=action->isChecked();
-//        emit newImageProcessingFlags(imageProcessingFlags);
-//    }
-//    else if(action->text()=="Dilate")
-//    {
-//        imageProcessingFlags.dilateOn=action->isChecked();
-//        emit newImageProcessingFlags(imageProcessingFlags);
-//    }
-//    else if(action->text()=="Erode")
-//    {
-//        imageProcessingFlags.erodeOn=action->isChecked();
-//        emit newImageProcessingFlags(imageProcessingFlags);
-//    }
-//    else if(action->text()=="Flip")
-//    {
-//        imageProcessingFlags.flipOn=action->isChecked();
-//        emit newImageProcessingFlags(imageProcessingFlags);
-//    }
-//    else if(action->text()=="Canny")
-//    {
-//        imageProcessingFlags.cannyOn=action->isChecked();
-//        emit newImageProcessingFlags(imageProcessingFlags);
-//    }
-//    else if(action->text()=="Settings...")
-//        setImageProcessingSettings();
-//}
 
 void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
 {

@@ -28,6 +28,7 @@
 #include "bufferThread.h"
 #include "createSetDialog.h"
 #include "MatToQImage.h"
+#include "imageview.h"
 
 #if USECV3 == 0
     using namespace cv::ocl;
@@ -46,15 +47,17 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
     private:
-    bool stop;
-    Mat frame;
-    int frameRate;
-    VideoCapture *capture;
-    Mat RGBframe;
-    QImage img;
-    int currentPageIndex;
-    QSettings *settings;
-    QString path;
+        bool stop;
+        Mat frame;
+        int frameRate;
+        VideoCapture *capture;
+        Mat RGBframe;
+        QImage img;
+        int currentPageIndex;
+        QSettings *settings;
+        QString path;
+
+        ImageView *imgView;
 
         Ui::MainWindow *ui;
         QPushButton *connectToCameraButton;
@@ -82,6 +85,9 @@ class MainWindow : public QMainWindow
         void on_setComboBox_currentIndexChanged(const QString &arg1);
         void on_imageListWidget_itemClicked(QListWidgetItem *item);
         void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
+
+    signals:
+        void newFrame(const Mat &matFrame);
 };
 
 
