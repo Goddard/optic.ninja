@@ -20,8 +20,13 @@ void ImageView::updateFrame(const Mat &matFrame) //const QImage &frame
 {
     currentMatImage = matFrame;
     QImage frame = MatToQImage(matFrame);
+
+    imageBuffer.clear();
+
+    imageBuffer.append(frame);
+
     // Display frame
-    ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
+    ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
     connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
     setROI(QRect(0, 0, frame.width(), frame.height()));
 }
@@ -48,6 +53,7 @@ void ImageView::newMouseData(struct MouseData mouseData)
             wScalingFactor=(double) this->getCurrentROI().width() / (double) ui->frameLabel->pixmap()->width();
             hScalingFactor=(double) this->getCurrentROI().height() / (double) ui->frameLabel->pixmap()->height();
         }
+
         else
         {
             xScalingFactor=(double) mouseData.selectionBox.x() / (double) ui->frameLabel->width();
@@ -73,6 +79,7 @@ void ImageView::newMouseData(struct MouseData mouseData)
                 selectionBox.setX(x_temp+selectionBox.width());
                 selectionBox.setWidth(width_temp*-1);
             }
+
             if(selectionBox.height()<0)
             {
                 y_temp=selectionBox.y();
@@ -156,10 +163,16 @@ void ImageView::setImageProcessingSettings()
 void ImageView::handleContextMenuAction(QAction *action)
 {
     if(action->text()=="Reset ROI")
-        //emit setROI(QRect(0, 0, capturingThread->getInputSourceWidth(), capturingThread->getInputSourceHeight()));
-        setROI(QRect(0, 0, ui->frameLabel->width(), ui->frameLabel->height()));
+    {
+       //redisplay display original frame
+       ui->frameLabel->setPixmap(QPixmap::fromImage(imageBuffer.at(0)).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
+       connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
+       setROI(QRect(0, 0, imageBuffer.at(0).width(), imageBuffer.at(0).height()));
+    }
+
     else if(action->text()=="Scale to Fit Frame")
         ui->frameLabel->setScaledContents(action->isChecked());
+
     else if(action->text()=="Grayscale")
     {
         cvtColor(currentMatImage, currentMatImage, CV_BGR2GRAY);
@@ -197,6 +210,7 @@ void ImageView::handleContextMenuAction(QAction *action)
         setImageProcessingSettings();
 }
 
+//this sets the roi and needs to add something to the image buffer
 void ImageView::setROI(QRect roi)
 {
     currentROI.x = roi.x();
@@ -205,6 +219,9 @@ void ImageView::setROI(QRect roi)
     currentROI.height = roi.height();
 
     QImage frame = MatToQImage(currentMatImage);
+//    imageBuffer.append(frame);
+//    qDebug() << imageBuffer.count();
+
     // Display frame
     ui->frameLabel->setPixmap(QPixmap::fromImage(frame.copy(roi)).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
 }

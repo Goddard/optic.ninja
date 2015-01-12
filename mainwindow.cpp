@@ -11,12 +11,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     // Setup UI
     ui->setupUi(this);
+
     // Set start tab as blank
     QLabel *newTab = new QLabel(ui->tabWidget);
     newTab->setText("No camera connected.");
     newTab->setAlignment(Qt::AlignCenter);
     ui->tabWidget->addTab(newTab, "");
     ui->tabWidget->setTabsClosable(false);
+
     // Add "Connect to Camera" button to tab
     connectToCameraButton = new QPushButton();
     connectToCameraButton->setText("Connect to Camera");
@@ -28,8 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
     playVideoButton->setText("Play Video");
     ui->tabWidget->setCornerWidget(playVideoButton, Qt::TopRightCorner);
     connect(playVideoButton,SIGNAL(released()),this, SLOT(playVideoFile()));
-
     connect(ui->tabWidget,SIGNAL(tabCloseRequested(int)),this, SLOT(disconnectCamera(int)));
+
     // Set focus on button
     connectToCameraButton->setFocus();
     // Connect other signals/slots
@@ -41,10 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //set settings
     this->settings = new QSettings("C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\settings.ini", QSettings::IniFormat);
-    qDebug() << settings->value("setDirectory").toString();
-
+//    qDebug() << settings->value("setDirectory").toString();
     //this->qDir = new QDir();
-
     ui->setDirectoryTextEdit->setText(settings->value("setDirectory").toString());
 
     path = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets";
@@ -60,6 +60,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->ImageViewLayout->addWidget(imgView);
     //const Mat &matFrame
     connect(this, SIGNAL(newFrame(Mat)), imgView, SLOT(updateFrame(Mat)));
+
+    //create set controller
+    this->setController = new setControl();
+    qDebug() << path;
+    this->setController->setSetPath(path);
 }
 
 MainWindow::~MainWindow()
@@ -398,92 +403,66 @@ void MainWindow::on_createSetButton_clicked()
 
 void MainWindow::recieveSetText(const QString &newText)
 {
-    qDebug() << newText;
     ui->imageListWidget->clear();
     ui->setComboBox->clear();
     QDir dir(path);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-    //qDebug() << dir.filter();
     QStringList files = dir.entryList();
     ui->setComboBox->addItems(files);
 }
 
 void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
-    qDebug() << arg1;
-    ui->imageListWidget->clear();
-    //populate listview
-    QDirModel model;
-    model.setFilter(QDir::Files);
-    //ui->imageListWidget->setModel(&model);
-    //qDebug() << path.append("\\").append(arg1);
-    QString newPath = path + "\\" + arg1;
-    qDebug() << newPath;
-//    ui->imageListWidget->setRootIndex(model.index(newPath));
-//    ui->imageListWidget->addItems(model.index(newPath));
-
-    QDir dir(newPath);
-    dir.setFilter(QDir::Files);
-    //qDebug() << dir.filter();
-    QStringList files = dir.entryList();
-//    ui->imageListWidget->addItems(files);
-//    ui->imageListWidget->
-
-    QStringList::const_iterator constIterator;
-    for (constIterator = files.constBegin(); constIterator != files.constEnd(); ++constIterator)
-    {
-        //QListWidgetItem *item = new QListWidgetItem(ui->imageListWidget);
-        QFileInfo fi(newPath + "\\" + *constIterator);
-        QString name = fi.fileName();
-        //item->setText(name);
-        //QFileIconProvider iconSource;
-        //QIcon icon = iconSource.icon(fi);
-        //item->setIcon(icon);
-        //ui->imageListWidget->addItem(item);
-        ui->imageListWidget->addItem(new QListWidgetItem(QIcon(newPath + "\\" + *constIterator), name, ui->imageListWidget));
-
-        //QPixmap pix ("C:/images/wallpaper1.jpg") ;
-        //QPixmap* pix2 =  pix.scaled(80,80, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    }
+    currentSet = arg1;
+    regenerateSetItems();
 }
 
 void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
 {
-    //get set path
-    //get current set name
-    //get item->icon name
+    //get set path, get current set name, get item->icon name
     QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + item->text();
-    Mat image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);   // Read the file
-//    QImage qImageMod = MatToQImage(image);
+    this->setController->getImageStatus(iconPath);
+    qDebug() << iconPath;
+    Mat image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);
 
     emit newFrame(image);
-    //ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
-
-
-//    QPixmap qPixmapMod;
-//    qPixmapMod = QPixmap::fromImage(qImageMod);
-
-//    ui->frameLabel->width(qImageMod.width());
-//    ui->frameLabel->height(qImageMod.height());
-
-
-    //good stuff here
-//    ui->frameLabel->setFixedHeight(qImageMod.height());
-//    ui->frameLabel->setFixedWidth(qImageMod.width());
-//    ui->frameLabel->setPixmap(QPixmap::fromImage(qImageMod));
-
-
-
-    //.scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio)
-
-    //QGraphicsPixmapItem itemS(&qPixmapMod);
-//    QGraphicsScene *scene = new QGraphicsScene(this);
-//    ui->selectedImageGraphicsView->setScene(scene);
-//    scene->addPixmap(qPixmapMod);
-    //ui->selectedImageGraphicsView->scene(*scene);
 }
 
-void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
+//void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
+//{
+//    qDebug() << "Context Menu Test";
+//}
+
+void MainWindow::on_deleteImageButton_clicked()
 {
-    qDebug() << "Context Menu Test";
+    ui->imageListWidget->takeItem(ui->imageListWidget->currentRow());
+
+    setController->deleteImage(path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
+}
+
+void MainWindow::on_positiveImageRadioButton_clicked()
+{
+    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->selectedItems().at(0)->text();
+    qDebug() << ui->imageListWidget->selectedItems().at(0)->text();
+    this->setController->setImageStatus(iconPath, "1");
+    regenerateSetItems();
+}
+
+void MainWindow::on_negativeImageRadioButton_clicked()
+{
+    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->selectedItems().at(0)->text();
+    this->setController->setImageStatus(iconPath, "0");
+    regenerateSetItems();
+}
+
+void MainWindow::regenerateSetItems()
+{
+    QList<QFileInfo> listWidgetItems = setController->getSetFiles(currentSet);
+
+    ui->imageListWidget->clear();
+
+    for(int i= 0; i < listWidgetItems.count()-1; i++)
+    {
+        ui->imageListWidget->addItem(new QListWidgetItem(QIcon(listWidgetItems.at(i).absoluteFilePath()), listWidgetItems.at(i).fileName(), ui->imageListWidget));
+    }
 }

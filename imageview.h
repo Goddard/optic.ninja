@@ -29,6 +29,7 @@ private:
     Mat currentMatImage;
     QImage currentQImage;
     Rect currentROI;
+    QList<QImage> imageBuffer;
 
 public:
     explicit ImageView(QWidget *parent = 0);

@@ -70,7 +70,8 @@ SOURCES += main.cpp \
     detectionThread.cpp \
     setimage.cpp \
     createSetDialog.cpp \
-    imageview.cpp
+    imageview.cpp \
+    setcontrol.cpp
 
 HEADERS += \
     camera.h \
@@ -92,7 +93,8 @@ HEADERS += \
     detectionThread.h \
     setimage.h \
     createSetDialog.h \
-    imageview.h
+    imageview.h \
+    setcontrol.h
 
 OTHER_FILES += \
     README

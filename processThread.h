@@ -51,7 +51,7 @@ class processThread : public QThread
     private:
         void updateFPS(int);
         void setROI();
-        void resetROI();
+        //void resetROI();
         bufferThread *sharedImageBuffer;
         Mat currentFrame;
         Mat currentFrameGrayscale;

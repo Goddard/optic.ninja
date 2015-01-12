@@ -29,6 +29,7 @@
 #include "createSetDialog.h"
 #include "MatToQImage.h"
 #include "imageview.h"
+#include "setcontrol.h"
 
 #if USECV3 == 0
     using namespace cv::ocl;
@@ -55,9 +56,13 @@ class MainWindow : public QMainWindow
         QImage img;
         int currentPageIndex;
         QSettings *settings;
+        QSettings *setSettings;
         QString path;
+        QString currentSet;
 
         ImageView *imgView;
+
+        setControl *setController;
 
         Ui::MainWindow *ui;
         QPushButton *connectToCameraButton;
@@ -68,6 +73,7 @@ class MainWindow : public QMainWindow
         bool removeFromMapByTabIndex(QMap<int, int>& map, int tabIndex);
         void updateMapValues(QMap<int, int>& map, int tabIndex);
         void setTabCloseToolTips(QTabWidget *tabs, QString tooltip);
+        void regenerateSetItems();
 
     public slots:
         void connectToCamera();
@@ -84,9 +90,15 @@ class MainWindow : public QMainWindow
         void on_createSetButton_clicked();
         void on_setComboBox_currentIndexChanged(const QString &arg1);
         void on_imageListWidget_itemClicked(QListWidgetItem *item);
-        void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
+//        void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
 
-    signals:
+        void on_deleteImageButton_clicked();
+
+        void on_positiveImageRadioButton_clicked();
+
+        void on_negativeImageRadioButton_clicked();
+
+signals:
         void newFrame(const Mat &matFrame);
 };
 
