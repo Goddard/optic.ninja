@@ -13,12 +13,15 @@ FrameLabel::FrameLabel(QWidget *parent) : QLabel(parent)
     mouseData.leftButtonRelease=false;
     mouseData.rightButtonRelease=false;
     createContextMenu();
+
+    setMouseTracking(true);
 }
 
 void FrameLabel::mouseMoveEvent(QMouseEvent *ev)
 {
     // Save mouse cursor position
     setMouseCursorPos(ev->pos());
+
     // Update box width and height if box drawing is in progress
     if(drawBox)
     {

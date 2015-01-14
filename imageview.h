@@ -25,17 +25,18 @@ class ImageView : public QWidget
 private:
     Ui::ImageView *ui;
     ImageProcessingSettingsDialog *imageProcessingSettingsDialog;
-    ImageProcessingFlags imageProcessingFlags;
+    struct ImageProcessingFlags imageProcessingFlags;
+    struct ImageProcessingSettings imgProesscSettings;
     Mat currentMatImage;
     QImage currentQImage;
     Rect currentROI;
-    QList<QImage> imageBuffer;
 
 public:
     explicit ImageView(QWidget *parent = 0);
     ~ImageView();
     QRect getCurrentROI();
     void setROI(QRect roi);
+    QList<QImage> imageBuffer;
 
 signals:
     void newImageProcessingFlags(struct ImageProcessingFlags imageProcessingFlags);
@@ -45,6 +46,8 @@ public slots:
     void newMouseData(struct MouseData mouseData);
     void updateMouseCursorPosLabel();
     void clearImageBuffer();
+    void updateProcessingThreadStats(struct ThreadStatisticsData statData);
+    void updateImageProcessingSettings(struct ImageProcessingSettings);
 
 private slots:
     void updateFrame(const Mat &matFrame);

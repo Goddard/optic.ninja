@@ -9,6 +9,24 @@ ImageView::ImageView(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
     connect(ui->frameLabel->menu, SIGNAL(triggered(QAction*)), this, SLOT(handleContextMenuAction(QAction*)));
+
+    //ui->mouseCursorPositionLabel->setText("");
+    ui->mouseCursorPositionLabel->setText(" ");
+
+    connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
+
+    // Initialize ImageProcessingFlags structure
+    imageProcessingFlags.grayscaleOn=false;
+    imageProcessingFlags.smoothOn=false;
+    imageProcessingFlags.dilateOn=false;
+    imageProcessingFlags.erodeOn=false;
+    imageProcessingFlags.flipOn=false;
+    imageProcessingFlags.cannyOn=false;
+
+    // Create image processing settings dialog
+    imageProcessingSettingsDialog = new ImageProcessingSettingsDialog(this);
+
+    connect(imageProcessingSettingsDialog, SIGNAL(newImageProcessingSettings(struct ImageProcessingSettings)), this, SLOT(updateImageProcessingSettings(struct ImageProcessingSettings)));
 }
 
 ImageView::~ImageView()
@@ -19,16 +37,15 @@ ImageView::~ImageView()
 void ImageView::updateFrame(const Mat &matFrame) //const QImage &frame
 {
     currentMatImage = matFrame;
-    QImage frame = MatToQImage(matFrame);
+    currentQImage = MatToQImage(matFrame);
 
     imageBuffer.clear();
 
-    imageBuffer.append(frame);
+    imageBuffer.append(currentQImage);
 
     // Display frame
-    ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
-    connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
-    setROI(QRect(0, 0, frame.width(), frame.height()));
+    ui->frameLabel->setPixmap(QPixmap::fromImage(currentQImage).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
+    setROI(QRect(0, 0, currentQImage.width(), currentQImage.height()));
 }
 
 void ImageView::newMouseData(struct MouseData mouseData)
@@ -112,7 +129,7 @@ void ImageView::clearImageBuffer()
 //    if(sharedImageBuffer->getByDeviceNumber(0)->clear())
 //        qDebug() << "[" << deviceNumber << "] Image buffer successfully cleared.";
 //    else
-        qDebug() << "[" << 0 << "] WARNING: Could not clear image buffer.";
+//        qDebug() << "[" << 0 << "] WARNING: Could not clear image buffer.";
 }
 
 void ImageView::updateMouseCursorPosLabel()
@@ -175,39 +192,92 @@ void ImageView::handleContextMenuAction(QAction *action)
 
     else if(action->text()=="Grayscale")
     {
-        cvtColor(currentMatImage, currentMatImage, CV_BGR2GRAY);
-        QImage frame = MatToQImage(currentMatImage);
-        // Display frame
-        ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
+        imageProcessingFlags.grayscaleOn=action->isChecked();
+
+//        if(imageProcessingFlags.grayscaleOn && (currentMatImage.channels() == 3 || currentMatImage.channels() == 4))
+//            cvtColor(currentMatImage, currentMatImage, CV_BGR2GRAY);
+
+        if(imageProcessingFlags.grayscaleOn == true)
+        {
+            cvtColor(currentMatImage, currentMatImage, CV_BGR2GRAY);
+        }
+
+        else if(imageProcessingFlags.grayscaleOn == false)
+        {
+            action->setChecked(true);
+            imageProcessingFlags.grayscaleOn = false;
+        }
     }
 
     else if(action->text()=="Smooth")
     {
         imageProcessingFlags.smoothOn=action->isChecked();
-        emit newImageProcessingFlags(imageProcessingFlags);
+
+        if(imageProcessingFlags.smoothOn)
+        {
+            switch(imgProesscSettings.smoothType)
+            {
+                // BLUR
+                case 0:
+                    blur(currentMatImage, currentMatImage, Size(imgProesscSettings.smoothParam1, imgProesscSettings.smoothParam2));
+                    break;
+                // GAUSSIAN
+                case 1:
+                    GaussianBlur(currentMatImage, currentMatImage,
+                                 Size(imgProesscSettings.smoothParam1, imgProesscSettings.smoothParam2),
+                                 imgProesscSettings.smoothParam3, imgProesscSettings.smoothParam4);
+                    break;
+                // MEDIAN
+                case 2:
+                    medianBlur(currentMatImage, currentMatImage,
+                               imgProesscSettings.smoothParam1);
+                    break;
+            }
+        }
+        // Dilat
     }
     else if(action->text()=="Dilate")
     {
         imageProcessingFlags.dilateOn=action->isChecked();
         emit newImageProcessingFlags(imageProcessingFlags);
     }
+
     else if(action->text()=="Erode")
     {
         imageProcessingFlags.erodeOn=action->isChecked();
         emit newImageProcessingFlags(imageProcessingFlags);
     }
+
     else if(action->text()=="Flip")
     {
         imageProcessingFlags.flipOn=action->isChecked();
-        emit newImageProcessingFlags(imageProcessingFlags);
+//        if(imageProcessingFlags.flipOn)
+//        {
+            flip(currentMatImage, currentMatImage, imgProesscSettings.flipCode);
+
+//        }
     }
+
     else if(action->text()=="Canny")
     {
         imageProcessingFlags.cannyOn=action->isChecked();
-        emit newImageProcessingFlags(imageProcessingFlags);
+
+//        if(imageProcessingFlags.cannyOn)
+//        {
+            Canny(currentMatImage, currentMatImage,
+                  imgProesscSettings.cannyThreshold1, imgProesscSettings.cannyThreshold2,
+                  imgProesscSettings.cannyApertureSize, imgProesscSettings.cannyL2gradient);
+//        }
     }
+
     else if(action->text()=="Settings...")
         setImageProcessingSettings();
+
+    QImage frame = MatToQImage(currentMatImage);
+
+    imageBuffer.append(frame);
+
+    ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
 }
 
 //this sets the roi and needs to add something to the image buffer
@@ -229,4 +299,33 @@ void ImageView::setROI(QRect roi)
 QRect ImageView::getCurrentROI()
 {
     return QRect(currentROI.x, currentROI.y, currentROI.width, currentROI.height);
+}
+
+void ImageView::updateProcessingThreadStats(struct ThreadStatisticsData statData)
+{
+    // Show processing rate in processingRateLabel
+    //ui->processingRateLabel->setText(QString::number(statData.averageFPS)+" fps");
+    // Show ROI information in roiLabel
+    ui->roiLabel->setText(QString("(")+QString::number(this->getCurrentROI().x())+QString(",")+
+                          QString::number(this->getCurrentROI().y())+QString(") ")+
+                          QString::number(this->getCurrentROI().width())+
+                          QString("x")+QString::number(this->getCurrentROI().height()));
+    // Show number of frames processed in nFramesProcessedLabel
+    //ui->nFramesProcessedLabel->setText(QString("[") + QString::number(statData.nFramesProcessed) + QString("]"));
+}
+
+void ImageView::updateImageProcessingSettings(struct ImageProcessingSettings imgProcSettings)
+{
+    this->imgProesscSettings.smoothType=imgProcSettings.smoothType;
+    this->imgProesscSettings.smoothParam1=imgProcSettings.smoothParam1;
+    this->imgProesscSettings.smoothParam2=imgProcSettings.smoothParam2;
+    this->imgProesscSettings.smoothParam3=imgProcSettings.smoothParam3;
+    this->imgProesscSettings.smoothParam4=imgProcSettings.smoothParam4;
+    this->imgProesscSettings.dilateNumberOfIterations=imgProcSettings.dilateNumberOfIterations;
+    this->imgProesscSettings.erodeNumberOfIterations=imgProcSettings.erodeNumberOfIterations;
+    this->imgProesscSettings.flipCode=imgProcSettings.flipCode;
+    this->imgProesscSettings.cannyThreshold1=imgProcSettings.cannyThreshold1;
+    this->imgProesscSettings.cannyThreshold2=imgProcSettings.cannyThreshold2;
+    this->imgProesscSettings.cannyApertureSize=imgProcSettings.cannyApertureSize;
+    this->imgProesscSettings.cannyL2gradient=imgProcSettings.cannyL2gradient;
 }

@@ -60,10 +60,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->ImageViewLayout->addWidget(imgView);
     //const Mat &matFrame
     connect(this, SIGNAL(newFrame(Mat)), imgView, SLOT(updateFrame(Mat)));
+    connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
 
     //create set controller
     this->setController = new setControl();
-    qDebug() << path;
+//    qDebug() << path;
     this->setController->setSetPath(path);
 }
 
@@ -383,11 +384,11 @@ void MainWindow::on_saveSetDirectoryButton_clicked()
 {
 //    QSettings settings;
     //QSettings settings ("C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\settings.ini", QSettings::IniFormat);
-    qDebug() << ui->setDirectoryTextEdit->text();
+//    qDebug() << ui->setDirectoryTextEdit->text();
     QString test = ui->setDirectoryTextEdit->text();
     settings->setValue("setDirectory", test);
     settings->sync();
-    qDebug() << settings->value("setDirectory").toString();
+//    qDebug() << settings->value("setDirectory").toString();
 }
 
 void MainWindow::on_createSetButton_clicked()
@@ -422,7 +423,7 @@ void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
     //get set path, get current set name, get item->icon name
     QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + item->text();
     this->setController->getImageStatus(iconPath);
-    qDebug() << iconPath;
+//    qDebug() << iconPath;
     Mat image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);
 
     emit newFrame(image);
@@ -442,17 +443,19 @@ void MainWindow::on_deleteImageButton_clicked()
 
 void MainWindow::on_positiveImageRadioButton_clicked()
 {
-    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->selectedItems().at(0)->text();
-    qDebug() << ui->imageListWidget->selectedItems().at(0)->text();
-    this->setController->setImageStatus(iconPath, "1");
+    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text();
+//    qDebug() << ui->imageListWidget->selectedItems().at(0)->text();
+    QString newPath = this->setController->setImageStatus(iconPath, "1");
     regenerateSetItems();
+    regenerateOriginalImage(newPath);
 }
 
 void MainWindow::on_negativeImageRadioButton_clicked()
 {
-    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->selectedItems().at(0)->text();
-    this->setController->setImageStatus(iconPath, "0");
+    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text();
+    QString newPath = this->setController->setImageStatus(iconPath, "0");
     regenerateSetItems();
+    regenerateOriginalImage(newPath);
 }
 
 void MainWindow::regenerateSetItems()
@@ -465,4 +468,23 @@ void MainWindow::regenerateSetItems()
     {
         ui->imageListWidget->addItem(new QListWidgetItem(QIcon(listWidgetItems.at(i).absoluteFilePath()), listWidgetItems.at(i).fileName(), ui->imageListWidget));
     }
+}
+
+void MainWindow::regenerateOriginalImage(QString newPath)
+{
+    //get set path, get current set name, get item->icon name
+//    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text();
+//    qDebug() << newPath;
+    this->setController->getImageStatus(newPath);
+    Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
+
+    emit newFrame(image);
+}
+
+void MainWindow::on_saveImageButton_clicked()
+{
+//    bool returnValue = this->setController->saveImage(img, "test" + ui->imageListWidget->currentItem()->text());
+
+    bool returnValue = imgView->imageBuffer.last().save(path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
+    qDebug() << returnValue;
 }

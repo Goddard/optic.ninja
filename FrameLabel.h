@@ -7,6 +7,8 @@
 #include <QtCore/QRect>
 #include <QLabel>
 #include <QMenu>
+#include <QDebug>
+
 // Local
 #include "structures.h"
 

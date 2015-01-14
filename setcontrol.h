@@ -16,9 +16,9 @@ public:
     void setSetPath(QString path);
     QList<QFileInfo> getSetFiles(QString setName);
     bool checkExstension(QString exstension);
-    bool setImageStatus(QString filePath, QString posNeg);
+    QString setImageStatus(QString filePath, QString posNeg);
     bool getImageStatus(QString fileName);
-    bool saveImage();
+    bool saveImage(QImage modifiedImage, QString fileName);
     bool deleteImage(QString filePath);
     QString getImageSize(QString filePath);
     QString getImageBufferSize();

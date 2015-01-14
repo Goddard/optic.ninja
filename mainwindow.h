@@ -46,6 +46,7 @@ class MainWindow : public QMainWindow
     public:
         explicit MainWindow(QWidget *parent = 0);
         ~MainWindow();
+        void regenerateOriginalImage(QString newPath);
 
     private:
         bool stop;
@@ -75,6 +76,8 @@ class MainWindow : public QMainWindow
         void setTabCloseToolTips(QTabWidget *tabs, QString tooltip);
         void regenerateSetItems();
 
+        struct ThreadStatisticsData statsData;
+
     public slots:
         void connectToCamera();
         void playVideoFile();
@@ -98,8 +101,11 @@ class MainWindow : public QMainWindow
 
         void on_negativeImageRadioButton_clicked();
 
+        void on_saveImageButton_clicked();
+
 signals:
         void newFrame(const Mat &matFrame);
+        void updateStatisticsInGUI(struct ThreadStatisticsData);
 };
 
 
