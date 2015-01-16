@@ -17,14 +17,15 @@ public:
     QList<QFileInfo> getSetFiles(QString setName);
     bool checkExstension(QString exstension);
     QString setImageStatus(QString filePath, QString posNeg);
-    bool getImageStatus(QString fileName);
+    int getImageStatus(QString fileName);
     bool saveImage(QImage modifiedImage, QString fileName);
     bool deleteImage(QString filePath);
     QString getImageSize(QString filePath);
     QString getImageBufferSize();
+    void getSetFileNames(QString setName);
 
 private:
-    QString *setPath;
+    QString setPath;
     QString setName;
     QSettings *setSettings;
     QStringList exstensionList;

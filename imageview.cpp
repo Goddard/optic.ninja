@@ -10,9 +10,7 @@ ImageView::ImageView(QWidget *parent) :
     connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
     connect(ui->frameLabel->menu, SIGNAL(triggered(QAction*)), this, SLOT(handleContextMenuAction(QAction*)));
 
-    //ui->mouseCursorPositionLabel->setText("");
     ui->mouseCursorPositionLabel->setText(" ");
-
     connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
 
     // Initialize ImageProcessingFlags structure
@@ -25,7 +23,6 @@ ImageView::ImageView(QWidget *parent) :
 
     // Create image processing settings dialog
     imageProcessingSettingsDialog = new ImageProcessingSettingsDialog(this);
-
     connect(imageProcessingSettingsDialog, SIGNAL(newImageProcessingSettings(struct ImageProcessingSettings)), this, SLOT(updateImageProcessingSettings(struct ImageProcessingSettings)));
 }
 
@@ -289,11 +286,11 @@ void ImageView::setROI(QRect roi)
     currentROI.height = roi.height();
 
     QImage frame = MatToQImage(currentMatImage);
-//    imageBuffer.append(frame);
 //    qDebug() << imageBuffer.count();
 
     // Display frame
     ui->frameLabel->setPixmap(QPixmap::fromImage(frame.copy(roi)).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
+    imageBuffer.append(frame.copy(roi));
 }
 
 QRect ImageView::getCurrentROI()

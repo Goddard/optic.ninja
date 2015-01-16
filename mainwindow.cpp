@@ -34,38 +34,37 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set focus on button
     connectToCameraButton->setFocus();
+
     // Connect other signals/slots
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionFullScreen, SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
+
     // Create SharedImageBuffer object
     sharedImageBuffer = new bufferThread();
 
     //set settings
     this->settings = new QSettings("C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\settings.ini", QSettings::IniFormat);
-//    qDebug() << settings->value("setDirectory").toString();
-    //this->qDir = new QDir();
     ui->setDirectoryTextEdit->setText(settings->value("setDirectory").toString());
 
     path = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets";
     QDir dir(path);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-    //qDebug() << dir.filter();
     QStringList files = dir.entryList();
     ui->setComboBox->addItems(files);
 
-//    qDebug() << "Width" << ui->ImageViewLayout->width();
-//    qDebug() << "Height" << ui->ImageViewLayout->height();
-    imgView = new ImageView(); //ui->ImageViewLayout
+    //create set controller
+    this->setController = new setControl();
+    this->setController->setSetPath(path);
+
+    imgView = new ImageView();
     ui->ImageViewLayout->addWidget(imgView);
-    //const Mat &matFrame
     connect(this, SIGNAL(newFrame(Mat)), imgView, SLOT(updateFrame(Mat)));
     connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
 
-    //create set controller
-    this->setController = new setControl();
-//    qDebug() << path;
-    this->setController->setSetPath(path);
+    regenerateSetItems();
+
+    ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 }
 
 MainWindow::~MainWindow()
@@ -416,6 +415,8 @@ void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
     currentSet = arg1;
     regenerateSetItems();
+
+    this->setController->getSetFileNames(currentSet);
 }
 
 void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
@@ -464,7 +465,7 @@ void MainWindow::regenerateSetItems()
 
     ui->imageListWidget->clear();
 
-    for(int i= 0; i < listWidgetItems.count()-1; i++)
+    for(int i= 0; i < listWidgetItems.count(); i++)
     {
         ui->imageListWidget->addItem(new QListWidgetItem(QIcon(listWidgetItems.at(i).absoluteFilePath()), listWidgetItems.at(i).fileName(), ui->imageListWidget));
     }
@@ -472,9 +473,6 @@ void MainWindow::regenerateSetItems()
 
 void MainWindow::regenerateOriginalImage(QString newPath)
 {
-    //get set path, get current set name, get item->icon name
-//    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text();
-//    qDebug() << newPath;
     this->setController->getImageStatus(newPath);
     Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
 
@@ -483,8 +481,6 @@ void MainWindow::regenerateOriginalImage(QString newPath)
 
 void MainWindow::on_saveImageButton_clicked()
 {
-//    bool returnValue = this->setController->saveImage(img, "test" + ui->imageListWidget->currentItem()->text());
-
     bool returnValue = imgView->imageBuffer.last().save(path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
-    qDebug() << returnValue;
+    ui->imageListWidget->currentItem()->setIcon(QIcon(path + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text()));
 }

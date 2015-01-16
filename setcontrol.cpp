@@ -13,61 +13,46 @@ setControl::setControl(QObject *parent) :
 void setControl::setSetPath(QString path)
 {
     //set the path for this image set
-    setPath = &path;
+    setPath = path;
 }
 
 //gets the set files list in a qlist
 QList<QFileInfo> setControl::getSetFiles(QString setName)
 {
     //populate listview
-    QDirModel model;
-    model.setFilter(QDir::Files);
+//    QDirModel model;
+//    model.setFilter(QDir::Files);
 
     QList<QFileInfo> listFiles;
-
-    //define complete path of set
-    //QString newPath = *setPath + "\\" + setName;
-    //qDebug() << newPath;
-    QString newPath = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets\\" + setName;
-
-    // On change need to read settings from set folder.
-    // set settings
-    this->setSettings = new QSettings(newPath + "\\setSettings.ini", QSettings::IniFormat);
-//    qDebug() << this->setSettings->value("test").toString();
-    this->setSettings->setValue("test", "test");
-    this->setSettings->sync();
-//    qDebug() << this->setSettings->value("test").toString();
+    QString newPath = this->setPath + "/" + setName;
 
     QDir dir(newPath);
     dir.setFilter(QDir::Files);
     QStringList files = dir.entryList();
 
-    QStringList::const_iterator constIterator;
-    for (constIterator = files.constBegin(); constIterator != files.constEnd(); ++constIterator)
+    //QStringList::const_iterator constIterator;
+    //for (constIterator = files.constBegin(); constIterator != files.constEnd(); ++constIterator)
+    foreach (const QString &str, files)
     {
-        QFileInfo fi(newPath + "\\" + *constIterator);
+        QFileInfo fi(newPath + "\\" + str);
 
-        //make sure file is valid formatZ
+        //make sure file is valid format
         if(checkExstension(fi.completeSuffix()))
         {
             listFiles.append(fi);
-//            qDebug() << fi.fileName();
         }
     }
 
     return listFiles;
 }
 
-
 //checks the file extensions to make sure it is the images desired.
 bool setControl::checkExstension(QString extension)
 {
-//    qDebug() << extension;
+    //qDebug() << extension;
     //define safe files to show in interface
     QList<QString> extensionList;
     extensionList << "JPG" << "JPEG" << "jpg" << "jpeg" << "png" << "bmp";
-
-//    qDebug() << extensionList.count();
 
     if(extensionList.contains(extension))
         return true;
@@ -142,7 +127,7 @@ QString setControl::setImageStatus(QString filePath, QString posNeg)
 }
 
 //get the image status by reading the first character 0 being false and 1 being true
-bool setControl::getImageStatus(QString fileName)
+int setControl::getImageStatus(QString fileName)
 {
     QFileInfo fileInfo(fileName);
 //    qDebug() << fileInfo.baseName().at(0);
@@ -151,25 +136,26 @@ bool setControl::getImageStatus(QString fileName)
     if(fileStatus == 0)
     {
 //        qDebug() << "Value already set on image and it is false";
-        return false;
+        return 0;
     }
 
     else if (fileStatus == 1)
     {
 //        qDebug() << "Value already set on image and it true";
-        return true;
+        return 1;
     }
 
     else
     {
 //        qDebug() << "Value not set";
-        return false;
+        return 2;
     }
 }
 
 //saves any changes you may of done
 bool setControl::saveImage(QImage modifiedImage, QString fileName)
 {
+    qDebug() << "Image Saving";
     return modifiedImage.save(fileName);
 }
 
@@ -198,4 +184,53 @@ QString setControl::getImageSize(QString  filePath)
 QString setControl::getImageBufferSize()
 {
 
+}
+
+void setControl::getSetFileNames(QString setName)
+{
+    QDirModel model;
+    model.setFilter(QDir::Files);
+//    QList<QFileInfo> listFiles;
+    //QString newPath = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets\\" + setName;
+    QString newPath = this->setPath + "/" + setName;
+
+    QDir dir(newPath);
+    dir.setFilter(QDir::Files);
+    QStringList files = dir.entryList();
+
+    // Create a new file
+    QFile positiveFile(newPath + "/positive.dat");
+    positiveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream positiveOut(&positiveFile);
+
+    // Create a new file
+    QFile negativeFile(newPath + "/negative.dat");
+    negativeFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream negativeOut(&negativeFile);
+
+    QStringList::const_iterator constIterator;
+    for (constIterator = files.constBegin(); constIterator != files.constEnd(); ++constIterator)
+    {
+        QFileInfo fi(newPath + "\\" + *constIterator);
+
+        if(checkExstension(fi.completeSuffix()))
+        {
+            if(getImageStatus(fi.baseName()) == 1)
+            {
+                //listFiles.append(fi);
+                positiveOut << fi.fileName() << endl;
+            }
+
+            else if(getImageStatus(fi.baseName()) == 0)
+            {
+                negativeOut << fi.fileName() << endl;
+            }
+        }
+    }
+
+    // optional, as QFile destructor will already do it:
+    positiveFile.close();
+    negativeFile.close();
+
+    //return listFiles;
 }
