@@ -71,7 +71,8 @@ SOURCES += main.cpp \
     setimage.cpp \
     createSetDialog.cpp \
     imageview.cpp \
-    setcontrol.cpp
+    setcontrol.cpp \
+    appsettings.cpp
 
 HEADERS += \
     camera.h \
@@ -94,7 +95,8 @@ HEADERS += \
     setimage.h \
     createSetDialog.h \
     imageview.h \
-    setcontrol.h
+    setcontrol.h \
+    appsettings.h
 
 OTHER_FILES += \
     README

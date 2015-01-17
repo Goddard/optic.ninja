@@ -21,6 +21,7 @@
 #endif
 
 // Local
+#include "appsettings.h"
 #include "CameraConnectDialog.h"
 #include "playvideodialog.h"
 #include "CameraView.h"
@@ -58,12 +59,12 @@ class MainWindow : public QMainWindow
         int currentPageIndex;
         QSettings *settings;
         QSettings *setSettings;
-        QString path;
         QString currentSet;
 
         ImageView *imgView;
 
         setControl *setController;
+        appSettings *appSettingsController;
 
         Ui::MainWindow *ui;
         QPushButton *connectToCameraButton;

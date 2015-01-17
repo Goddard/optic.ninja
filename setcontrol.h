@@ -23,6 +23,7 @@ public:
     QString getImageSize(QString filePath);
     QString getImageBufferSize();
     void getSetFileNames(QString setName);
+    QStringList getSets();
 
 private:
     QString setPath;

@@ -9,11 +9,18 @@ setControl::setControl(QObject *parent) :
 
 }
 
-//Sets the path where the set images are stored for the set controller
+//Sets the path where the set directories are stored
 void setControl::setSetPath(QString path)
 {
-    //set the path for this image set
-    setPath = path;
+    this->setPath = path;
+}
+
+QStringList setControl::getSets()
+{
+    QDir dir(this->setPath);
+    dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+
+    return dir.entryList();
 }
 
 //gets the set files list in a qlist
