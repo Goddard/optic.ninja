@@ -8,14 +8,15 @@
 #include <QDirModel>
 #include <QDebug>
 
+#include <setimage.h>
+
 class setControl : public QObject
 {
     Q_OBJECT
 public:
-    explicit setControl(QObject *parent = 0);
+    explicit setControl(QString setPathParm, QObject *parent = 0);
     void setSetPath(QString path);
-    QList<QFileInfo> getSetFiles(QString setName);
-    bool checkExstension(QString exstension);
+    QList<setImage> getSetFiles(QString setName, QString viewType = NULL);
     QString setImageStatus(QString filePath, QString posNeg);
     int getImageStatus(QString fileName);
     bool saveImage(QImage modifiedImage, QString fileName);
@@ -25,12 +26,14 @@ public:
     void getSetFileNames(QString setName);
     QStringList getSets();
 
+    QList<setImage> setFiles;
+
 private:
     QString setPath;
     QString setName;
     QSettings *setSettings;
     QStringList exstensionList;
-    QList<QFileInfo> setFiles;
+
 
 signals:
 

@@ -31,6 +31,7 @@
 #include "MatToQImage.h"
 #include "imageview.h"
 #include "setcontrol.h"
+#include "setimage.h"
 
 #if USECV3 == 0
     using namespace cv::ocl;
@@ -60,6 +61,7 @@ class MainWindow : public QMainWindow
         QSettings *settings;
         QSettings *setSettings;
         QString currentSet;
+        QString currentView;
 
         ImageView *imgView;
 
@@ -78,6 +80,8 @@ class MainWindow : public QMainWindow
         void regenerateSetItems();
 
         struct ThreadStatisticsData statsData;
+
+        int SET_IMAGE;
 
     public slots:
         void connectToCamera();
@@ -103,6 +107,8 @@ class MainWindow : public QMainWindow
         void on_negativeImageRadioButton_clicked();
 
         void on_saveImageButton_clicked();
+
+        void on_viewComboBox_activated(const QString &arg1);
 
 signals:
         void newFrame(const Mat &matFrame);

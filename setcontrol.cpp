@@ -3,10 +3,10 @@
 //QString setPath;
 //QString setName;
 //QSettings setSettings;
-setControl::setControl(QObject *parent) :
+setControl::setControl(QString setPathParm, QObject *parent) :
     QObject(parent)
 {
-
+    this->setPath = setPathParm;
 }
 
 //Sets the path where the set directories are stored
@@ -19,65 +19,73 @@ QStringList setControl::getSets()
 {
     QDir dir(this->setPath);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-
     return dir.entryList();
 }
 
 //gets the set files list in a qlist
-QList<QFileInfo> setControl::getSetFiles(QString setName)
+QList<setImage> setControl::getSetFiles(QString setName, QString viewType)
 {
-    //populate listview
-//    QDirModel model;
-//    model.setFilter(QDir::Files);
+    QList<QFileInfo> tempFileInfoList;
+    this->setFiles.clear();
 
-    QList<QFileInfo> listFiles;
-    QString newPath = this->setPath + "/" + setName;
+    QStringList extensionList;
+    extensionList << "*.JPG" << "*.JPEG" << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.pgm" << "*.PGM";
 
-    QDir dir(newPath);
-    dir.setFilter(QDir::Files);
-    QStringList files = dir.entryList();
+    QString setBasePath = this->setPath + QDir::separator() + setName;
+    QString positiveView = "positive";
+    QString negativeView = "negative";
+    QString completeView = "complete";
 
-    //QStringList::const_iterator constIterator;
-    //for (constIterator = files.constBegin(); constIterator != files.constEnd(); ++constIterator)
-    foreach (const QString &str, files)
+    if(viewType == "NULL" || viewType == "All" || viewType == "Undefined")
     {
-        QFileInfo fi(newPath + "\\" + str);
-
-        //make sure file is valid format
-        if(checkExstension(fi.completeSuffix()))
-        {
-            listFiles.append(fi);
-        }
+        QDir dir(setBasePath);
+        dir.setFilter(QDir::Files);
+        dir.setNameFilters(extensionList);
+        tempFileInfoList = dir.entryInfoList();
     }
 
-    return listFiles;
-}
+    if(viewType == "Positive" || viewType == "All")
+    {
+        QDir dir(setBasePath + QDir::separator() + positiveView);
+        dir.setFilter(QDir::Files);
+        tempFileInfoList += dir.entryInfoList();
+    }
 
-//checks the file extensions to make sure it is the images desired.
-bool setControl::checkExstension(QString extension)
-{
-    //qDebug() << extension;
-    //define safe files to show in interface
-    QList<QString> extensionList;
-    extensionList << "JPG" << "JPEG" << "jpg" << "jpeg" << "png" << "bmp";
+    if(viewType == "Negative" || viewType == "All")
+    {
+        QDir dir(setBasePath + QDir::separator() + negativeView);
+        dir.setFilter(QDir::Files);
+        tempFileInfoList += dir.entryInfoList();
+    }
 
-    if(extensionList.contains(extension))
-        return true;
+    if(viewType == "Complete")
+    {
+        QDir dir(setBasePath + QDir::separator() + completeView);
+        dir.setFilter(QDir::Files);
+        tempFileInfoList += dir.entryInfoList();
+    }
 
-    return false;
+    //foreach(const QFileInfo &fileInfo, tempFileInfoList)
+    for (int i = 0; i < tempFileInfoList.count(); ++i)
+    {
+//        QFileInfo tempInfo = ;
+        setImage *newSetImage = new setImage(tempFileInfoList.at(i));
+//        newSetImage->
+//        this->setFiles->append(new setImage(tempFileInfoList.at(i)));
+//        this->setFiles->append(new setImage(fileInfo));
+        this->setFiles.append(*newSetImage);
+    }
+
+    return this->setFiles;
 }
 
 //sets the image set as either being positive or negative sample
 QString setControl::setImageStatus(QString filePath, QString posNeg)
 {
-//    qDebug() << "Set Image " + filePath;
-//    qDebug() << "Bool Value" + posNeg;
     //get current image name
     QFileInfo fi(filePath);
     QFile fc(filePath);
     QString newFileName = "";
-
-//    qDebug() << "File Path " + fi.absolutePath();
 
     //check if first two characters are in our format if it is we will just change first character
     if((fi.baseName().at(0).toLatin1() == '0' || fi.baseName().at(0).toLatin1() == '1') && fi.baseName().at(1).toLatin1() == '_')
@@ -139,14 +147,15 @@ int setControl::getImageStatus(QString fileName)
     QFileInfo fileInfo(fileName);
 //    qDebug() << fileInfo.baseName().at(0);
     int fileStatus = fileInfo.baseName().at(0).digitValue();
+    char fileStatus2 = fileInfo.baseName().at(0).digitValue();
 
-    if(fileStatus == 0)
+    if(fileStatus == 0 || fileStatus2 == 'n')
     {
 //        qDebug() << "Value already set on image and it is false";
         return 0;
     }
 
-    else if (fileStatus == 1)
+    else if (fileStatus == 1 || fileStatus2 == 'p')
     {
 //        qDebug() << "Value already set on image and it true";
         return 1;
@@ -195,10 +204,6 @@ QString setControl::getImageBufferSize()
 
 void setControl::getSetFileNames(QString setName)
 {
-    QDirModel model;
-    model.setFilter(QDir::Files);
-//    QList<QFileInfo> listFiles;
-    //QString newPath = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets\\" + setName;
     QString newPath = this->setPath + "/" + setName;
 
     QDir dir(newPath);
@@ -220,8 +225,8 @@ void setControl::getSetFileNames(QString setName)
     {
         QFileInfo fi(newPath + "\\" + *constIterator);
 
-        if(checkExstension(fi.completeSuffix()))
-        {
+//        if(checkExstension(fi.completeSuffix()))
+//        {
             if(getImageStatus(fi.baseName()) == 1)
             {
                 //listFiles.append(fi);
@@ -232,12 +237,12 @@ void setControl::getSetFileNames(QString setName)
             {
                 negativeOut << fi.fileName() << endl;
             }
-        }
+//        }
     }
 
     // optional, as QFile destructor will already do it:
-    positiveFile.close();
-    negativeFile.close();
+//    positiveFile.close();
+//    negativeFile.close();
 
     //return listFiles;
 }

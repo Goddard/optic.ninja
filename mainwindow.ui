@@ -108,10 +108,20 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <layout class="QGridLayout" name="gridLayout_6" columnminimumwidth="50,0">
+           <layout class="QGridLayout" name="gridLayout_6" columnminimumwidth="50,0,0,0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SetMinimumSize</enum>
             </property>
+            <item row="0" column="2">
+             <widget class="QComboBox" name="setComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QPushButton" name="createSetButton">
               <property name="minimumSize">
@@ -131,13 +141,46 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="4">
+             <widget class="QComboBox" name="viewComboBox">
+              <item>
+               <property name="text">
+                <string>All</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Undefined</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Positive</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Negative</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Complete</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>View Type :</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="setComboBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Current Set :</string>
               </property>
              </widget>
             </item>
@@ -233,8 +276,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>98</width>
-               <height>28</height>
+               <width>46</width>
+               <height>16</height>
               </rect>
              </property>
              <widget class="QLabel" name="label">
@@ -446,6 +489,7 @@ padding: 10px; color: white;
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionHot_Keys"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -496,6 +540,11 @@ padding: 10px; color: white;
    </property>
    <property name="text">
     <string>Full Screen</string>
+   </property>
+  </action>
+  <action name="actionHot_Keys">
+   <property name="text">
+    <string>Hot Keys</string>
    </property>
   </action>
  </widget>
