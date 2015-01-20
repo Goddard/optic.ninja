@@ -2,6 +2,7 @@
 #define SETCONTROL_H
 
 #include <QObject>
+#include <QWidget>
 #include <QSettings>
 #include <QListWidget>
 #include <QFileInfo>
@@ -11,11 +12,11 @@
 #include <setimage.h>
 #include <imageview.h>
 
-class setControl : public QObject
+class setControl : public QWidget
 {
     Q_OBJECT
 public:
-    explicit setControl(QString setPathParm, QObject *parent = 0);
+    explicit setControl(QString setPathParm, QWidget *parent = 0);
     ~setControl();
     QList<setImage *> *getSetFiles(QString setName, QString viewType = NULL);
     QString setImageStatus(QString filePath, QString posNeg);
@@ -38,7 +39,7 @@ private:
     QString setPath;
     QString setName;
     QSettings *setSettings;
-    QStringList *extensionList;
+    QStringList extensionList;
 
 
 signals:

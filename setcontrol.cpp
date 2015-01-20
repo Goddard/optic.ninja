@@ -3,8 +3,8 @@
 //QString setPath;
 //QString setName;
 //QSettings setSettings;
-setControl::setControl(QString setPathParm, QObject *parent) :
-    QObject(parent)
+setControl::setControl(QString setPathParm, QWidget *parent) :
+    QWidget(parent)
 {
     this->setPath = setPathParm;
 
