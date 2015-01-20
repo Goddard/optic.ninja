@@ -63,8 +63,6 @@ class MainWindow : public QMainWindow
         QString currentSet;
         QString currentView;
 
-        ImageView *imgView;
-
         setControl *setController;
         appSettings *appSettingsController;
 
@@ -79,9 +77,9 @@ class MainWindow : public QMainWindow
         void setTabCloseToolTips(QTabWidget *tabs, QString tooltip);
         void regenerateSetItems();
 
-        struct ThreadStatisticsData statsData;
+//        struct ThreadStatisticsData statsData;
 
-        int SET_IMAGE;
+//        int SET_IMAGE;
 
     public slots:
         void connectToCamera();
@@ -109,6 +107,8 @@ class MainWindow : public QMainWindow
         void on_saveImageButton_clicked();
 
         void on_viewComboBox_activated(const QString &arg1);
+
+        void on_imageListWidget_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
 signals:
         void newFrame(const Mat &matFrame);

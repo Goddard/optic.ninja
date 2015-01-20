@@ -13,6 +13,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
 #include "MatToQImage.h"
 
 #if USECV3 == 0
@@ -32,14 +33,19 @@ public:
     setImage& operator=( const setImage& ){}
     ~setImage();
 
-    QIcon getImageQIcon();
-    Mat getImageMat();
-    QImage getImageQImage();
+    QIcon *getImageQIcon();
+    Mat *getImageMat();
+    QImage *getImageQImage();
+    QPixmap *getImageQPixmap();
     //QListWidgetItem getImageQListWidgetItem(int listIndex, QListWidget widgetParent);
     QFileInfo getImageFileInfo() const;
 
 private:
     QFileInfo fileInfo;
+    QIcon fileIcon;
+    Mat fileMat;
+    QImage fileImage;
+    QPixmap filePixmap;
 
 signals:
 
@@ -47,6 +53,6 @@ public slots:
 
 };
 
-Q_DECLARE_METATYPE(setImage)
+//Q_DECLARE_METATYPE(setImage)
 
 #endif // SETIMAGE_H

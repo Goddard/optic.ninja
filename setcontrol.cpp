@@ -7,12 +7,16 @@ setControl::setControl(QString setPathParm, QObject *parent) :
     QObject(parent)
 {
     this->setPath = setPathParm;
+
+    //create image viewer
+    this->imgView = new ImageView();
+    connect(this, SIGNAL(newFrame(QPixmap*)), imgView, SLOT(updateFrame(QPixmap*)));
+//    connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
 }
 
-//Sets the path where the set directories are stored
-void setControl::setSetPath(QString path)
+setControl::~setControl()
 {
-    this->setPath = path;
+    delete imgView;
 }
 
 QStringList setControl::getSets()
@@ -22,14 +26,20 @@ QStringList setControl::getSets()
     return dir.entryList();
 }
 
+ImageView *setControl::getImageView()
+{
+    return this->imgView;
+}
+
 //gets the set files list in a qlist
-QList<setImage> setControl::getSetFiles(QString setName, QString viewType)
+QList<setImage *> *setControl::getSetFiles(QString setName, QString viewType)
 {
     QList<QFileInfo> tempFileInfoList;
+    qDeleteAll(this->setFiles.begin(), this->setFiles.end());
     this->setFiles.clear();
 
-    QStringList extensionList;
-    extensionList << "*.JPG" << "*.JPEG" << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.pgm" << "*.PGM";
+//    QStringList extensionList;
+    this->extensionList << "*.JPG" << "*.JPEG" << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.pgm" << "*.PGM";
 
     QString setBasePath = this->setPath + QDir::separator() + setName;
     QString positiveView = "positive";
@@ -65,18 +75,21 @@ QList<setImage> setControl::getSetFiles(QString setName, QString viewType)
         tempFileInfoList += dir.entryInfoList();
     }
 
-    //foreach(const QFileInfo &fileInfo, tempFileInfoList)
     for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
-//        QFileInfo tempInfo = ;
-        setImage *newSetImage = new setImage(tempFileInfoList.at(i));
-//        newSetImage->
-//        this->setFiles->append(new setImage(tempFileInfoList.at(i)));
-//        this->setFiles->append(new setImage(fileInfo));
-        this->setFiles.append(*newSetImage);
+//        setImage *newSetImage = new setImage(tempFileInfoList.value(i));
+        this->setFiles.append(new setImage(tempFileInfoList.value(i)));
+
+        if(i == 0)
+        {
+//            Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
+            //QPixmap *newPixmap = this->setFiles.at(0).getImageQPixmap();
+            emit newFrame(this->setFiles.value(i)->getImageQPixmap());
+        }
     }
 
-    return this->setFiles;
+    tempFileInfoList.clear();
+    return &this->setFiles;
 }
 
 //sets the image set as either being positive or negative sample

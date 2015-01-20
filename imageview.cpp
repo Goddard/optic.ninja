@@ -31,18 +31,18 @@ ImageView::~ImageView()
     delete ui;
 }
 
-void ImageView::updateFrame(const Mat &matFrame) //const QImage &frame
+void ImageView::updateFrame(QPixmap *imagePixmap) //const Mat &matFrame
 {
-    currentMatImage = matFrame;
-    currentQImage = MatToQImage(matFrame);
+    //currentMatImage = matFrame;
+    //currentQImage = MatToQImage(matFrame);
 
-    imageBuffer.clear();
+//    imageBuffer.clear();
 
-    imageBuffer.append(currentQImage);
+//    imageBuffer.append(currentQImage);
 
     // Display frame
-    ui->frameLabel->setPixmap(QPixmap::fromImage(currentQImage).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
-    setROI(QRect(0, 0, currentQImage.width(), currentQImage.height()));
+    ui->frameLabel->setPixmap(imagePixmap->scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
+    //setROI(QRect(0, 0, currentQImage.width(), currentQImage.height()));
 }
 
 void ImageView::newMouseData(struct MouseData mouseData)

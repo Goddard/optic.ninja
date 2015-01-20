@@ -9,14 +9,15 @@
 #include <QDebug>
 
 #include <setimage.h>
+#include <imageview.h>
 
 class setControl : public QObject
 {
     Q_OBJECT
 public:
     explicit setControl(QString setPathParm, QObject *parent = 0);
-    void setSetPath(QString path);
-    QList<setImage> getSetFiles(QString setName, QString viewType = NULL);
+    ~setControl();
+    QList<setImage *> *getSetFiles(QString setName, QString viewType = NULL);
     QString setImageStatus(QString filePath, QString posNeg);
     int getImageStatus(QString fileName);
     bool saveImage(QImage modifiedImage, QString fileName);
@@ -26,16 +27,22 @@ public:
     void getSetFileNames(QString setName);
     QStringList getSets();
 
-    QList<setImage> setFiles;
+    QList<setImage *> setFiles;
+
+    ImageView *imgView;
+    ImageView *getImageView();
+
+    struct ThreadStatisticsData statsData;
 
 private:
     QString setPath;
     QString setName;
     QSettings *setSettings;
-    QStringList exstensionList;
+    QStringList *extensionList;
 
 
 signals:
+        void newFrame(QPixmap *pixmapFrame);
 
 public slots:
 

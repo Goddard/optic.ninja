@@ -60,26 +60,17 @@ MainWindow::MainWindow(QWidget *parent) :
     //add sets to ui
     ui->setComboBox->addItems(this->setController->getSets());
 
-    //create image viewer
-    imgView = new ImageView();
+//    //create image viewer
+//    imgView = new ImageView();
+    ui->ImageViewLayout->addWidget(this->setController->getImageView());
 
-    //add image viewer to ui
-    ui->ImageViewLayout->addWidget(imgView);
-
-    connect(this, SIGNAL(newFrame(Mat)), imgView, SLOT(updateFrame(Mat)));
-    connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
-
-    regenerateSetItems();
-
-//    QString iconPath = path + "\\" + ui->setComboBox->currentText() + "\\" + this->setController->getSetFiles(ui->setComboBox->currentText()).at(0).fileName();
-//    this->setController->getImageStatus(iconPath);
-//    Mat image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);
-//    emit newFrame(image);
+//    regenerateSetItems();
+//    regenerateOriginalImage(this->setController->setFiles.at(0).getImageFileInfo().absoluteFilePath());
 
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 
-    qRegisterMetaType<setImage>();
-    SET_IMAGE = QMetaType::type("setImage");
+//    qRegisterMetaType<setImage>();
+//    SET_IMAGE = QMetaType::type("setImage");
 }
 
 MainWindow::~MainWindow()
@@ -422,6 +413,7 @@ void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
     currentSet = arg1;
     regenerateSetItems();
+    //regenerateOriginalImage();
 
 //    this->setController->getSetFileNames(currentSet, ui->viewComboBox->currentText());
 }
@@ -442,13 +434,13 @@ void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
 //    qDebug() << item->data(Qt::UserRole).toString();
     //Mat image = imread(this->setController->setFiles.at(item->text().toInt()).absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
 
-    setImage setImageItem = qvariant_cast<setImage>(item->data(SET_IMAGE));
+    //setImage setImageItem = qvariant_cast<setImage>(item->data(SET_IMAGE));
 
 //    QVariant variant;
 //    ...
 //    QColor color = variant.value<QColor>()
 
-    emit newFrame(setImageItem.getImageMat());
+    //emit newFrame(setImageItem.getImageMat());
 }
 
 //void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
@@ -480,33 +472,43 @@ void MainWindow::on_negativeImageRadioButton_clicked()
 
 void MainWindow::regenerateSetItems()
 {
-    QList<setImage> setImages = setController->getSetFiles(currentSet, ui->viewComboBox->currentText());
+    QList<setImage*> *setImages = setController->getSetFiles(currentSet, currentView);
     ui->imageListWidget->clear();
-    for(int i= 0; i < setImages.count(); i++)
+    for(int i= 0; i < setImages->count(); i++)
     {
-        QListWidgetItem *currentWidgetItem = new QListWidgetItem(QIcon(setImages.at(i).getImageFileInfo().absoluteFilePath()), QString::number(i), ui->imageListWidget);
-        currentWidgetItem->setData(SET_IMAGE, QVariant::fromValue(setImages.at(i)));
+        //QIcon(setImages->at(i)->getImageFileInfo().absoluteFilePath())
+        QListWidgetItem *currentWidgetItem = new QListWidgetItem(*setImages->at(i)->getImageQIcon(), QString::number(i), ui->imageListWidget);
+//        currentWidgetItem->setData(SET_IMAGE, QVariant::fromValue(*setImages->at(i)));
         ui->imageListWidget->addItem(currentWidgetItem);
 
-//        ui->imageListWidget->addItem(setImages.at(i).getImageQListWidgetItem(i, ui->imageListWidget));
+        if(i == 0)
+        {
+            ui->imageListWidget->setCurrentItem(currentWidgetItem);
+        }
     }
 }
 
 void MainWindow::regenerateOriginalImage(QString newPath)
 {
-    this->setController->getImageStatus(newPath);
-    Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
-    emit newFrame(image);
+//    this->setController->getImageStatus(newPath);
+//    Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
+//    emit newFrame(image);
 }
 
 void MainWindow::on_saveImageButton_clicked()
 {
-    bool returnValue = imgView->imageBuffer.last().save(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
-    ui->imageListWidget->currentItem()->setIcon(QIcon(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text()));
+//    bool returnValue = imgView->imageBuffer.last().save(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
+//    ui->imageListWidget->currentItem()->setIcon(QIcon(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text()));
 }
 
 void MainWindow::on_viewComboBox_activated(const QString &arg1)
 {
     currentView = arg1;
     regenerateSetItems();
+}
+
+void MainWindow::on_imageListWidget_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+//    setImage setImageItem = qvariant_cast<setImage>(current->data(SET_IMAGE));
+//    emit newFrame(setImageItem.getImageMat());
 }

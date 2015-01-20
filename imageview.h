@@ -50,7 +50,7 @@ public slots:
     void updateImageProcessingSettings(struct ImageProcessingSettings);
 
 private slots:
-    void updateFrame(const Mat &matFrame);
+    void updateFrame(QPixmap *imagePixmap);
     void handleContextMenuAction(QAction *action);
 };
 

@@ -4,27 +4,40 @@ setImage::setImage(QFileInfo fileInfoParm, QObject *parent)// :
     //QObject(parent)
 {
     this->fileInfo = fileInfoParm;
+    this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
+    this->fileImage = MatToQImage(this->fileMat);
+    this->filePixmap = QPixmap::fromImage(fileImage);
+    this->fileIcon = QIcon(this->filePixmap);
 }
 
 setImage::~setImage()
 {
-    //delete this;
+//    delete fileInfo;
+//    delete fileIcon;
+//    delete fileMat;
+//    delete fileImage;
+//    delete filePixmap;
 }
 
-Mat setImage::getImageMat()
+Mat *setImage::getImageMat()
 {
-    return imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
+    return &this->fileMat;
 }
 
 
-QIcon setImage::getImageQIcon()
+QIcon *setImage::getImageQIcon()
 {
-    return QIcon(this->fileInfo.absoluteFilePath());
+    return &this->fileIcon;
 }
 
-QImage setImage::getImageQImage()
+QImage *setImage::getImageQImage()
 {
+    return &this->fileImage;
+}
 
+QPixmap *setImage::getImageQPixmap()
+{
+    return &this->filePixmap;
 }
 
 //QListWidgetItem setItem::getImageQListWidgetItem(int listIndex, QListWidget *widgetParent)
