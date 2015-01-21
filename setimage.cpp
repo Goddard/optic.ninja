@@ -42,8 +42,8 @@ QPixmap *setImage::getImageQPixmap()
 
 //QListWidgetItem setItem::getImageQListWidgetItem(int listIndex, QListWidget *widgetParent)
 //{
-    //QListWidgetItem *currentWidgetItem = new QListWidgetItem(this->getImageQIcon(), QString::number(listIndex), widgetParent);
-    //currentWidgetItem->setData(Qt::UserRole, &this);
+//    QListWidgetItem *currentWidgetItem = new QListWidgetItem(this->getImageQIcon(), QString::number(listIndex), widgetParent);
+//    currentWidgetItem->setData(Qt::UserRole, &this);
 
 //    return currentWidgetItem;
 //}

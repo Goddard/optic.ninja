@@ -186,34 +186,6 @@
             </item>
            </layout>
           </item>
-          <item row="5" column="0">
-           <widget class="QListWidget" name="imageListWidget">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>771</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>150</width>
-              <height>150</height>
-             </size>
-            </property>
-            <property name="layoutMode">
-             <enum>QListView::SinglePass</enum>
-            </property>
-            <property name="viewMode">
-             <enum>QListView::IconMode</enum>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="2" colspan="2">
            <layout class="QGridLayout" name="gridLayout_8">
             <property name="sizeConstraint">
@@ -249,7 +221,14 @@
             </item>
            </layout>
           </item>
-          <item row="5" column="1" colspan="3">
+          <item row="1" column="0" rowspan="5">
+           <layout class="QGridLayout" name="SetViewLayout">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="4" column="2" rowspan="2" colspan="2">
            <layout class="QGridLayout" name="ImageViewLayout" rowstretch="0" columnstretch="0" rowminimumheight="0" columnminimumwidth="0">
             <property name="sizeConstraint">
              <enum>QLayout::SetMinimumSize</enum>

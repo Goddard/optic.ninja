@@ -90,12 +90,9 @@ class MainWindow : public QMainWindow
         void recieveSetText(const QString &newText);
 
     private slots:
-        void on_listWidget_clicked(const QModelIndex &index);
-        void on_listWidget_itemClicked(QListWidgetItem *item);
         void on_saveSetDirectoryButton_clicked();
         void on_createSetButton_clicked();
         void on_setComboBox_currentIndexChanged(const QString &arg1);
-        void on_imageListWidget_itemClicked(QListWidgetItem *item);
 //        void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
 
         void on_deleteImageButton_clicked();
@@ -107,8 +104,6 @@ class MainWindow : public QMainWindow
         void on_saveImageButton_clicked();
 
         void on_viewComboBox_activated(const QString &arg1);
-
-        void on_imageListWidget_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
 signals:
         void newFrame(const Mat &matFrame);

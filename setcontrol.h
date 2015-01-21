@@ -8,15 +8,16 @@
 #include <QFileInfo>
 #include <QDirModel>
 #include <QDebug>
+#include <QHBoxLayout>
 
 #include <setimage.h>
 #include <imageview.h>
 
-class setControl : public QWidget
+class setControl : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit setControl(QString setPathParm, QWidget *parent = 0);
+    explicit setControl(QString setPathParm, QListWidget *parent = 0);
     ~setControl();
     QList<setImage *> *getSetFiles(QString setName, QString viewType = NULL);
     QString setImageStatus(QString filePath, QString posNeg);
@@ -35,11 +36,15 @@ public:
 
     struct ThreadStatisticsData statsData;
 
+    QPushButton *button;
+
 private:
     QString setPath;
     QString setName;
     QSettings *setSettings;
     QStringList extensionList;
+
+    QListWidget *setListWidget;
 
 
 signals:

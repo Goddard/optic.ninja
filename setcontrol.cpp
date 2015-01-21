@@ -3,8 +3,8 @@
 //QString setPath;
 //QString setName;
 //QSettings setSettings;
-setControl::setControl(QString setPathParm, QWidget *parent) :
-    QWidget(parent)
+setControl::setControl(QString setPathParm, QListWidget *parent) :
+    QListWidget(parent)
 {
     this->setPath = setPathParm;
 
@@ -12,6 +12,14 @@ setControl::setControl(QString setPathParm, QWidget *parent) :
     this->imgView = new ImageView();
     connect(this, SIGNAL(newFrame(QPixmap*)), imgView, SLOT(updateFrame(QPixmap*)));
 //    connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
+
+//    this->setListWidget = new QListWidget();
+
+//    resize(100,100);
+////    button = new QPushButton("Click here to go back");
+//    QHBoxLayout hLayout;
+////    hLayout.addWidget(new QPushButton("Click here to go back"));
+//    hLayout.addWidget(setListWidget);
 }
 
 setControl::~setControl()
@@ -79,7 +87,7 @@ QList<setImage *> *setControl::getSetFiles(QString setName, QString viewType)
     {
 //        setImage *newSetImage = new setImage(tempFileInfoList.value(i));
         this->setFiles.append(new setImage(tempFileInfoList.value(i)));
-
+        this->addItem(this->setFiles.value(i)->getImageFileInfo().baseName());
         if(i == 0)
         {
 //            Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
