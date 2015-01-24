@@ -61,14 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //add sets to ui
     ui->setComboBox->addItems(this->setController->getSets());
-
-//    //create image viewer
-//    imgView = new ImageView();
     ui->ImageViewLayout->addWidget(this->setController->getImageView());
-
-
-//    regenerateSetItems();
-//    regenerateOriginalImage(this->setController->setFiles.at(0).getImageFileInfo().absoluteFilePath());
 
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 
@@ -376,6 +369,12 @@ void MainWindow::setFullScreen(bool input)
         this->showNormal();
 }
 
+void MainWindow::on_listWidget_clicked(const QModelIndex &index)
+{
+    //currentPageIndex = (currentPageIndex + 1) % 3;
+    ui->stackedWidget->setCurrentIndex(index.row());
+}
+
 void MainWindow::on_saveSetDirectoryButton_clicked()
 {
     QString userSetDirectory = ui->setDirectoryTextEdit->text();
@@ -402,8 +401,8 @@ void MainWindow::recieveSetText(const QString &newText)
 
 void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
-    currentSet = arg1;
-    setController->getSetFiles(currentSet, currentView);
+    this->currentSet = arg1;
+    this->setController->getSetFiles(currentSet, currentView);
 //    regenerateSetItems();
     //regenerateOriginalImage();
 
@@ -448,18 +447,12 @@ void MainWindow::on_deleteImageButton_clicked()
 
 void MainWindow::on_positiveImageRadioButton_clicked()
 {
-    //QString iconPath = appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text();
-    //QString newPath = this->setController->setImageStatus(iconPath, "1");
-    regenerateSetItems();
-    //regenerateOriginalImage(newPath);
+    this->setController->setImageStatus("positive");
 }
 
 void MainWindow::on_negativeImageRadioButton_clicked()
 {
-    //QString iconPath = appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text();
-    //QString newPath = this->setController->setImageStatus(iconPath, "0");
-    regenerateSetItems();
-    //regenerateOriginalImage(newPath);
+    this->setController->setImageStatus("negative");
 }
 
 void MainWindow::regenerateSetItems()
@@ -495,7 +488,7 @@ void MainWindow::on_saveImageButton_clicked()
 
 void MainWindow::on_viewComboBox_activated(const QString &arg1)
 {
-    currentView = arg1;
-    currentSet = ui->setComboBox->currentText();
+    this->currentView = arg1;
+    this->currentSet = ui->setComboBox->currentText();
     setController->getSetFiles(currentSet, currentView);
 }

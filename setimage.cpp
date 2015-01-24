@@ -1,13 +1,15 @@
 #include "setimage.h"
 
-setImage::setImage(QFileInfo fileInfoParm, QObject *parent)// :
-    //QObject(parent)
+setImage::setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent) :
+    QObject(parent)
 {
     this->fileInfo = fileInfoParm;
     this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
     this->fileImage = MatToQImage(this->fileMat);
     this->filePixmap = QPixmap::fromImage(fileImage);
     this->fileIcon = QIcon(this->filePixmap);
+    this->fileSetType = fileSetTypeParm;
+    this->fileWidgetItem = new QListWidgetItem(this->fileIcon, QString::number(index));
 }
 
 setImage::~setImage()
@@ -40,20 +42,29 @@ QPixmap *setImage::getImageQPixmap()
     return &this->filePixmap;
 }
 
-//QListWidgetItem setItem::getImageQListWidgetItem(int listIndex, QListWidget *widgetParent)
-//{
-//    QListWidgetItem *currentWidgetItem = new QListWidgetItem(this->getImageQIcon(), QString::number(listIndex), widgetParent);
-//    currentWidgetItem->setData(Qt::UserRole, &this);
-
-//    return currentWidgetItem;
-//}
-
 QFileInfo setImage::getImageFileInfo() const
 {
     return this->fileInfo;
 }
 
-//QString setImage::getPath()
-//{
+QListWidgetItem *setImage::getImageWidgetItem()
+{
+    return this->fileWidgetItem;
+}
 
-//}
+QString *setImage::getImageStatus()
+{
+    return &this->fileSetType;
+}
+
+void setImage::setImageFileInfo(QFileInfo fileInfoParm)
+{
+    this->fileInfo = fileInfoParm;
+    this->resetImageMat();
+}
+
+
+void setImage::resetImageMat()
+{
+    this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
+}

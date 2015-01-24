@@ -37,6 +37,7 @@ public:
     QRect getCurrentROI();
     void setROI(QRect roi);
     QList<QImage> imageBuffer;
+    void clearFrame();
 
 signals:
     void newImageProcessingFlags(struct ImageProcessingFlags imageProcessingFlags);

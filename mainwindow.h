@@ -105,6 +105,8 @@ class MainWindow : public QMainWindow
 
         void on_viewComboBox_activated(const QString &arg1);
 
+        void on_listWidget_clicked(const QModelIndex &index);
+
 signals:
         void newFrame(const Mat &matFrame);
         void updateStatisticsInGUI(struct ThreadStatisticsData);

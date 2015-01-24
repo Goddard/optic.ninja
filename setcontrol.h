@@ -19,9 +19,10 @@ class setControl : public QListWidget
 public:
     explicit setControl(QString setPathParm, QListWidget *parent = 0);
     ~setControl();
-    QList<setImage *> *getSetFiles(QString setName, QString viewType = NULL);
-    QString setImageStatus(QString filePath, QString posNeg);
-    int getImageStatus(QString fileName);
+    void addSetItem(int index, setImage *setImage);
+
+    QList<setImage *> *getSetFiles(QString setNameParm, QString viewType = NULL);
+    bool setImageStatus(QString setType);
     bool saveImage(QImage modifiedImage, QString fileName);
     bool deleteImage(QString filePath);
     QString getImageSize(QString filePath);
@@ -29,9 +30,7 @@ public:
     void getSetFileNames(QString setName);
     QStringList getSets();
 
-    QList<setImage *> setFiles;
 
-    ImageView *imgView;
     ImageView *getImageView();
 
     struct ThreadStatisticsData statsData;
@@ -43,14 +42,20 @@ private:
     QString setName;
     QSettings *setSettings;
     QStringList extensionList;
-
+    QList<setImage *> setFiles;
     QListWidget *setListWidget;
 
+    ImageView *imgView;
+
+
+protected:
+//    virtual void currentRowChanged(int currentRow);
 
 signals:
         void newFrame(QPixmap *pixmapFrame);
 
 public slots:
+        void setItemClicked(int currentRow);
 
 };
 

@@ -1,8 +1,5 @@
 #include "setcontrol.h"
 
-//QString setPath;
-//QString setName;
-//QSettings setSettings;
 setControl::setControl(QString setPathParm, QListWidget *parent) :
     QListWidget(parent)
 {
@@ -13,18 +10,29 @@ setControl::setControl(QString setPathParm, QListWidget *parent) :
     connect(this, SIGNAL(newFrame(QPixmap*)), imgView, SLOT(updateFrame(QPixmap*)));
 //    connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
 
-//    this->setListWidget = new QListWidget();
+    this->setViewMode(QListView::IconMode);
+    this->setIconSize(QSize(105, 105));
 
-//    resize(100,100);
-////    button = new QPushButton("Click here to go back");
-//    QHBoxLayout hLayout;
-////    hLayout.addWidget(new QPushButton("Click here to go back"));
-//    hLayout.addWidget(setListWidget);
+    connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
+
+    //add permitted extensions
+    this->extensionList << "*.JPG" << "*.JPEG" << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.pgm" << "*.PGM";
 }
 
 setControl::~setControl()
 {
     delete imgView;
+}
+
+void setControl::addSetItem(int index, setImage *setImage)
+{
+    this->setFiles.append(setImage);
+    this->addItem(this->setFiles.at(index)->getImageWidgetItem());
+}
+
+void setControl::setItemClicked(int currentRow)
+{
+    emit newFrame(this->setFiles.value(currentRow)->getImageQPixmap());
 }
 
 QStringList setControl::getSets()
@@ -40,60 +48,70 @@ ImageView *setControl::getImageView()
 }
 
 //gets the set files list in a qlist
-QList<setImage *> *setControl::getSetFiles(QString setName, QString viewType)
+QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType)
 {
+    //set setname globally
+    this->setName = setNameParm;
+
+    //clear setfiles, fileinfo, and qlistitems
     QList<QFileInfo> tempFileInfoList;
     qDeleteAll(this->setFiles.begin(), this->setFiles.end());
     this->setFiles.clear();
+    this->clear();
 
-//    QStringList extensionList;
-    this->extensionList << "*.JPG" << "*.JPEG" << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.pgm" << "*.PGM";
-
-    QString setBasePath = this->setPath + QDir::separator() + setName;
+    QString setBasePath = this->setPath + QDir::separator() + this->setName;
     QString positiveView = "positive";
     QString negativeView = "negative";
     QString completeView = "complete";
 
+    QDir dir(setBasePath);
+    dir.setFilter(QDir::Files);
+    dir.setNameFilters(extensionList);
+
     if(viewType == "NULL" || viewType == "All" || viewType == "Undefined")
     {
-        QDir dir(setBasePath);
-        dir.setFilter(QDir::Files);
-        dir.setNameFilters(extensionList);
+        dir.setPath(setBasePath);
         tempFileInfoList = dir.entryInfoList();
+        for (int i = 0; i < tempFileInfoList.count(); ++i)
+        {
+            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
+        }
     }
 
     if(viewType == "Positive" || viewType == "All")
     {
-        QDir dir(setBasePath + QDir::separator() + positiveView);
-        dir.setFilter(QDir::Files);
+        dir.setPath(setBasePath + QDir::separator() + positiveView);
         tempFileInfoList += dir.entryInfoList();
+        for (int i = 0; i < tempFileInfoList.count(); ++i)
+        {
+            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Positive"), i));
+        }
     }
 
     if(viewType == "Negative" || viewType == "All")
     {
-        QDir dir(setBasePath + QDir::separator() + negativeView);
-        dir.setFilter(QDir::Files);
+        dir.setPath(setBasePath + QDir::separator() + negativeView);
         tempFileInfoList += dir.entryInfoList();
+        for (int i = 0; i < tempFileInfoList.count(); ++i)
+        {
+            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Negative"), i));
+        }
     }
 
     if(viewType == "Complete")
     {
-        QDir dir(setBasePath + QDir::separator() + completeView);
-        dir.setFilter(QDir::Files);
+        dir.setPath(setBasePath + QDir::separator() + completeView);
         tempFileInfoList += dir.entryInfoList();
+        for (int i = 0; i < tempFileInfoList.count(); ++i)
+        {
+            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Complete"), i));
+        }
     }
 
-    for (int i = 0; i < tempFileInfoList.count(); ++i)
+    if(this->setFiles.count() > 0)
     {
-//        setImage *newSetImage = new setImage(tempFileInfoList.value(i));
-        this->setFiles.append(new setImage(tempFileInfoList.value(i)));
-        this->addItem(this->setFiles.value(i)->getImageFileInfo().baseName());
-        if(i == 0)
-        {
-//            Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
-            //QPixmap *newPixmap = this->setFiles.at(0).getImageQPixmap();
-            emit newFrame(this->setFiles.value(i)->getImageQPixmap());
-        }
+        emit newFrame(this->setFiles.value(0)->getImageQPixmap());
+        this->setCurrentRow(0);
     }
 
     tempFileInfoList.clear();
@@ -101,91 +119,21 @@ QList<setImage *> *setControl::getSetFiles(QString setName, QString viewType)
 }
 
 //sets the image set as either being positive or negative sample
-QString setControl::setImageStatus(QString filePath, QString posNeg)
+bool setControl::setImageStatus(QString setType)
 {
-    //get current image name
-    QFileInfo fi(filePath);
-    QFile fc(filePath);
-    QString newFileName = "";
-
-    //check if first two characters are in our format if it is we will just change first character
-    if((fi.baseName().at(0).toLatin1() == '0' || fi.baseName().at(0).toLatin1() == '1') && fi.baseName().at(1).toLatin1() == '_')
+    int index = this->currentRow();
+    QString newPath = this->setPath + QDir::separator() + this->setName + QDir::separator() + setType + QDir::separator() + this->setFiles.at(index)->getImageFileInfo().fileName();
+    bool moveStatus = QFile::rename(this->setFiles.at(index)->getImageFileInfo().absoluteFilePath(), newPath);
+    if(moveStatus ==true && (setType == "positive" || setType == "negative"))
     {
-        newFileName = posNeg;
-        for(int i=1; i < fi.baseName().count(); i++)
-        {
-            newFileName += fi.baseName().at(i);
-        }
-
-        newFileName += "." + fi.completeSuffix();
-
-        //qDebug() << newFileName;
-        if(fc.rename(fi.absolutePath() + "/" + newFileName))
-        {
-//            qDebug() << "Image Status Set";
-        }
-
-        else
-        {
-//            qDebug() << "Image Status Not Set";
-        }
-        return fi.absolutePath() + "/" + newFileName;
+        this->takeItem(index);
+        this->setFiles.removeAt(index);
+        this->imgView->clearFrame();
     }
 
-    //it looks like our file naming format hasn't been set so we need to change the first two characters
-    else
+    else if(moveStatus == true)
     {
-        newFileName = posNeg + "_";
-        for(int i=0; i < fi.baseName().count(); i++)
-        {
-            newFileName += fi.baseName().at(i);
-        }
-
-        newFileName += "." + fi.completeSuffix();
-
-//        qDebug() << newFileName;
-        if(fc.rename(fi.absolutePath() + "/" + newFileName))
-        {
-//            qDebug() << "Image Status Set";
-        }
-
-        else
-        {
-//            qDebug() << "Image Status Not Set";
-        }
-        return fi.absolutePath() + "/" + newFileName;
-    }
-
-    return NULL;
-    //if posNeg is 1 set start of iamge name to true
-
-    //if posNeg is 0 set start of image name to false
-}
-
-//get the image status by reading the first character 0 being false and 1 being true
-int setControl::getImageStatus(QString fileName)
-{
-    QFileInfo fileInfo(fileName);
-//    qDebug() << fileInfo.baseName().at(0);
-    int fileStatus = fileInfo.baseName().at(0).digitValue();
-    char fileStatus2 = fileInfo.baseName().at(0).digitValue();
-
-    if(fileStatus == 0 || fileStatus2 == 'n')
-    {
-//        qDebug() << "Value already set on image and it is false";
-        return 0;
-    }
-
-    else if (fileStatus == 1 || fileStatus2 == 'p')
-    {
-//        qDebug() << "Value already set on image and it true";
-        return 1;
-    }
-
-    else
-    {
-//        qDebug() << "Value not set";
-        return 2;
+        this->setFiles.at(index)->setImageFileInfo(QFileInfo(newPath));
     }
 }
 
@@ -248,13 +196,13 @@ void setControl::getSetFileNames(QString setName)
 
 //        if(checkExstension(fi.completeSuffix()))
 //        {
-            if(getImageStatus(fi.baseName()) == 1)
+            //if(getImageStatus(fi.baseName()) == 1)
             {
                 //listFiles.append(fi);
                 positiveOut << fi.fileName() << endl;
             }
 
-            else if(getImageStatus(fi.baseName()) == 0)
+            //else if(getImageStatus(fi.baseName()) == 0)
             {
                 negativeOut << fi.fileName() << endl;
             }

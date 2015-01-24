@@ -2,6 +2,8 @@
 #define SETIMAGE_H
 
 #include <QFileInfo>
+#include <QIcon>
+#include <QPixmap>
 #include <QListWidgetItem>
 
 // OpenCV
@@ -22,23 +24,27 @@
 
 using namespace cv;
 
-class setImage// : public QObject
+class setImage : public QObject
 {
-//Q_OBJECT
+Q_OBJECT
 
 public:
     setImage() {}
     //setImage(const setImage&) {}
-    explicit setImage(QFileInfo fileInfoParm, QObject *parent = 0);
-    setImage& operator=( const setImage& ){}
+    explicit setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent = 0);
+//    setImage& operator=( const setImage& ){}
     ~setImage();
 
     QIcon *getImageQIcon();
     Mat *getImageMat();
     QImage *getImageQImage();
     QPixmap *getImageQPixmap();
-    //QListWidgetItem getImageQListWidgetItem(int listIndex, QListWidget widgetParent);
     QFileInfo getImageFileInfo() const;
+    QListWidgetItem *getImageWidgetItem();
+    QString *getImageStatus();
+
+    void setImageFileInfo(QFileInfo fileInfoParm);
+    void resetImageMat();
 
 private:
     QFileInfo fileInfo;
@@ -46,6 +52,8 @@ private:
     Mat fileMat;
     QImage fileImage;
     QPixmap filePixmap;
+    QString fileSetType;
+    QListWidgetItem *fileWidgetItem;
 
 signals:
 

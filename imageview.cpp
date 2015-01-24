@@ -45,6 +45,12 @@ void ImageView::updateFrame(QPixmap *imagePixmap) //const Mat &matFrame
     //setROI(QRect(0, 0, currentQImage.width(), currentQImage.height()));
 }
 
+void ImageView::clearFrame()
+{
+    ui->frameLabel->clear();
+    //ui->frameLabel->setText("");
+}
+
 void ImageView::newMouseData(struct MouseData mouseData)
 {
     // Local variable(s)
