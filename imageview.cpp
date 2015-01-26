@@ -7,11 +7,11 @@ ImageView::ImageView(QWidget *parent) :
 {
     // Setup UI
     ui->setupUi(this);
-    connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
-    connect(ui->frameLabel->menu, SIGNAL(triggered(QAction*)), this, SLOT(handleContextMenuAction(QAction*)));
+    //connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
+    //connect(ui->frameLabel->menu, SIGNAL(triggered(QAction*)), this, SLOT(handleContextMenuAction(QAction*)));
 
-    ui->mouseCursorPositionLabel->setText(" ");
-    connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
+    //ui->mouseCursorPositionLabel->setText(" ");
+    //connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
 
     // Initialize ImageProcessingFlags structure
     imageProcessingFlags.grayscaleOn=false;
@@ -24,6 +24,9 @@ ImageView::ImageView(QWidget *parent) :
     // Create image processing settings dialog
     imageProcessingSettingsDialog = new ImageProcessingSettingsDialog(this);
     connect(imageProcessingSettingsDialog, SIGNAL(newImageProcessingSettings(struct ImageProcessingSettings)), this, SLOT(updateImageProcessingSettings(struct ImageProcessingSettings)));
+    //ui->imageSizeLabel->setText("0 W, 0 H");
+
+    //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 ImageView::~ImageView()
@@ -31,24 +34,36 @@ ImageView::~ImageView()
     delete ui;
 }
 
-void ImageView::updateFrame(QPixmap *imagePixmap) //const Mat &matFrame
+void ImageView::paintEvent(QPaintEvent*)
 {
-    //currentMatImage = matFrame;
-    //currentQImage = MatToQImage(matFrame);
+  if (this->imageBuffer.empty()){ return; }
 
-//    imageBuffer.clear();
+  QPainter painter(this);
+//  QMargins
+  painter.drawImage(rect(), *this->imageBuffer.at(this->imageBuffer.count()-1), this->imageBuffer.at(this->imageBuffer.count()-1)->rect());
+}
 
-//    imageBuffer.append(currentQImage);
+//set when setimage first set - most likely done from setControl
+//execute when any changes are made on processing thread or roi function
+//clear when set image changes - done from image setControl also
+void ImageView::addBufferFrame(QImage *qImageAdd)
+{
+    imageBuffer.append(qImageAdd);
+    this->repaint();
+    //ui->ImageBufferSize->setText(QString::number(imageBuffer.count()));
+}
 
+void ImageView::updateFrame(QPixmap *imagePixmap)
+{
+    //this->addBufferFrame(imagePixmap->toImage());
     // Display frame
-    ui->frameLabel->setPixmap(imagePixmap->scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
-    //setROI(QRect(0, 0, currentQImage.width(), currentQImage.height()));
+    //ui->frameLabel->setPixmap(imagePixmap->scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
+    //ui->imageSizeLabel->setText(QString::number(imagePixmap->width()) + " W " + QString::number(imagePixmap->height()) + " H");
 }
 
 void ImageView::clearFrame()
 {
-    ui->frameLabel->clear();
-    //ui->frameLabel->setText("");
+    //ui->frameLabel->clear();
 }
 
 void ImageView::newMouseData(struct MouseData mouseData)
@@ -66,21 +81,21 @@ void ImageView::newMouseData(struct MouseData mouseData)
         double hScalingFactor;
 
         // Selection box calculation depends on whether frame is scaled to fit label or not
-        if(!ui->frameLabel->hasScaledContents())
-        {
-            xScalingFactor=((double) mouseData.selectionBox.x() - ((ui->frameLabel->width() - ui->frameLabel->pixmap()->width()) / 2)) / (double) ui->frameLabel->pixmap()->width();
-            yScalingFactor=((double) mouseData.selectionBox.y() - ((ui->frameLabel->height() - ui->frameLabel->pixmap()->height()) / 2)) / (double) ui->frameLabel->pixmap()->height();
-            wScalingFactor=(double) this->getCurrentROI().width() / (double) ui->frameLabel->pixmap()->width();
-            hScalingFactor=(double) this->getCurrentROI().height() / (double) ui->frameLabel->pixmap()->height();
-        }
+//        if(!ui->frameLabel->hasScaledContents())
+//        {
+//            xScalingFactor=((double) mouseData.selectionBox.x() - ((ui->frameLabel->width() - ui->frameLabel->pixmap()->width()) / 2)) / (double) ui->frameLabel->pixmap()->width();
+//            yScalingFactor=((double) mouseData.selectionBox.y() - ((ui->frameLabel->height() - ui->frameLabel->pixmap()->height()) / 2)) / (double) ui->frameLabel->pixmap()->height();
+//            wScalingFactor=(double) this->getCurrentROI().width() / (double) ui->frameLabel->pixmap()->width();
+//            hScalingFactor=(double) this->getCurrentROI().height() / (double) ui->frameLabel->pixmap()->height();
+//        }
 
-        else
-        {
-            xScalingFactor=(double) mouseData.selectionBox.x() / (double) ui->frameLabel->width();
-            yScalingFactor=(double) mouseData.selectionBox.y() / (double) ui->frameLabel->height();
-            wScalingFactor=(double) this->getCurrentROI().width() / (double) ui->frameLabel->width();
-            hScalingFactor=(double) this->getCurrentROI().height() / (double) ui->frameLabel->height();
-        }
+//        else
+//        {
+//            xScalingFactor=(double) mouseData.selectionBox.x() / (double) ui->frameLabel->width();
+//            yScalingFactor=(double) mouseData.selectionBox.y() / (double) ui->frameLabel->height();
+//            wScalingFactor=(double) this->getCurrentROI().width() / (double) ui->frameLabel->width();
+//            hScalingFactor=(double) this->getCurrentROI().height() / (double) ui->frameLabel->height();
+//        }
 
         // Set selection box properties (new ROI)
         selectionBox.setX(xScalingFactor*this->getCurrentROI().width() + this->getCurrentROI().x());
@@ -133,40 +148,41 @@ void ImageView::clearImageBuffer()
 //        qDebug() << "[" << deviceNumber << "] Image buffer successfully cleared.";
 //    else
 //        qDebug() << "[" << 0 << "] WARNING: Could not clear image buffer.";
+    this->imageBuffer.clear();
 }
 
 void ImageView::updateMouseCursorPosLabel()
 {
     // Update mouse cursor position in mouseCursorPosLabel
-    ui->mouseCursorPositionLabel->setText(QString("(")+QString::number(ui->frameLabel->getMouseCursorPos().x())+
-                                     QString(",")+QString::number(ui->frameLabel->getMouseCursorPos().y())+
-                                     QString(")"));
+//    ui->mouseCursorPositionLabel->setText(QString("(")+QString::number(ui->frameLabel->getMouseCursorPos().x())+
+//                                     QString(",")+QString::number(ui->frameLabel->getMouseCursorPos().y())+
+//                                     QString(")"));
 
     // Show pixel cursor position if camera is connected (image is being shown)
-    if(ui->frameLabel->pixmap()!=0)
-    {
-        // Scaling factor calculation depends on whether frame is scaled to fit label or not
-        if(!ui->frameLabel->hasScaledContents())
-        {
-            double xScalingFactor=((double) ui->frameLabel->getMouseCursorPos().x() - ((ui->frameLabel->width() - ui->frameLabel->pixmap()->width()) / 2)) / (double) ui->frameLabel->pixmap()->width();
-            double yScalingFactor=((double) ui->frameLabel->getMouseCursorPos().y() - ((ui->frameLabel->height() - ui->frameLabel->pixmap()->height()) / 2)) / (double) ui->frameLabel->pixmap()->height();
+//    if(ui->frameLabel->pixmap()!=0)
+//    {
+//        // Scaling factor calculation depends on whether frame is scaled to fit label or not
+//        if(!ui->frameLabel->hasScaledContents())
+//        {
+//            double xScalingFactor=((double) ui->frameLabel->getMouseCursorPos().x() - ((ui->frameLabel->width() - ui->frameLabel->pixmap()->width()) / 2)) / (double) ui->frameLabel->pixmap()->width();
+//            double yScalingFactor=((double) ui->frameLabel->getMouseCursorPos().y() - ((ui->frameLabel->height() - ui->frameLabel->pixmap()->height()) / 2)) / (double) ui->frameLabel->pixmap()->height();
 
-            ui->mouseCursorPositionLabel->setText(ui->mouseCursorPositionLabel->text()+
-                                             QString(" [")+QString::number((int)(xScalingFactor*this->getCurrentROI().width()))+
-                                             QString(",")+QString::number((int)(yScalingFactor*this->getCurrentROI().height()))+
-                                             QString("]"));
-        }
-        else
-        {
-            double xScalingFactor=(double) ui->frameLabel->getMouseCursorPos().x() / (double) ui->frameLabel->width();
-            double yScalingFactor=(double) ui->frameLabel->getMouseCursorPos().y() / (double) ui->frameLabel->height();
+//            ui->mouseCursorPositionLabel->setText(ui->mouseCursorPositionLabel->text()+
+//                                             QString(" [")+QString::number((int)(xScalingFactor*this->getCurrentROI().width()))+
+//                                             QString(",")+QString::number((int)(yScalingFactor*this->getCurrentROI().height()))+
+//                                             QString("]"));
+//        }
+//        else
+//        {
+//            double xScalingFactor=(double) ui->frameLabel->getMouseCursorPos().x() / (double) ui->frameLabel->width();
+//            double yScalingFactor=(double) ui->frameLabel->getMouseCursorPos().y() / (double) ui->frameLabel->height();
 
-            ui->mouseCursorPositionLabel->setText(ui->mouseCursorPositionLabel->text()+
-                                             QString(" [")+QString::number((int)(xScalingFactor*this->getCurrentROI().width()))+
-                                             QString(",")+QString::number((int)(yScalingFactor*this->getCurrentROI().height()))+
-                                             QString("]"));
-        }
-    }
+//            ui->mouseCursorPositionLabel->setText(ui->mouseCursorPositionLabel->text()+
+//                                             QString(" [")+QString::number((int)(xScalingFactor*this->getCurrentROI().width()))+
+//                                             QString(",")+QString::number((int)(yScalingFactor*this->getCurrentROI().height()))+
+//                                             QString("]"));
+//        }
+//    }
 }
 
 void ImageView::setImageProcessingSettings()
@@ -185,13 +201,13 @@ void ImageView::handleContextMenuAction(QAction *action)
     if(action->text()=="Reset ROI")
     {
        //redisplay display original frame
-       ui->frameLabel->setPixmap(QPixmap::fromImage(imageBuffer.at(0)).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
-       connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
-       setROI(QRect(0, 0, imageBuffer.at(0).width(), imageBuffer.at(0).height()));
+       //ui->frameLabel->setPixmap(QPixmap::fromImage(imageBuffer.at(0)).scaled(ui->frameLabel->width(), ui->frameLabel->height(), Qt::KeepAspectRatio));
+       //connect(ui->frameLabel, SIGNAL(newMouseData(struct MouseData)), this, SLOT(newMouseData(struct MouseData)));
+       //setROI(QRect(0, 0, imageBuffer.at(0).width(), imageBuffer.at(0).height()));
     }
 
-    else if(action->text()=="Scale to Fit Frame")
-        ui->frameLabel->setScaledContents(action->isChecked());
+//    else if(action->text()=="Scale to Fit Frame")
+//        ui->frameLabel->setScaledContents(action->isChecked());
 
     else if(action->text()=="Grayscale")
     {
@@ -278,9 +294,10 @@ void ImageView::handleContextMenuAction(QAction *action)
 
     QImage frame = MatToQImage(currentMatImage);
 
-    imageBuffer.append(frame);
+//    imageBuffer.append(frame);
+    //this->addBufferFrame(frame);
 
-    ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
+    //ui->frameLabel->setPixmap(QPixmap::fromImage(frame).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
 }
 
 //this sets the roi and needs to add something to the image buffer
@@ -295,8 +312,8 @@ void ImageView::setROI(QRect roi)
 //    qDebug() << imageBuffer.count();
 
     // Display frame
-    ui->frameLabel->setPixmap(QPixmap::fromImage(frame.copy(roi)).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
-    imageBuffer.append(frame.copy(roi));
+    //ui->frameLabel->setPixmap(QPixmap::fromImage(frame.copy(roi)).scaled(ui->frameLabel->width(), ui->frameLabel->height(),Qt::KeepAspectRatio));
+    //imageBuffer.append(frame.copy(roi));
 }
 
 QRect ImageView::getCurrentROI()
@@ -309,10 +326,10 @@ void ImageView::updateProcessingThreadStats(struct ThreadStatisticsData statData
     // Show processing rate in processingRateLabel
     //ui->processingRateLabel->setText(QString::number(statData.averageFPS)+" fps");
     // Show ROI information in roiLabel
-    ui->roiLabel->setText(QString("(")+QString::number(this->getCurrentROI().x())+QString(",")+
-                          QString::number(this->getCurrentROI().y())+QString(") ")+
-                          QString::number(this->getCurrentROI().width())+
-                          QString("x")+QString::number(this->getCurrentROI().height()));
+//    ui->roiLabel->setText(QString("(")+QString::number(this->getCurrentROI().x())+QString(",")+
+//                          QString::number(this->getCurrentROI().y())+QString(") ")+
+//                          QString::number(this->getCurrentROI().width())+
+//                          QString("x")+QString::number(this->getCurrentROI().height()));
     // Show number of frames processed in nFramesProcessedLabel
     //ui->nFramesProcessedLabel->setText(QString("[") + QString::number(statData.nFramesProcessed) + QString("]"));
 }

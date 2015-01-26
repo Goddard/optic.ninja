@@ -52,21 +52,29 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::information(this, "Permission Issue", QString("It appears we can't access our application folder : %1").arg(appSettingsController->settingsPath));
     }
 
-    ui->setDirectoryTextEdit->setText(appSettingsController->getSetsPath());
+    ui->setDirectoryTextEdit->setText(this->appSettingsController->getSetsPath());
+    ui->setImageExtensionTextEdit->setText(this->appSettingsController->getSetImageExtensions());
 
     //create set controller
-    this->setController = new setControl(appSettingsController->getSetsPath());
+    this->setController = new setControl(appSettingsController);
     ui->SetViewLayout->addWidget(this->setController);
-    setController->getSetFiles(currentSet, currentView);
-
     //add sets to ui
     ui->setComboBox->addItems(this->setController->getSets());
+
+    //add items to set list widget
+    this->setController->getSetFiles(ui->setComboBox->currentText(), ui->viewComboBox->currentText());
+
+    //add image view widget to main window
     ui->ImageViewLayout->addWidget(this->setController->getImageView());
 
+    //setup shortcut keys
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 
-//    qRegisterMetaType<setImage>();
-//    SET_IMAGE = QMetaType::type("setImage");
+//    ui->stackedWidget->setAutoFillBackground(true);
+    if (ui->listWidget->count() > 0) {
+      ui->listWidget->item(1)->setSelected(true);
+    }
+    ui->listWidget->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -371,15 +379,13 @@ void MainWindow::setFullScreen(bool input)
 
 void MainWindow::on_listWidget_clicked(const QModelIndex &index)
 {
-    //currentPageIndex = (currentPageIndex + 1) % 3;
     ui->stackedWidget->setCurrentIndex(index.row());
 }
 
-void MainWindow::on_saveSetDirectoryButton_clicked()
+void MainWindow::on_saveAppSettingsButton_clicked()
 {
-    QString userSetDirectory = ui->setDirectoryTextEdit->text();
-    settings->setValue("setDirectory", userSetDirectory);
-    settings->sync();
+    this->appSettingsController->setSetsPath(ui->setDirectoryTextEdit->text());
+    this->appSettingsController->setSetImageExtensions(ui->setImageExtensionTextEdit->text());
 }
 
 void MainWindow::on_createSetButton_clicked()
@@ -403,41 +409,7 @@ void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
     this->currentSet = arg1;
     this->setController->getSetFiles(currentSet, currentView);
-//    regenerateSetItems();
-    //regenerateOriginalImage();
-
-//    this->setController->getSetFileNames(currentSet, ui->viewComboBox->currentText());
 }
-
-//void MainWindow::on_imageListWidget_itemClicked(QListWidgetItem *item)
-//{
-    //get set path, get current set name, get item->icon name
-    //QString iconPath = appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + item->text();
-    //this->setController->getImageStatus(iconPath);
-    //item->text();
-
-//    this->setController->setFiles.indexOf()
-//    item->
-//    Mat image = imread(iconPath.toStdString(), CV_LOAD_IMAGE_COLOR);
-
-//    emit newFrame(image);
-
-//    qDebug() << item->data(Qt::UserRole).toString();
-    //Mat image = imread(this->setController->setFiles.at(item->text().toInt()).absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
-
-    //setImage setImageItem = qvariant_cast<setImage>(item->data(SET_IMAGE));
-
-//    QVariant variant;
-//    ...
-//    QColor color = variant.value<QColor>()
-
-    //emit newFrame(setImageItem.getImageMat());
-//}
-
-//void MainWindow::on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos)
-//{
-//    qDebug() << "Context Menu Test";
-//}
 
 void MainWindow::on_deleteImageButton_clicked()
 {

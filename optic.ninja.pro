@@ -11,7 +11,7 @@ DEFINES += APP_VERSION=\\\"1.0.0\\\" \
 
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-TARGET = vision-core
+TARGET = optic.ninja
 
 TEMPLATE = app
 

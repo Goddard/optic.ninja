@@ -1,22 +1,22 @@
 #include "setcontrol.h"
 
-setControl::setControl(QString setPathParm, QListWidget *parent) :
+setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
     QListWidget(parent)
 {
-    this->setPath = setPathParm;
+    this->appSettingsController = appSettingsParm;
+    this->setPath = this->appSettingsController->getSetsPath();
 
     //create image viewer
     this->imgView = new ImageView();
     connect(this, SIGNAL(newFrame(QPixmap*)), imgView, SLOT(updateFrame(QPixmap*)));
-//    connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
+    //connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
 
     this->setViewMode(QListView::IconMode);
     this->setIconSize(QSize(105, 105));
 
     connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
 
-    //add permitted extensions
-    this->extensionList << "*.JPG" << "*.JPEG" << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.pgm" << "*.PGM";
+    this->extensionList = this->appSettingsController->getSetImageExtensions().split(",");
 }
 
 setControl::~setControl()
@@ -32,7 +32,13 @@ void setControl::addSetItem(int index, setImage *setImage)
 
 void setControl::setItemClicked(int currentRow)
 {
-    emit newFrame(this->setFiles.value(currentRow)->getImageQPixmap());
+    if(this->setFiles.value(currentRow))
+    {
+        this->imgView->clearImageBuffer();
+        this->imgView->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
+        //emit newFrame(this->setFiles.value(currentRow)->getImageQPixmap());
+//        addBufferFrame();
+    }
 }
 
 QStringList setControl::getSets()
@@ -53,6 +59,9 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
     //set setname globally
     this->setName = setNameParm;
 
+    //set settings file and get initial values
+    this->setSetSettingsFile();
+
     //clear setfiles, fileinfo, and qlistitems
     QList<QFileInfo> tempFileInfoList;
     qDeleteAll(this->setFiles.begin(), this->setFiles.end());
@@ -66,9 +75,9 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
 
     QDir dir(setBasePath);
     dir.setFilter(QDir::Files);
-    dir.setNameFilters(extensionList);
+    dir.setNameFilters(this->extensionList);
 
-    if(viewType == "NULL" || viewType == "All" || viewType == "Undefined")
+    if(viewType == "NULL" || viewType == "Undefined")
     {
         dir.setPath(setBasePath);
         tempFileInfoList = dir.entryInfoList();
@@ -78,7 +87,7 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
         }
     }
 
-    if(viewType == "Positive" || viewType == "All")
+    if(viewType == "Positive")
     {
         dir.setPath(setBasePath + QDir::separator() + positiveView);
         tempFileInfoList += dir.entryInfoList();
@@ -88,7 +97,7 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
         }
     }
 
-    if(viewType == "Negative" || viewType == "All")
+    if(viewType == "Negative")
     {
         dir.setPath(setBasePath + QDir::separator() + negativeView);
         tempFileInfoList += dir.entryInfoList();
@@ -110,7 +119,8 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
 
     if(this->setFiles.count() > 0)
     {
-        emit newFrame(this->setFiles.value(0)->getImageQPixmap());
+        this->imgView->addBufferFrame(this->setFiles.value(0)->getImageQImage());
+        //emit newFrame(this->setFiles.value(0)->getImageQPixmap());
         this->setCurrentRow(0);
     }
 
@@ -171,6 +181,7 @@ QString setControl::getImageBufferSize()
 
 }
 
+//generates two files one positive and one negative positive has all details for traincascade negative just has file names and paths
 void setControl::getSetFileNames(QString setName)
 {
     QString newPath = this->setPath + "/" + setName;
@@ -214,4 +225,10 @@ void setControl::getSetFileNames(QString setName)
 //    negativeFile.close();
 
     //return listFiles;
+}
+
+void setControl::setSetSettingsFile()
+{
+    if(!this->setName.isEmpty())
+        this->setSettings = new QSettings(this->setPath + QDir::separator() + this->setName + QDir::separator() + "setSettings.ini", QSettings::IniFormat);
 }

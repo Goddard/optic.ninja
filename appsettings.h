@@ -4,7 +4,7 @@
 #include <QSettings>
 #include <QDir>
 #include <QCoreApplication>
-
+#include <QStringListIterator>
 #include <QDebug>
 
 class appSettings : public QObject
@@ -21,10 +21,16 @@ public:
     QString settingsPath;
 
     QString getSetsPath();
+    void setSetsPath(QString setsPath);
+
+    void setSetImageExtensions(QString extensionListPram);
+    QString getSetImageExtensions();
+    QSettings *getSettings();
 
 private:
     QSettings *mainSettings;
     QString setsPath;
+    QStringList validSetImageExtensions;
 
 };
 

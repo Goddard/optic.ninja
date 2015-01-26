@@ -2,17 +2,19 @@
 #define IMAGEVIEW_H
 
 #include <QWidget>
-//QT
-#include <QtCore/QString>
+#include <QString>
 #include <QMessageBox>
-#include <QtCore/QObject>
+#include <QObject>
 #include <QRect>
+#include <QPainter>
 
 #include "ImageProcessingSettingsDialog.h"
 #include "structures.h"
 #include "bufferThread.h"
 #include "processThread.h"
 #include "MatToQImage.h"
+
+#include "setimage.h"
 
 namespace Ui {
     class ImageView;
@@ -22,22 +24,29 @@ class ImageView : public QWidget
 {
     Q_OBJECT
 
-private:
-    Ui::ImageView *ui;
-    ImageProcessingSettingsDialog *imageProcessingSettingsDialog;
-    struct ImageProcessingFlags imageProcessingFlags;
-    struct ImageProcessingSettings imgProesscSettings;
-    Mat currentMatImage;
-    QImage currentQImage;
-    Rect currentROI;
-
 public:
     explicit ImageView(QWidget *parent = 0);
     ~ImageView();
     QRect getCurrentROI();
     void setROI(QRect roi);
-    QList<QImage> imageBuffer;
+
+    QList<QImage*> imageBuffer;
     void clearFrame();
+    void addBufferFrame(QImage *qImageAdd);
+
+private:
+    Ui::ImageView *ui;
+    ImageProcessingSettingsDialog *imageProcessingSettingsDialog;
+    struct ImageProcessingFlags imageProcessingFlags;
+    struct ImageProcessingSettings imgProesscSettings;
+
+    //might phase out and just user imageBuffer
+    Mat currentMatImage;
+    QImage currentQImage;
+    Rect currentROI;
+
+protected:
+  void paintEvent(QPaintEvent* event);
 
 signals:
     void newImageProcessingFlags(struct ImageProcessingFlags imageProcessingFlags);

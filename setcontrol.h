@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QHBoxLayout>
 
+#include <appsettings.h>
 #include <setimage.h>
 #include <imageview.h>
 
@@ -17,7 +18,7 @@ class setControl : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit setControl(QString setPathParm, QListWidget *parent = 0);
+    explicit setControl(appSettings *appSettingsParm, QListWidget *parent = 0);
     ~setControl();
     void addSetItem(int index, setImage *setImage);
 
@@ -37,6 +38,8 @@ public:
 
     QPushButton *button;
 
+    void setSetSettingsFile();
+
 private:
     QString setPath;
     QString setName;
@@ -44,8 +47,8 @@ private:
     QStringList extensionList;
     QList<setImage *> setFiles;
     QListWidget *setListWidget;
-
     ImageView *imgView;
+    appSettings *appSettingsController;
 
 
 protected:
