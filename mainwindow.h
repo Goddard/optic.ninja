@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QDirModel>
 #include <QListWidgetItem>
+#include <QScrollArea>
 
 // OpenCV
 #if USECV3 == 0

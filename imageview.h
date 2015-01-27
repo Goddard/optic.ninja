@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QRect>
 #include <QPainter>
+#include <QGridLayout>
 
 #include "ImageProcessingSettingsDialog.h"
 #include "structures.h"

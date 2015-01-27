@@ -27,6 +27,9 @@ ImageView::ImageView(QWidget *parent) :
     //ui->imageSizeLabel->setText("0 W, 0 H");
 
     //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+//    QScrollArea *scrollArea = new QScrollArea;
+//    scrollArea->setBackgroundRole(QPalette::Dark);
+//    scrollArea->setWidget(this);
 }
 
 ImageView::~ImageView()
@@ -36,11 +39,44 @@ ImageView::~ImageView()
 
 void ImageView::paintEvent(QPaintEvent*)
 {
-  if (this->imageBuffer.empty()){ return; }
+    if (this->imageBuffer.empty()){ return; }
 
-  QPainter painter(this);
-//  QMargins
-  painter.drawImage(rect(), *this->imageBuffer.at(this->imageBuffer.count()-1), this->imageBuffer.at(this->imageBuffer.count()-1)->rect());
+    QImage tempQImage = *this->imageBuffer.at(this->imageBuffer.count()-1);
+    //tempQImage = tempQImage.scaled(rect().size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    if(tempQImage.width() > this->width() || tempQImage.height() > this->height())
+        this->resize(tempQImage.width(), tempQImage.height());
+    else
+    {
+//        QObject *obj = new QGridLayout;
+        QGridLayout *parentLayout = qobject_cast<QGridLayout *>(this->parent());
+        //this->resize(parentLayout->sizeHint());
+    }
+
+    double widgetWidth = this->width();
+    double widgetHeight = this->height();
+    QRectF target(0, 0, widgetWidth, widgetHeight);
+
+    double imageSizeWidth = static_cast<double>(tempQImage.width());
+    double imageSizeHeight = static_cast<double>(tempQImage.height());
+    QRectF source(0.0, 0.0, imageSizeWidth, imageSizeHeight);
+
+    int deltaX = 0;
+    int deltaY = 0;
+    if(source.width() < target.width())
+        deltaX = target.width() - source.width();
+    else
+        deltaX = source.width() - target.width();
+
+    if(source.height() < target.height())
+        deltaY = target.height() - source.height();
+    else
+        deltaY = source.height() - target.height();
+
+    QPainter painter(this);
+    painter.translate(deltaX / 2, deltaY / 2);
+
+    painter.drawImage(source, tempQImage);
 }
 
 //set when setimage first set - most likely done from setControl

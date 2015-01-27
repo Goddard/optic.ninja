@@ -64,8 +64,16 @@ MainWindow::MainWindow(QWidget *parent) :
     //add items to set list widget
     this->setController->getSetFiles(ui->setComboBox->currentText(), ui->viewComboBox->currentText());
 
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    scrollArea->setGeometry(ui->ImageViewLayout->geometry());
+    this->setController->getImageView()->setGeometry(ui->ImageViewLayout->geometry());
+    scrollArea->setWidget(this->setController->getImageView());
+
     //add image view widget to main window
-    ui->ImageViewLayout->addWidget(this->setController->getImageView());
+//    ui->ImageViewLayout->addWidget(this->setController->getImageView());
+    ui->ImageViewLayout->addWidget(scrollArea);
 
     //setup shortcut keys
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
