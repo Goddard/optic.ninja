@@ -65,11 +65,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setController->getSetFiles(ui->setComboBox->currentText(), ui->viewComboBox->currentText());
 
     QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setAlignment(Qt::AlignHCenter);
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     scrollArea->setGeometry(ui->ImageViewLayout->geometry());
     this->setController->getImageView()->setGeometry(ui->ImageViewLayout->geometry());
     scrollArea->setWidget(this->setController->getImageView());
+
+    connect(ui->setImagespinBox, SIGNAL(valueChanged(int)), this->setController->getImageView(), SLOT(zoomChanged(int)));
 
     //add image view widget to main window
 //    ui->ImageViewLayout->addWidget(this->setController->getImageView());
@@ -79,7 +82,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 
 //    ui->stackedWidget->setAutoFillBackground(true);
-    if (ui->listWidget->count() > 0) {
+    if(ui->listWidget->count() > 0)
+    {
       ui->listWidget->item(1)->setSelected(true);
     }
     ui->listWidget->setFocus();

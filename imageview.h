@@ -8,6 +8,11 @@
 #include <QRect>
 #include <QPainter>
 #include <QGridLayout>
+#include <QMouseEvent>
+#include <QLabel>
+#include <QRadioButton>
+
+#include <QRubberBand>
 
 #include "ImageProcessingSettingsDialog.h"
 #include "structures.h"
@@ -46,8 +51,28 @@ private:
     QImage currentQImage;
     Rect currentROI;
 
+    double zoomLevel;
+    int mouseXPosition;
+    int mouseYPosition;
+    QLabel *mousePositionLabel;
+
+    int currentBufferImageIndex;
+
+    QPoint drawStartPoint;
+    QPoint drawEndPoint;
+
+//    QList<QRectF *>
+    QRectF *drawRectangle;
+
+    bool scribbling;
+    void drawLineTo(const QPoint &endPoint);
+    bool modified;
+
 protected:
-  void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 signals:
     void newImageProcessingFlags(struct ImageProcessingFlags imageProcessingFlags);
@@ -55,7 +80,7 @@ signals:
 public slots:
     void setImageProcessingSettings();
     void newMouseData(struct MouseData mouseData);
-    void updateMouseCursorPosLabel();
+    void setMousePosition();
     void clearImageBuffer();
     void updateProcessingThreadStats(struct ThreadStatisticsData statData);
     void updateImageProcessingSettings(struct ImageProcessingSettings);
@@ -63,6 +88,7 @@ public slots:
 private slots:
     void updateFrame(QPixmap *imagePixmap);
     void handleContextMenuAction(QAction *action);
+    void zoomChanged(int zoomLevelParm);
 };
 
 #endif // IMAGEVIEW_H

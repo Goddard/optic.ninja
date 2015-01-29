@@ -7,7 +7,7 @@ ImageView::ImageView(QWidget *parent) :
 {
     // Setup UI
     ui->setupUi(this);
-    //connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
+//    connect(this, SIGNAL(onMouseMoveEvent()), this, SLOT(setMousePosition()));
     //connect(ui->frameLabel->menu, SIGNAL(triggered(QAction*)), this, SLOT(handleContextMenuAction(QAction*)));
 
     //ui->mouseCursorPositionLabel->setText(" ");
@@ -24,12 +24,15 @@ ImageView::ImageView(QWidget *parent) :
     // Create image processing settings dialog
     imageProcessingSettingsDialog = new ImageProcessingSettingsDialog(this);
     connect(imageProcessingSettingsDialog, SIGNAL(newImageProcessingSettings(struct ImageProcessingSettings)), this, SLOT(updateImageProcessingSettings(struct ImageProcessingSettings)));
-    //ui->imageSizeLabel->setText("0 W, 0 H");
 
-    //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//    QScrollArea *scrollArea = new QScrollArea;
-//    scrollArea->setBackgroundRole(QPalette::Dark);
-//    scrollArea->setWidget(this);
+    this->zoomLevel = 1;
+    this->mouseXPosition = 0;
+    this->mouseYPosition = 0;
+    this->setMouseTracking(true);
+
+    this->currentBufferImageIndex = 0;
+
+    modified = false;
 }
 
 ImageView::~ImageView()
@@ -37,46 +40,103 @@ ImageView::~ImageView()
     delete ui;
 }
 
+void ImageView::zoomChanged(int zoomLevelParm)
+{
+    this->zoomLevel = static_cast<double>(zoomLevelParm) / 100;
+    this->repaint();
+}
+
+void ImageView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        this->drawStartPoint = event->pos();
+        drawLineTo(event->pos());
+        scribbling = true;
+    }
+}
+
+void ImageView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && scribbling) {
+        drawLineTo(event->pos());
+        scribbling = false;
+    }
+}
+
+void ImageView::mouseMoveEvent(QMouseEvent *event)
+{
+    this->mouseXPosition = event->x();
+    this->mouseYPosition = event->y();
+
+    //get frame label 3 levels higher
+    if(this->parentWidget())
+        if(this->parentWidget()->parentWidget())
+            if(this->parentWidget()->parentWidget()->parentWidget())
+            {
+                QLabel *mouseLocationLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("mouseLocationLabel");
+                        mouseLocationLabel->setText("( " + QString::number(this->mouseXPosition) + ", " + QString::number(this->mouseYPosition) + " )" +
+                                                    "[ " + QString::number(this->imageBuffer.at(this->imageBuffer.count()-1)->width()) + " / " + QString::number(this->imageBuffer.at(this->imageBuffer.count()-1)->height()) + " ] ");
+            }
+
+    if ((event->buttons() & Qt::LeftButton) && scribbling)
+    {
+//        ->adjust(this->drawStartPoint.x(), this->drawStartPoint.y(), this->mouseXPosition, this->mouseYPosition);
+        drawLineTo(event->pos());
+        update();
+
+    }
+}
+
+//static QRect box(const QPoint& p1, const QPoint &p2)
+//{
+//    int min_x = p1.x();
+//    int min_y = p1.y();
+//    int max_x = p2.x();
+//    int max_y = p2.y();
+//    if(max_x < min_x)
+//    {
+//        max_x = min_x;
+//        min_x = p2.x();
+//    }
+//    if(max_y < min_x)
+//    {
+//        max_y = min_y;
+//        min_y = p2.y();
+//    }
+//    return QRect(min_x, min_y, max_x - min_x, max_y - min_y);
+//}
+
+void ImageView::drawLineTo(const QPoint &endPoint)
+{
+    QPainter painter(this->imageBuffer.at(this->imageBuffer.count()-1));
+    //painter.setPen(QPen( Qt::blue, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    drawRectangle = new QRectF(this->drawStartPoint, endPoint);
+    QPen pen(QColor("#00FF00"), 2 );
+    painter.setPen( pen );
+    painter.drawRect(*drawRectangle);
+    update(QRect(this->drawStartPoint, endPoint));
+}
+
 void ImageView::paintEvent(QPaintEvent*)
 {
     if (this->imageBuffer.empty()){ return; }
 
+    //select correct image based on request
+    //this->currentBufferImageIndex
     QImage tempQImage = *this->imageBuffer.at(this->imageBuffer.count()-1);
-    //tempQImage = tempQImage.scaled(rect().size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    if(tempQImage.width() > this->width() || tempQImage.height() > this->height())
-        this->resize(tempQImage.width(), tempQImage.height());
-    else
-    {
-//        QObject *obj = new QGridLayout;
-        QGridLayout *parentLayout = qobject_cast<QGridLayout *>(this->parent());
-        //this->resize(parentLayout->sizeHint());
-    }
-
-    double widgetWidth = this->width();
-    double widgetHeight = this->height();
+    double widgetWidth = static_cast<double>(this->width()) / this->zoomLevel;
+    double widgetHeight = static_cast<double>(this->height()) / this->zoomLevel;
     QRectF target(0, 0, widgetWidth, widgetHeight);
 
-    double imageSizeWidth = static_cast<double>(tempQImage.width());
-    double imageSizeHeight = static_cast<double>(tempQImage.height());
+    double imageSizeWidth = static_cast<double>(tempQImage.width()) * this->zoomLevel;
+    double imageSizeHeight = static_cast<double>(tempQImage.height()) * this->zoomLevel;
     QRectF source(0.0, 0.0, imageSizeWidth, imageSizeHeight);
 
-    int deltaX = 0;
-    int deltaY = 0;
-    if(source.width() < target.width())
-        deltaX = target.width() - source.width();
-    else
-        deltaX = source.width() - target.width();
-
-    if(source.height() < target.height())
-        deltaY = target.height() - source.height();
-    else
-        deltaY = source.height() - target.height();
+    this->resize(imageSizeWidth, imageSizeHeight);
 
     QPainter painter(this);
-    painter.translate(deltaX / 2, deltaY / 2);
-
-    painter.drawImage(source, tempQImage);
+    painter.drawImage(source, tempQImage, target);
 }
 
 //set when setimage first set - most likely done from setControl
@@ -84,7 +144,17 @@ void ImageView::paintEvent(QPaintEvent*)
 //clear when set image changes - done from image setControl also
 void ImageView::addBufferFrame(QImage *qImageAdd)
 {
-    imageBuffer.append(qImageAdd);
+    this->imageBuffer.append(qImageAdd);
+    this->currentBufferImageIndex = this->imageBuffer.count();
+
+    if(this->parentWidget())
+        if(this->parentWidget()->parentWidget())
+            if(this->parentWidget()->parentWidget()->parentWidget())
+            {
+                QLabel *bufferSizeLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("frameBufferLabel");
+                bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
+            }
+
     this->repaint();
     //ui->ImageBufferSize->setText(QString::number(imageBuffer.count()));
 }
@@ -187,8 +257,10 @@ void ImageView::clearImageBuffer()
     this->imageBuffer.clear();
 }
 
-void ImageView::updateMouseCursorPosLabel()
+void ImageView::setMousePosition()
 {
+    //this->mouseXPosition = this->get ->getMouseCursorPos().x();
+    //label_y=ui->frameLabel->getMouseCursorPos().y();
     // Update mouse cursor position in mouseCursorPosLabel
 //    ui->mouseCursorPositionLabel->setText(QString("(")+QString::number(ui->frameLabel->getMouseCursorPos().x())+
 //                                     QString(",")+QString::number(ui->frameLabel->getMouseCursorPos().y())+

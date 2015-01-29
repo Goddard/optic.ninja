@@ -52,9 +52,9 @@ QListWidgetItem *setImage::getImageWidgetItem()
     return this->fileWidgetItem;
 }
 
-QString *setImage::getImageStatus()
+QString setImage::getImageStatus()
 {
-    return &this->fileSetType;
+    return this->fileSetType;
 }
 
 void setImage::setImageFileInfo(QFileInfo fileInfoParm)

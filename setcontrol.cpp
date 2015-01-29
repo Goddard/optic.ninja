@@ -36,8 +36,28 @@ void setControl::setItemClicked(int currentRow)
     {
         this->imgView->clearImageBuffer();
         this->imgView->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
-        //emit newFrame(this->setFiles.value(currentRow)->getImageQPixmap());
-//        addBufferFrame();
+
+        if(this->parentWidget())
+            if(this->parentWidget()->parentWidget())
+            {
+                QLabel *fileNameLabel = this->parentWidget()->parentWidget()->findChild<QLabel *>("fileNameLabel");
+                fileNameLabel->setText(this->setFiles.at(currentRow)->getImageFileInfo().fileName());
+
+                QLabel *fileSizeLabel = this->parentWidget()->parentWidget()->findChild<QLabel *>("imageSizeLabel");
+                fileSizeLabel->setText(QString::number((this->setFiles.at(currentRow)->getImageFileInfo().size()) / 1024) + " KB");
+
+                if(this->setFiles.at(currentRow)->getImageStatus() == "Positive")
+                {
+                    QRadioButton *positiveRadioButton = this->parentWidget()->parentWidget()->findChild<QRadioButton *>("positiveImageRadioButton");
+                    positiveRadioButton->setChecked(true);
+                }
+
+                else if(this->setFiles.at(currentRow)->getImageStatus() == "Negative")
+                {
+                    QRadioButton *negativeRadioButton = this->parentWidget()->parentWidget()->findChild<QRadioButton *>("negativeImageRadioButton");
+                    negativeRadioButton->setChecked(true);
+                }
+            }
     }
 }
 

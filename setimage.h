@@ -41,7 +41,7 @@ public:
     QPixmap *getImageQPixmap();
     QFileInfo getImageFileInfo() const;
     QListWidgetItem *getImageWidgetItem();
-    QString *getImageStatus();
+    QString getImageStatus();
 
     void setImageFileInfo(QFileInfo fileInfoParm);
     void resetImageMat();

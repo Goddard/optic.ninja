@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1542</width>
-    <height>1112</height>
+    <width>1920</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>0</width>
-    <height>0</height>
+    <width>1920</width>
+    <height>1080</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -107,7 +107,70 @@
           </sizepolicy>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0">
+          <item row="1" column="0" rowspan="2" colspan="4">
+           <layout class="QGridLayout" name="SetViewLayout">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="0" column="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QPushButton" name="compileSetButton">
+              <property name="text">
+               <string>Compile Set</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="completeSetButton">
+              <property name="text">
+               <string>Complete Set</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="3">
+           <layout class="QGridLayout" name="gridLayout_8">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item row="0" column="3">
+             <widget class="QRadioButton" name="positiveImageRadioButton">
+              <property name="text">
+               <string>Positive</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="deleteImageButton">
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QRadioButton" name="negativeImageRadioButton">
+              <property name="text">
+               <string>Negative</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="saveImageButton">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0" colspan="2">
            <layout class="QGridLayout" name="gridLayout_6">
             <property name="sizeConstraint">
              <enum>QLayout::SetMinimumSize</enum>
@@ -115,14 +178,26 @@
             <item row="0" column="3">
              <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>View Type :</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;View Type :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Current Set :</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Current Set :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -181,10 +256,25 @@
             </item>
            </layout>
           </item>
-          <item row="4" column="0">
+          <item row="4" column="0" colspan="2">
            <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
             <item>
              <widget class="QLabel" name="frameBufferLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>75</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>[ 1 / 1 ]</string>
               </property>
@@ -218,6 +308,52 @@
             </item>
             <item>
              <widget class="QSpinBox" name="setImagespinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::PlusMinus</enum>
+              </property>
+              <property name="suffix">
+               <string comment="%" extracomment="%">%</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>1500</number>
+              </property>
+              <property name="singleStep">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="imageSizeLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>75</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>0.0 MB</string>
+              </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
@@ -225,74 +361,27 @@
             </item>
            </layout>
           </item>
-          <item row="0" column="2" colspan="2">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QPushButton" name="pushButton">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0" rowspan="2" colspan="4">
-           <layout class="QGridLayout" name="SetViewLayout">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetNoConstraint</enum>
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-           </layout>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>120</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
-          <item row="6" column="0" rowspan="2" colspan="4">
+          <item row="5" column="0" rowspan="3" colspan="4">
            <layout class="QGridLayout" name="ImageViewLayout" rowstretch="0" columnstretch="0">
             <property name="sizeConstraint">
              <enum>QLayout::SetNoConstraint</enum>
             </property>
-           </layout>
-          </item>
-          <item row="4" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_3"/>
-          </item>
-          <item row="4" column="2" colspan="2">
-           <layout class="QGridLayout" name="gridLayout_8">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetMaximumSize</enum>
-            </property>
-            <item row="0" column="3">
-             <widget class="QRadioButton" name="positiveImageRadioButton">
-              <property name="text">
-               <string>Positive</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="deleteImageButton">
-              <property name="text">
-               <string>Delete</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
-             <widget class="QRadioButton" name="negativeImageRadioButton">
-              <property name="text">
-               <string>Negative</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="saveImageButton">
-              <property name="text">
-               <string>Save</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>
@@ -315,8 +404,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>1417</width>
-               <height>1051</height>
+               <width>46</width>
+               <height>16</height>
               </rect>
              </property>
              <widget class="QLabel" name="label">
@@ -568,7 +657,7 @@ padding: 10px; color: white;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1542</width>
+     <width>1920</width>
      <height>31</height>
     </rect>
    </property>
