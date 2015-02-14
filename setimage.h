@@ -6,6 +6,8 @@
 #include <QPixmap>
 #include <QListWidgetItem>
 
+#include <QDebug>
+
 // OpenCV
 #if USECV3 == 0
     #include <opencv2/ocl/ocl.hpp>

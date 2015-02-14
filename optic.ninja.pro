@@ -110,7 +110,7 @@ FORMS += \
     createsetdialog.ui \
     imageview.ui
 
-QMAKE_CXXFLAGS += -Wall
+QMAKE_CXXFLAGS += -Wall -std=gnu++11
 
 RESOURCES += \
     irconresource.qrc

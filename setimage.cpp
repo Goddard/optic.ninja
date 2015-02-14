@@ -7,9 +7,11 @@ setImage::setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, Q
     this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
     this->fileImage = MatToQImage(this->fileMat);
     this->filePixmap = QPixmap::fromImage(fileImage);
-    this->fileIcon = QIcon(this->filePixmap);
+    this->fileIcon = QIcon(this->filePixmap); // this->fileInfo.absoluteFilePath()
     this->fileSetType = fileSetTypeParm;
     this->fileWidgetItem = new QListWidgetItem(this->fileIcon, QString::number(index));
+
+//    qDebug() << "Set Image Created : " + this->fileInfo.baseName();
 }
 
 setImage::~setImage()

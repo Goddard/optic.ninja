@@ -69,24 +69,24 @@ MainWindow::MainWindow(QWidget *parent) :
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     scrollArea->setGeometry(ui->ImageViewLayout->geometry());
-    this->setController->getImageView()->setGeometry(ui->ImageViewLayout->geometry());
     scrollArea->setWidget(this->setController->getImageView());
 
     connect(ui->setImagespinBox, SIGNAL(valueChanged(int)), this->setController->getImageView(), SLOT(zoomChanged(int)));
 
     //add image view widget to main window
-//    ui->ImageViewLayout->addWidget(this->setController->getImageView());
     ui->ImageViewLayout->addWidget(scrollArea);
 
     //setup shortcut keys
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 
-//    ui->stackedWidget->setAutoFillBackground(true);
     if(ui->listWidget->count() > 0)
     {
       ui->listWidget->item(1)->setSelected(true);
     }
     ui->listWidget->setFocus();
+
+    this->setController->repaint();
+    this->setController->getImageView()->repaint();
 }
 
 MainWindow::~MainWindow()
@@ -425,8 +425,16 @@ void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 
 void MainWindow::on_deleteImageButton_clicked()
 {
-    //ui->imageListWidget->takeItem(ui->imageListWidget->currentRow());
-    //setController->deleteImage(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Set File Delete Confirmation");
+    msgBox.setText("Are you sure you want to delete this set image?");
+    msgBox.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Apply);
+
+    if(msgBox.exec() == QMessageBox::Apply)
+    {
+      this->setController->deleteImage();
+    }
 }
 
 void MainWindow::on_positiveImageRadioButton_clicked()
@@ -439,35 +447,11 @@ void MainWindow::on_negativeImageRadioButton_clicked()
     this->setController->setImageStatus("negative");
 }
 
-void MainWindow::regenerateSetItems()
-{
-//    QList<setImage*> *setImages = setController->getSetFiles(currentSet, currentView);
-//    //ui->imageListWidget->clear();
-//    for(int i= 0; i < setImages->count(); i++)
-//    {
-//        //QIcon(setImages->at(i)->getImageFileInfo().absoluteFilePath())
-//        //QListWidgetItem *currentWidgetItem = new QListWidgetItem(*setImages->at(i)->getImageQIcon(), QString::number(i), ui->imageListWidget);
-//        currentWidgetItem->setData(SET_IMAGE, QVariant::fromValue(*setImages->at(i)));
-//        //ui->imageListWidget->addItem(currentWidgetItem);
-
-//        if(i == 0)
-//        {
-//            //ui->imageListWidget->setCurrentItem(currentWidgetItem);
-//        }
-//    }
-}
-
-void MainWindow::regenerateOriginalImage(QString newPath)
-{
-//    this->setController->getImageStatus(newPath);
-//    Mat image = imread(newPath.toStdString(), CV_LOAD_IMAGE_COLOR);
-//    emit newFrame(image);
-}
-
 void MainWindow::on_saveImageButton_clicked()
 {
-//    bool returnValue = imgView->imageBuffer.last().save(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
-//    ui->imageListWidget->currentItem()->setIcon(QIcon(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text()));
+    this->setController->saveImage();
+    //bool returnValue = this->setController->getImageView()->imageBuffer.last().save(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
+    //this->setController->currentItem()->setIcon(QIcon(this->appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + this->setController->currentItem()->text()));
 }
 
 void MainWindow::on_viewComboBox_activated(const QString &arg1)
@@ -475,4 +459,9 @@ void MainWindow::on_viewComboBox_activated(const QString &arg1)
     this->currentView = arg1;
     this->currentSet = ui->setComboBox->currentText();
     setController->getSetFiles(currentSet, currentView);
+}
+
+void MainWindow::on_copySetImageButton_clicked()
+{
+    this->setController->copyImage();
 }

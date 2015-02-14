@@ -22,27 +22,27 @@ public:
     ~setControl();
     void addSetItem(int index, setImage *setImage);
 
-    QList<setImage *> *getSetFiles(QString setNameParm, QString viewType = NULL);
+    QList<setImage *> *getSetFiles(QString setNameParm, QString viewTypeParm = NULL);
     bool setImageStatus(QString setType);
-    bool saveImage(QImage modifiedImage, QString fileName);
-    bool deleteImage(QString filePath);
+    bool saveImage();
+    bool copyImage();
+    bool deleteImage();
     QString getImageSize(QString filePath);
     QString getImageBufferSize();
     void getSetFileNames(QString setName);
     QStringList getSets();
-
 
     ImageView *getImageView();
 
     struct ThreadStatisticsData statsData;
 
     QPushButton *button;
-
     void setSetSettingsFile();
 
 private:
     QString setPath;
     QString setName;
+    QString viewType;
     QSettings *setSettings;
     QStringList extensionList;
     QList<setImage *> setFiles;
@@ -50,12 +50,11 @@ private:
     ImageView *imgView;
     appSettings *appSettingsController;
 
-
 protected:
 //    virtual void currentRowChanged(int currentRow);
 
 signals:
-        void newFrame(QPixmap *pixmapFrame);
+//        void newFrame(QPixmap *pixmapFrame);
 
 public slots:
         void setItemClicked(int currentRow);

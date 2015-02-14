@@ -11,11 +11,10 @@
 #include <QMouseEvent>
 #include <QLabel>
 #include <QRadioButton>
+#include <QSpinBox>
 
 #include <QRubberBand>
 
-#include "ImageProcessingSettingsDialog.h"
-#include "structures.h"
 #include "bufferThread.h"
 #include "processThread.h"
 #include "MatToQImage.h"
@@ -33,23 +32,14 @@ class ImageView : public QWidget
 public:
     explicit ImageView(QWidget *parent = 0);
     ~ImageView();
-    QRect getCurrentROI();
-    void setROI(QRect roi);
 
-    QList<QImage*> imageBuffer;
+    QList<QImage> imageBuffer;
     void clearFrame();
     void addBufferFrame(QImage *qImageAdd);
+    const QImage *getCurrentBufferImage();
 
 private:
     Ui::ImageView *ui;
-    ImageProcessingSettingsDialog *imageProcessingSettingsDialog;
-    struct ImageProcessingFlags imageProcessingFlags;
-    struct ImageProcessingSettings imgProesscSettings;
-
-    //might phase out and just user imageBuffer
-    Mat currentMatImage;
-    QImage currentQImage;
-    Rect currentROI;
 
     double zoomLevel;
     int mouseXPosition;
@@ -61,34 +51,27 @@ private:
     QPoint drawStartPoint;
     QPoint drawEndPoint;
 
-//    QList<QRectF *>
-    QRectF *drawRectangle;
+    QRect newROI;
+    QImage setROI;
 
-    bool scribbling;
-    void drawLineTo(const QPoint &endPoint);
-    bool modified;
+    QRubberBand *rubberBand {rubberBand = NULL};
 
 protected:
     void paintEvent(QPaintEvent* event);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent * event);
 
 signals:
-    void newImageProcessingFlags(struct ImageProcessingFlags imageProcessingFlags);
 
 public slots:
-    void setImageProcessingSettings();
-    void newMouseData(struct MouseData mouseData);
-    void setMousePosition();
     void clearImageBuffer();
-    void updateProcessingThreadStats(struct ThreadStatisticsData statData);
-    void updateImageProcessingSettings(struct ImageProcessingSettings);
 
 private slots:
-    void updateFrame(QPixmap *imagePixmap);
-    void handleContextMenuAction(QAction *action);
     void zoomChanged(int zoomLevelParm);
+    void moveBufferForward();
+    void moveBufferBackward();
 };
 
 #endif // IMAGEVIEW_H

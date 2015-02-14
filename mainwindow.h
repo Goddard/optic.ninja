@@ -15,6 +15,8 @@
 #include <QListWidgetItem>
 #include <QScrollArea>
 
+#include <QGraphicsProxyWidget>
+
 // OpenCV
 #if USECV3 == 0
     #include <opencv2/ocl/ocl.hpp>
@@ -81,6 +83,7 @@ class MainWindow : public QMainWindow
 //        struct ThreadStatisticsData statsData;
 
 //        int SET_IMAGE;
+        QMessageBox *tempMessageBox;
 
     public slots:
         void connectToCamera();
@@ -107,6 +110,8 @@ class MainWindow : public QMainWindow
         void on_viewComboBox_activated(const QString &arg1);
 
         void on_listWidget_clicked(const QModelIndex &index);
+
+        void on_copySetImageButton_clicked();
 
 signals:
         void newFrame(const Mat &matFrame);

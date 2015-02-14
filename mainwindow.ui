@@ -6,21 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1900</width>
+    <height>1050</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1920</width>
-    <height>1080</height>
+    <width>0</width>
+    <height>0</height>
    </size>
+  </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
   </property>
   <property name="windowTitle">
    <string>Optic.Ninja</string>
@@ -140,24 +143,17 @@
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
-            <item row="0" column="3">
-             <widget class="QRadioButton" name="positiveImageRadioButton">
-              <property name="text">
-               <string>Positive</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="deleteImageButton">
-              <property name="text">
-               <string>Delete</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
+            <item row="0" column="5">
              <widget class="QRadioButton" name="negativeImageRadioButton">
               <property name="text">
                <string>Negative</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QPushButton" name="deleteImageButton">
+              <property name="text">
+               <string>Delete</string>
               </property>
              </widget>
             </item>
@@ -165,6 +161,20 @@
              <widget class="QPushButton" name="saveImageButton">
               <property name="text">
                <string>Save</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QRadioButton" name="positiveImageRadioButton">
+              <property name="text">
+               <string>Positive</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="copySetImageButton">
+              <property name="text">
+               <string>Copy</string>
               </property>
              </widget>
             </item>
@@ -404,7 +414,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>46</width>
+               <width>63</width>
                <height>16</height>
               </rect>
              </property>
@@ -657,8 +667,8 @@ padding: 10px; color: white;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1920</width>
-     <height>31</height>
+     <width>1900</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

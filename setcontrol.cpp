@@ -8,8 +8,6 @@ setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
 
     //create image viewer
     this->imgView = new ImageView();
-    connect(this, SIGNAL(newFrame(QPixmap*)), imgView, SLOT(updateFrame(QPixmap*)));
-    //connect(this, SIGNAL(updateStatisticsInGUI(struct ThreadStatisticsData)), imgView, SLOT(updateProcessingThreadStats(struct ThreadStatisticsData)));
 
     this->setViewMode(QListView::IconMode);
     this->setIconSize(QSize(105, 105));
@@ -36,6 +34,10 @@ void setControl::setItemClicked(int currentRow)
     {
         this->imgView->clearImageBuffer();
         this->imgView->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
+
+        //this->sceneContainer->clear();
+
+//        this->sceneContainer->addPixmap(this->setFiles.at(currentRow)->getImageQPixmap());
 
         if(this->parentWidget())
             if(this->parentWidget()->parentWidget())
@@ -74,10 +76,11 @@ ImageView *setControl::getImageView()
 }
 
 //gets the set files list in a qlist
-QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType)
+QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewTypeParm)
 {
     //set setname globally
     this->setName = setNameParm;
+    this->viewType = viewTypeParm;
 
     //set settings file and get initial values
     this->setSetSettingsFile();
@@ -96,6 +99,7 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
     QDir dir(setBasePath);
     dir.setFilter(QDir::Files);
     dir.setNameFilters(this->extensionList);
+    dir.setSorting(QDir::Time);
 
     if(viewType == "NULL" || viewType == "Undefined")
     {
@@ -139,8 +143,8 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
 
     if(this->setFiles.count() > 0)
     {
+        this->imgView->clearImageBuffer();
         this->imgView->addBufferFrame(this->setFiles.value(0)->getImageQImage());
-        //emit newFrame(this->setFiles.value(0)->getImageQPixmap());
         this->setCurrentRow(0);
     }
 
@@ -168,22 +172,52 @@ bool setControl::setImageStatus(QString setType)
 }
 
 //saves any changes you may of done
-bool setControl::saveImage(QImage modifiedImage, QString fileName)
+bool setControl::saveImage()
 {
-    qDebug() << "Image Saving";
-    return modifiedImage.save(fileName);
+    this->imgView->getCurrentBufferImage()->save(this->setFiles.at(this->currentRow())->getImageFileInfo().absoluteFilePath());
+    this->currentItem()->setIcon(QIcon(this->setFiles.at(this->currentRow())->getImageFileInfo().absoluteFilePath()));
+    return true;
+}
+
+bool setControl::copyImage()
+{
+    int numTrys = 0;
+    bool keepTrying = false;
+    QString newFileName;
+
+    while(!keepTrying)
+    {
+        numTrys++;
+        newFileName = this->setFiles.at(this->currentRow())->getImageFileInfo().absolutePath()
+            + QDir::separator() + this->setFiles.at(this->currentRow())->getImageFileInfo().completeBaseName()
+            + "-" + QString::number(numTrys)
+            + "." + this->setFiles.at(this->currentRow())->getImageFileInfo().completeSuffix();
+
+        QFileInfo checkFile(newFileName);
+        if(!checkFile.exists())
+        {
+            this->imgView->getCurrentBufferImage()->save(newFileName);
+            keepTrying = false;
+            this->getSetFiles(this->setName, this->viewType);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //deletes the image from the folder and set info file
-bool setControl::deleteImage(QString filePath)
+bool setControl::deleteImage()
 {
     //QString newPath = "C:\\Users\\Ryein\\OneDrive\\Documents\\projects\\vision-core\\sets\\" + setName;
-    QFile deleteFile(filePath);
+    QFile deleteFile(this->setFiles.at(this->currentRow())->getImageFileInfo().absoluteFilePath());
+
 //    QFileDialog dialog;
 //        dialog.setSidebarUrls(urls);
 //        dialog.setFileMode(QFileDialog::AnyFile);
 //        if(dialog.exec()) {
             deleteFile.remove();
+            this->getSetFiles(this->setName, this->viewType);
             return true;
 //        }
 //        return false;
