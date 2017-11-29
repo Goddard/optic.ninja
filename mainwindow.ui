@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1900</width>
-    <height>1050</height>
+    <width>1847</width>
+    <height>1058</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -110,13 +110,6 @@
           </sizepolicy>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0" rowspan="2" colspan="4">
-           <layout class="QGridLayout" name="SetViewLayout">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetNoConstraint</enum>
-            </property>
-           </layout>
-          </item>
           <item row="0" column="3">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <property name="sizeConstraint">
@@ -133,48 +126,6 @@
              <widget class="QPushButton" name="completeSetButton">
               <property name="text">
                <string>Complete Set</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="4" column="3">
-           <layout class="QGridLayout" name="gridLayout_8">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetFixedSize</enum>
-            </property>
-            <item row="0" column="5">
-             <widget class="QRadioButton" name="negativeImageRadioButton">
-              <property name="text">
-               <string>Negative</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QPushButton" name="deleteImageButton">
-              <property name="text">
-               <string>Delete</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="saveImageButton">
-              <property name="text">
-               <string>Save</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
-             <widget class="QRadioButton" name="positiveImageRadioButton">
-              <property name="text">
-               <string>Positive</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="copySetImageButton">
-              <property name="text">
-               <string>Copy</string>
               </property>
              </widget>
             </item>
@@ -249,7 +200,7 @@
              <widget class="QPushButton" name="createSetButton">
               <property name="minimumSize">
                <size>
-                <width>100</width>
+                <width>200</width>
                 <height>0</height>
                </size>
               </property>
@@ -266,7 +217,89 @@
             </item>
            </layout>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>120</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0" rowspan="3" colspan="4">
+           <layout class="QGridLayout" name="SetViewLayout">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="4" column="0" rowspan="2" colspan="4">
+           <layout class="QGridLayout" name="ImageViewLayout" rowstretch="0" columnstretch="0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="6" column="3">
+           <layout class="QGridLayout" name="gridLayout_8">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item row="0" column="3">
+             <widget class="QPushButton" name="deleteImageButton">
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="saveImageButton">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="copySetImageButton">
+              <property name="text">
+               <string>Copy</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QRadioButton" name="positiveImageRadioButton">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Square</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QRadioButton" name="negativeImageRadioButton">
+              <property name="text">
+               <string>Line</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QRadioButton" name="circalDrawRadioButton">
+              <property name="text">
+               <string>Circle</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="6" column="0" colspan="2">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <property name="sizeConstraint">
              <enum>QLayout::SetNoConstraint</enum>
@@ -371,29 +404,6 @@
             </item>
            </layout>
           </item>
-          <item row="0" column="2">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>120</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="5" column="0" rowspan="3" colspan="4">
-           <layout class="QGridLayout" name="ImageViewLayout" rowstretch="0" columnstretch="0">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetNoConstraint</enum>
-            </property>
-           </layout>
-          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="page_3">
@@ -414,7 +424,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>63</width>
+               <width>47</width>
                <height>16</height>
               </rect>
              </property>
@@ -532,7 +542,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>95</width>
+        <width>112</width>
         <height>16777215</height>
        </size>
       </property>
@@ -543,27 +553,29 @@
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">QListWidget 
-{ 
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(100, 100, 100, 255), stop:1 rgba(150, 150, 150, 255));  
-border-right: 2px groove gray; 
+       <string notr="true">
+QListWidget
+{
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(100, 100, 100, 255), stop:1 rgba(150, 150, 150, 255));
+border-right: 2px groove gray;
 }
 
-QListWidget::item:hover 
-{ 
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(150, 150, 150, 255), stop:1 rgba(200, 200, 200, 255)); 
+QListWidget::item:hover
+{
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(150, 150, 150, 255), stop:1 rgba(200, 200, 200, 255));
 }
 
-QListWidget::item:selected 
-{ 
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(200, 200, 200, 200), stop:1 rgba(220, 220, 220, 255)); 
+QListWidget::item:selected
+{
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(200, 200, 200, 200), stop:1 rgba(220, 220, 220, 255));
 }
 
-QListWidget::item 
-{ 
-border-bottom: 2px groove gray; 
-padding: 10px; color: white; 
-}</string>
+QListWidget::item
+{
+border-bottom: 2px groove gray;
+padding: 10px; color: white;
+}
+</string>
       </property>
       <property name="lineWidth">
        <number>0</number>
@@ -579,8 +591,8 @@ padding: 10px; color: white;
       </property>
       <property name="iconSize">
        <size>
-        <width>70</width>
-        <height>70</height>
+        <width>85</width>
+        <height>85</height>
        </size>
       </property>
       <property name="textElideMode">
@@ -596,8 +608,14 @@ padding: 10px; color: white;
        <property name="text">
         <string>Analyze</string>
        </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="textAlignment">
-        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+        <set>AlignCenter</set>
        </property>
        <property name="icon">
         <iconset resource="irconresource.qrc">
@@ -613,12 +631,12 @@ padding: 10px; color: white;
        </property>
        <property name="font">
         <font>
-         <weight>75</weight>
-         <bold>true</bold>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="textAlignment">
-        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+        <set>AlignCenter</set>
        </property>
        <property name="icon">
         <iconset resource="irconresource.qrc">
@@ -632,8 +650,14 @@ padding: 10px; color: white;
        <property name="text">
         <string>Options</string>
        </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="textAlignment">
-        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+        <set>AlignCenter</set>
        </property>
        <property name="icon">
         <iconset resource="irconresource.qrc">
@@ -647,8 +671,14 @@ padding: 10px; color: white;
        <property name="text">
         <string>About</string>
        </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="textAlignment">
-        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+        <set>AlignCenter</set>
        </property>
        <property name="icon">
         <iconset resource="irconresource.qrc">
@@ -667,13 +697,13 @@ padding: 10px; color: white;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1900</width>
-     <height>21</height>
+     <width>1847</width>
+     <height>35</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Fi&amp;le</string>
     </property>
     <addaction name="actionQuit"/>
    </widget>
@@ -692,14 +722,14 @@ padding: 10px; color: white;
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionFullScreen"/>
     <addaction name="actionView_Types"/>
    </widget>
    <widget class="QMenu" name="menuTrain">
     <property name="title">
-     <string>Train</string>
+     <string>Trai&amp;n</string>
     </property>
     <addaction name="actionCreate_Set"/>
     <addaction name="actionCurrent_Set"/>
@@ -712,12 +742,12 @@ padding: 10px; color: white;
   </widget>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionSynchronizeStreams">
@@ -725,7 +755,7 @@ padding: 10px; color: white;
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Synchronize streams</string>
+    <string>&amp;Synchronize streams</string>
    </property>
   </action>
   <action name="actionScaleToFitFrame">
@@ -741,27 +771,27 @@ padding: 10px; color: white;
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Full Screen</string>
+    <string>&amp;Full Screen</string>
    </property>
   </action>
   <action name="actionHot_Keys">
    <property name="text">
-    <string>Hot Keys</string>
+    <string>&amp;Hot Keys</string>
    </property>
   </action>
   <action name="actionCreate_Set">
    <property name="text">
-    <string>Create Set</string>
+    <string>&amp;Create Set</string>
    </property>
   </action>
   <action name="actionView_Types">
    <property name="text">
-    <string>Set View Types</string>
+    <string>&amp;Set View Types</string>
    </property>
   </action>
   <action name="actionCurrent_Set">
    <property name="text">
-    <string>Current Set</string>
+    <string>Current &amp;Set</string>
    </property>
   </action>
  </widget>

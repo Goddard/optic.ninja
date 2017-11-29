@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setController = new setControl(appSettingsController);
     ui->SetViewLayout->addWidget(this->setController);
     //add sets to ui
-    ui->setComboBox->addItems(this->setController->getSets());
+    ui->setComboBox->addItems(this->setController->getSetDirectories());
 
     //add items to set list widget
     this->setController->getSetFiles(ui->setComboBox->currentText(), ui->viewComboBox->currentText());

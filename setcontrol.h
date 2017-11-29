@@ -30,7 +30,7 @@ public:
     QString getImageSize(QString filePath);
     QString getImageBufferSize();
     void getSetFileNames(QString setName);
-    QStringList getSets();
+    QStringList getSetDirectories();
 
     ImageView *getImageView();
 

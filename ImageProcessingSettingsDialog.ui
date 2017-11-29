@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
-    <height>380</height>
+    <width>549</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>421</width>
-     <height>361</height>
+     <width>531</width>
+     <height>511</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_40">
@@ -37,8 +37,8 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>401</width>
-          <height>221</height>
+          <width>501</width>
+          <height>321</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -136,7 +136,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Median</string>
+                  <string>&amp;Median</string>
                  </property>
                  <attribute name="buttonGroup">
                   <string notr="true">smoothTypeGroup</string>
@@ -576,8 +576,8 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>401</width>
-          <height>221</height>
+          <width>501</width>
+          <height>321</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_46">
@@ -684,8 +684,8 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>401</width>
-          <height>221</height>
+          <width>501</width>
+          <height>321</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -792,8 +792,8 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>401</width>
-          <height>221</height>
+          <width>501</width>
+          <height>321</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_48">
@@ -839,7 +839,7 @@
               </font>
              </property>
              <property name="text">
-              <string>X-axis</string>
+              <string>&amp;X-axis</string>
              </property>
              <attribute name="buttonGroup">
               <string notr="true">flipCodeGroup</string>
@@ -910,8 +910,8 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>401</width>
-          <height>221</height>
+          <width>501</width>
+          <height>321</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_49">

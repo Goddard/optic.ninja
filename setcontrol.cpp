@@ -63,11 +63,17 @@ void setControl::setItemClicked(int currentRow)
     }
 }
 
-QStringList setControl::getSets()
+QStringList setControl::getSetDirectories()
 {
     QDir dir(this->setPath);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
     return dir.entryList();
+}
+
+QStringList setControl::getSetClassDirectories()
+{
+
+    return ;
 }
 
 ImageView *setControl::getImageView()
@@ -75,11 +81,17 @@ ImageView *setControl::getImageView()
     return this->imgView;
 }
 
+// TODO : Change to look at the directories only and seperate the functions to pull in images
+// also separate the set directories from the "class" directories inside the set directories.
+// this neesd to include the ability to create an import function that will read different
+// dataset structures such as one folder filled and only an annotations file.
+
 //gets the set files list in a qlist
 QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewTypeParm)
 {
     //set setname globally
     this->setName = setNameParm;
+    //this stands for the class now--need to refactor for naming clearity...
     this->viewType = viewTypeParm;
 
     //set settings file and get initial values
