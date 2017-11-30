@@ -39,6 +39,8 @@ void setControl::setItemClicked(int currentRow)
 
 //        this->sceneContainer->addPixmap(this->setFiles.at(currentRow)->getImageQPixmap());
 
+
+        //no longer needed because this functionality is wrong for datasets with many classes
         if(this->parentWidget())
             if(this->parentWidget()->parentWidget())
             {
@@ -63,17 +65,32 @@ void setControl::setItemClicked(int currentRow)
     }
 }
 
+//this is the current dataset name
+void setControl::setSetName(QString setNameParam)
+{
+    this->setName = setNameParam;
+}
+
+//this is the current dataset class
+void setControl::setViewName(QString viewNameParam)
+{
+    this->viewType = viewNameParam;
+}
+
 QStringList setControl::getSetDirectories()
 {
     QDir dir(this->setPath);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+    this->setName = dir.entryList().at(0);
     return dir.entryList();
 }
 
 QStringList setControl::getSetClassDirectories()
 {
-
-    return ;
+    QDir dir(this->setPath + QDir::separator() + this->setName);
+    dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+    this->viewType = dir.entryList().at(0);
+    return dir.entryList();
 }
 
 ImageView *setControl::getImageView()
@@ -87,12 +104,13 @@ ImageView *setControl::getImageView()
 // dataset structures such as one folder filled and only an annotations file.
 
 //gets the set files list in a qlist
-QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewTypeParm)
+QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString viewTypeParm
 {
+    //dont need this any more because it needs to be set in the setter method
     //set setname globally
-    this->setName = setNameParm;
+//    this->setName = setNameParm;
     //this stands for the class now--need to refactor for naming clearity...
-    this->viewType = viewTypeParm;
+//    this->viewType = viewTypeParm;
 
     //set settings file and get initial values
     this->setSetSettingsFile();
@@ -103,55 +121,56 @@ QList<setImage *> *setControl::getSetFiles(QString setNameParm, QString viewType
     this->setFiles.clear();
     this->clear();
 
-    QString setBasePath = this->setPath + QDir::separator() + this->setName;
-    QString positiveView = "positive";
-    QString negativeView = "negative";
-    QString completeView = "complete";
+    QString setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + this->viewType;
+//    QString positiveView = "positive";
+//    QString negativeView = "negative";
+//    QString completeView = "complete";
 
     QDir dir(setBasePath);
     dir.setFilter(QDir::Files);
     dir.setNameFilters(this->extensionList);
     dir.setSorting(QDir::Time);
 
-    if(viewType == "NULL" || viewType == "Undefined")
+//    if(viewType == "NULL" || viewType == "Undefined")
+//    {
+    dir.setPath(setBasePath);
+    tempFileInfoList = dir.entryInfoList();
+    for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
-        dir.setPath(setBasePath);
-        tempFileInfoList = dir.entryInfoList();
-        for (int i = 0; i < tempFileInfoList.count(); ++i)
-        {
-            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
-        }
+//        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
+        this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
     }
+//    }
 
-    if(viewType == "Positive")
-    {
-        dir.setPath(setBasePath + QDir::separator() + positiveView);
-        tempFileInfoList += dir.entryInfoList();
-        for (int i = 0; i < tempFileInfoList.count(); ++i)
-        {
-            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Positive"), i));
-        }
-    }
+//    if(viewType == "Positive")
+//    {
+//        dir.setPath(setBasePath + QDir::separator() + positiveView);
+//        tempFileInfoList += dir.entryInfoList();
+//        for (int i = 0; i < tempFileInfoList.count(); ++i)
+//        {
+//            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Positive"), i));
+//        }
+//    }
 
-    if(viewType == "Negative")
-    {
-        dir.setPath(setBasePath + QDir::separator() + negativeView);
-        tempFileInfoList += dir.entryInfoList();
-        for (int i = 0; i < tempFileInfoList.count(); ++i)
-        {
-            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Negative"), i));
-        }
-    }
+//    if(viewType == "Negative")
+//    {
+//        dir.setPath(setBasePath + QDir::separator() + negativeView);
+//        tempFileInfoList += dir.entryInfoList();
+//        for (int i = 0; i < tempFileInfoList.count(); ++i)
+//        {
+//            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Negative"), i));
+//        }
+//    }
 
-    if(viewType == "Complete")
-    {
-        dir.setPath(setBasePath + QDir::separator() + completeView);
-        tempFileInfoList += dir.entryInfoList();
-        for (int i = 0; i < tempFileInfoList.count(); ++i)
-        {
-            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Complete"), i));
-        }
-    }
+//    if(viewType == "Complete")
+//    {
+//        dir.setPath(setBasePath + QDir::separator() + completeView);
+//        tempFileInfoList += dir.entryInfoList();
+//        for (int i = 0; i < tempFileInfoList.count(); ++i)
+//        {
+//            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Complete"), i));
+//        }
+//    }
 
     if(this->setFiles.count() > 0)
     {
@@ -210,7 +229,7 @@ bool setControl::copyImage()
         {
             this->imgView->getCurrentBufferImage()->save(newFileName);
             keepTrying = false;
-            this->getSetFiles(this->setName, this->viewType);
+            this->getSetFiles();
             return true;
         }
     }
@@ -229,7 +248,7 @@ bool setControl::deleteImage()
 //        dialog.setFileMode(QFileDialog::AnyFile);
 //        if(dialog.exec()) {
             deleteFile.remove();
-            this->getSetFiles(this->setName, this->viewType);
+            this->getSetFiles();
             return true;
 //        }
 //        return false;

@@ -22,7 +22,7 @@ public:
     ~setControl();
     void addSetItem(int index, setImage *setImage);
 
-    QList<setImage *> *getSetFiles(QString setNameParm, QString viewTypeParm = NULL);
+    QList<setImage *> *getSetFiles();
     bool setImageStatus(QString setType);
     bool saveImage();
     bool copyImage();
@@ -30,7 +30,12 @@ public:
     QString getImageSize(QString filePath);
     QString getImageBufferSize();
     void getSetFileNames(QString setName);
+
     QStringList getSetDirectories();
+    QStringList getSetClassDirectories();
+
+    void setSetName(QString setNameParam);
+    void setViewName(QString setViewParam);
 
     ImageView *getImageView();
 

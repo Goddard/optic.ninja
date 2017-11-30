@@ -58,11 +58,16 @@ MainWindow::MainWindow(QWidget *parent) :
     //create set controller
     this->setController = new setControl(appSettingsController);
     ui->SetViewLayout->addWidget(this->setController);
-    //add sets to ui
-    ui->setComboBox->addItems(this->setController->getSetDirectories());
 
+    //add sets to ui combo selection drop down
+    ui->setComboBox->addItems(this->setController->getSetDirectories());
+    //add set classes to ui combo selection drop down
+    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
+
+//    this->setController->setSetName(ui->setComboBox->currentText());
+//    this->setController->setViewName(ui->viewComboBox->currentText());
     //add items to set list widget
-    this->setController->getSetFiles(ui->setComboBox->currentText(), ui->viewComboBox->currentText());
+//    this->setController->getSetFiles();
 
     QScrollArea *scrollArea = new QScrollArea;
     scrollArea->setAlignment(Qt::AlignHCenter);
@@ -419,8 +424,22 @@ void MainWindow::recieveSetText(const QString &newText)
 
 void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
-    this->currentSet = arg1;
-    this->setController->getSetFiles(currentSet, currentView);
+    //clear the set class combo dropdown box
+    ui->viewComboBox->clear();
+//    this->currentSet = arg1;
+    this->setController->setSetName(arg1);
+//    this->setController->setSetName(this->currentSet);
+
+    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
+    //removed because now the set files needs to be taken when the class view is changed
+//    this->setController->getSetFiles(currentSet); //, currentView
+}
+
+void MainWindow::on_viewComboBox_currentIndexChanged(const QString &arg1)
+{
+//    this->currentView = arg1;
+    this->setController->setViewName(arg1);
+    this->setController->getSetFiles();
 }
 
 void MainWindow::on_deleteImageButton_clicked()
@@ -439,12 +458,12 @@ void MainWindow::on_deleteImageButton_clicked()
 
 void MainWindow::on_positiveImageRadioButton_clicked()
 {
-    this->setController->setImageStatus("positive");
+//    this->setController->setImageStatus("positive");
 }
 
 void MainWindow::on_negativeImageRadioButton_clicked()
 {
-    this->setController->setImageStatus("negative");
+//    this->setController->setImageStatus("negative");
 }
 
 void MainWindow::on_saveImageButton_clicked()
@@ -456,9 +475,9 @@ void MainWindow::on_saveImageButton_clicked()
 
 void MainWindow::on_viewComboBox_activated(const QString &arg1)
 {
-    this->currentView = arg1;
-    this->currentSet = ui->setComboBox->currentText();
-    setController->getSetFiles(currentSet, currentView);
+//    this->currentView = arg1;
+//    this->currentSet = ui->setComboBox->currentText();
+//    setController->getSetFiles(); //currentSet, currentView
 }
 
 void MainWindow::on_copySetImageButton_clicked()

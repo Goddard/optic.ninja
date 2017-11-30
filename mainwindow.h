@@ -63,7 +63,10 @@ class MainWindow : public QMainWindow
         int currentPageIndex;
         QSettings *settings;
         QSettings *setSettings;
+
+        //current dataset
         QString currentSet;
+        //current class
         QString currentView;
 
         setControl *setController;
@@ -112,6 +115,8 @@ class MainWindow : public QMainWindow
         void on_listWidget_clicked(const QModelIndex &index);
 
         void on_copySetImageButton_clicked();
+
+        void on_viewComboBox_currentIndexChanged(const QString &arg1);
 
 signals:
         void newFrame(const Mat &matFrame);

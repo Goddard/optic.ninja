@@ -173,28 +173,7 @@
              </widget>
             </item>
             <item row="0" column="4">
-             <widget class="QComboBox" name="viewComboBox">
-              <item>
-               <property name="text">
-                <string>Positive</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Negative</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Undefined</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Complete</string>
-               </property>
-              </item>
-             </widget>
+             <widget class="QComboBox" name="viewComboBox"/>
             </item>
             <item row="0" column="0">
              <widget class="QPushButton" name="createSetButton">
