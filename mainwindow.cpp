@@ -60,14 +60,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->SetViewLayout->addWidget(this->setController);
 
     //add sets to ui combo selection drop down
+    // only need to call this function on initalization because it also
+    // initalizes the class view drop down due to the nature of using the slot
+    // on_index_changed fro Qt framework
     ui->setComboBox->addItems(this->setController->getSetDirectories());
+//    this->setController->getSetDirectories();
     //add set classes to ui combo selection drop down
-    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
+//    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
+    this->setController->getSetClassDirectories();
 
 //    this->setController->setSetName(ui->setComboBox->currentText());
 //    this->setController->setViewName(ui->viewComboBox->currentText());
     //add items to set list widget
-//    this->setController->getSetFiles();
+    this->setController->getSetFiles();
 
     QScrollArea *scrollArea = new QScrollArea;
     scrollArea->setAlignment(Qt::AlignHCenter);
@@ -91,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->listWidget->setFocus();
 
     this->setController->repaint();
-    this->setController->getImageView()->repaint();
+//    this->setController->getImageView()->repaint();
 }
 
 MainWindow::~MainWindow()

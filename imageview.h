@@ -13,6 +13,7 @@
 #include <QRadioButton>
 #include <QSpinBox>
 
+#include <QToolTip>
 #include <QRubberBand>
 
 #include "bufferThread.h"
@@ -37,6 +38,17 @@ public:
     void clearFrame();
     void addBufferFrame(QImage *qImageAdd);
     const QImage *getCurrentBufferImage();
+    void reDraw(); //QPainter *painter
+
+    enum MouseState {
+        Left,
+        Right,
+        Drag,
+        Move,
+        None
+    };
+
+    MouseState mouseState;
 
 private:
     Ui::ImageView *ui;
@@ -56,12 +68,21 @@ private:
 
     QRubberBand *rubberBand {rubberBand = NULL};
 
+    bool drawing;
+    bool drawSquare = false;
+
+    QPainter painter;
+    QRect testBox;
+
 protected:
     void paintEvent(QPaintEvent* event);
     void mouseMoveEvent(QMouseEvent *event);
+    bool mouseMoveBool;
+
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent * event);
+    bool wheelBool;
 
 signals:
 
