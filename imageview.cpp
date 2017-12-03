@@ -38,26 +38,28 @@ ImageView::~ImageView()
     delete ui;
 }
 
+//QRect* ImageView::validSelection()
+//{
+
+//}
+
 void ImageView::zoomChanged(int zoomLevelParm)
 {
-    this->zoomLevel = static_cast<double>(zoomLevelParm) / 100;
-    this->repaint();
-//    this->paintEvent(QPaintEvent*);
+    if(zoomLevelParm > 10)
+    {
+        this->zoomLevel = static_cast<double>(zoomLevelParm) / 100;
+        this->update();
+    }
 }
 
 void ImageView::mousePressEvent(QMouseEvent *event)
 {
-//    if (event->button() == Qt::LeftButton) {
-//        this->drawStartPoint = event->pos();
-//        if (!rubberBand)
-//            rubberBand = new QRubberBand(QRubberBand::Rectangle, this); //static_cast<QWidget *>(this)
-//            rubberBand->setGeometry(QRect(drawStartPoint, QSize()));
-//            rubberBand->show();
-//        }
-
     this->mouseState = Left;
-    this->drawStartPoint = event->pos();
-//    this->testBox = QRect(this->drawStartPoint.x(), this->drawStartPoint.y(), 0, 0);
+    int x = event->pos().x() / this->zoomLevel;
+    int y = event->pos().y() / this->zoomLevel;
+
+    this->drawStartPoint = QPoint(x, y);
+
     this->testBox.setTopLeft(event->pos());
     this->testBox.setBottomRight(event->pos());
 }
@@ -78,10 +80,8 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 //        }
 //    }
 
-    this->mouseState = None;
-    this->drawEndPoint = event->pos();
+    this->mouseState = LeftRelease;
     this->update();
-//    this->testBox = QRect(this->drawStartPoint.x(), this->drawStartPoint.y(), this->mouseXPosition, this->mouseYPosition);
 }
 
 void ImageView::mouseMoveEvent(QMouseEvent *event)
@@ -103,18 +103,9 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
                 }
             }
 
-//    if ((event->buttons() & Qt::LeftButton))
-//    {
-//        rubberBand->setGeometry(QRect(drawStartPoint, event->pos()).normalized());
-//        QToolTip::showText( event->globalPos(), QString("%1,%2")
-//                            .arg(rubberBand->size().width())
-//                            .arg(rubberBand->size().height()), this);
-//    }
-
     //setCursor(Qt::ArrowCursor);
     if (event->type() == QEvent::MouseMove) {
-//        this->mouseState = Drag;
-//        this->testBox.moveTopLeft(event->pos());
+        this->drawEndPoint = QPoint(event->pos().x() / this->zoomLevel, event->pos().y() / this->zoomLevel);
         this->testBox.setBottomRight(event->pos());
         this->update();
     }
@@ -130,9 +121,11 @@ void ImageView::wheelEvent(QWheelEvent * event)
 
                 int numDegrees = event->delta() / 8;
                 int valueAdded = (numDegrees) + setImageZoomSpinBox->value();
-                this->zoomChanged(valueAdded);
-                setImageZoomSpinBox->setValue(valueAdded);
-                this->wheelBool = true;
+                if(valueAdded > 10)
+                {
+                    this->zoomChanged(valueAdded);
+                    setImageZoomSpinBox->setValue(valueAdded);
+                }
             }
 }
 
@@ -161,30 +154,45 @@ void ImageView::reDraw() //QPainter *painter
     double imageSizeWidth = static_cast<double>(tempQImage.width()) * this->zoomLevel;
     double imageSizeHeight = static_cast<double>(tempQImage.height()) * this->zoomLevel;
     QRectF source(0.0, 0.0, imageSizeWidth, imageSizeHeight);
-
+    this->resize(imageSizeWidth, imageSizeHeight);
     this->painter.drawImage(source, tempQImage, target);
+
     this->painter.setBrush(Qt::NoBrush);
     this->painter.setPen(Qt::red);
+
+    // if user clicked the left button start drawing
     if(this->mouseState == Left)
     {
         this->painter.drawRect(this->testBox);
         this->drawing = true;
     }
 
+    // if the user is dragging continuously paint
     else if(this->drawing)
     {
         this->drawing = false;
-        this->mouseState = None;
 
         QPainter tempPainter(&tempQImage);
         tempPainter.setBrush(Qt::NoBrush);
         tempPainter.setPen(Qt::red);
-        tempPainter.drawRect(this->testBox);
 
-        this->addBufferFrame(&tempQImage);
-        this->painter.drawImage(source, tempQImage, target);
-//        this->painter.drawImage(0, 0, tempQImage);
-        this->update();
+        // if the user is dont drawing we will store the new image with the annotation in the buffer
+        // will have to add another function that pulls data from a store annotation buffer as well
+        if(this->mouseState == LeftRelease)
+        {
+            this->mouseState = None;
+
+            QRect tempRect = QRect(this->drawStartPoint, this->drawEndPoint);
+            tempPainter.drawRect(tempRect);
+            this->addBufferFrame(&tempQImage);
+            this->update();
+        }
+
+        // if the user is drawing but hasn't released the left button
+        else
+        {
+            tempPainter.drawRect(this->testBox);
+        }
     }
 
 
@@ -218,8 +226,6 @@ void ImageView::addBufferFrame(QImage *qImageAdd)
                 QLabel *bufferSizeLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("frameBufferLabel");
                 bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
             }
-
-//    this->repaint();
 }
 
 void ImageView::clearFrame()

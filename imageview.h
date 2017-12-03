@@ -35,6 +35,8 @@ public:
     ~ImageView();
 
     QList<QImage> imageBuffer;
+    QList<QRect> boxBuffer;
+
     void clearFrame();
     void addBufferFrame(QImage *qImageAdd);
     const QImage *getCurrentBufferImage();
@@ -42,6 +44,7 @@ public:
 
     enum MouseState {
         Left,
+        LeftRelease,
         Right,
         Drag,
         Move,
@@ -56,6 +59,7 @@ private:
     double zoomLevel;
     int mouseXPosition;
     int mouseYPosition;
+
     QLabel *mousePositionLabel;
 
     int currentBufferImageIndex;

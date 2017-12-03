@@ -11,6 +11,7 @@ setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
 
     this->setViewMode(QListView::IconMode);
     this->setIconSize(QSize(105, 105));
+    this->setMaximumWidth(550);
 
     connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
 
