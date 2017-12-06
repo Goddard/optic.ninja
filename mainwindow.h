@@ -118,6 +118,10 @@ class MainWindow : public QMainWindow
 
         void on_viewComboBox_currentIndexChanged(const QString &arg1);
 
+        void on_actionList_View_triggered();
+
+        void on_actionIcon_View_triggered();
+
 signals:
         void newFrame(const Mat &matFrame);
         void updateStatisticsInGUI(struct ThreadStatisticsData);

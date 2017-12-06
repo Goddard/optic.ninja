@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1847</width>
-    <height>1058</height>
+    <width>1921</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -162,7 +162,7 @@
                <widget class="QLabel" name="mouseLocationLabel">
                 <property name="minimumSize">
                  <size>
-                  <width>150</width>
+                  <width>225</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -636,7 +636,7 @@ padding: 10px; color: white;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1847</width>
+     <width>1921</width>
      <height>35</height>
     </rect>
    </property>
@@ -663,8 +663,15 @@ padding: 10px; color: white;
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <widget class="QMenu" name="menu_Set_View_Types">
+     <property name="title">
+      <string>&amp;Set View Types</string>
+     </property>
+     <addaction name="actionList_View"/>
+     <addaction name="actionIcon_View"/>
+    </widget>
     <addaction name="actionFullScreen"/>
-    <addaction name="actionView_Types"/>
+    <addaction name="menu_Set_View_Types"/>
    </widget>
    <widget class="QMenu" name="menuTrain">
     <property name="title">
@@ -723,14 +730,19 @@ padding: 10px; color: white;
     <string>&amp;Create Set</string>
    </property>
   </action>
-  <action name="actionView_Types">
-   <property name="text">
-    <string>&amp;Set View Types</string>
-   </property>
-  </action>
   <action name="actionCurrent_Set">
    <property name="text">
     <string>Current &amp;Set</string>
+   </property>
+  </action>
+  <action name="actionList_View">
+   <property name="text">
+    <string>List View</string>
+   </property>
+  </action>
+  <action name="actionIcon_View">
+   <property name="text">
+    <string>Icon View</string>
    </property>
   </action>
  </widget>

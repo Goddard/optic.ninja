@@ -489,3 +489,15 @@ void MainWindow::on_copySetImageButton_clicked()
 {
     this->setController->copyImage();
 }
+
+void MainWindow::on_actionList_View_triggered()
+{
+    this->setController->setViewMode(QListView::ListMode);
+    this->appSettingsController->setSetViewMode(QListView::ListMode);
+}
+
+void MainWindow::on_actionIcon_View_triggered()
+{
+    this->setController->setViewMode(QListView::IconMode);
+    this->appSettingsController->setSetViewMode(QListView::IconMode);
+}

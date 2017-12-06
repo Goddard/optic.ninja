@@ -32,6 +32,12 @@ appSettings::appSettings()
     //add permitted extensions
     if(this->validSetImageExtensions.isEmpty())
         this->setSetImageExtensions("*.PNG, *.JPG, *.JPEG, *.jpg, *.jpeg, *.png, *.bmp, *.pgm, *.PGM");
+
+    //get view mode
+    this->getSetsViewMode();
+
+    if(this->setViewMode == -1)
+        this->setViewMode = 1;
 }
 
 appSettings::~appSettings()
@@ -95,4 +101,19 @@ QString appSettings::getSetImageExtensions()
     this->mainSettings->endGroup();
 
     return setImageExtensionsLocal;
+}
+
+void appSettings::setSetViewMode(int viewMode, int subViewMode)
+{
+    //ListMode
+    //  Static - no moving
+    //IconMode
+    //  Free - allows moving
+    this->mainSettings->setValue("setViewMode", viewMode);
+    this->mainSettings->sync();
+}
+
+int appSettings::getSetsViewMode()
+{
+    return this->mainSettings->value("setViewMode", this->setViewMode).toInt();
 }

@@ -27,6 +27,10 @@ public:
     QString getSetImageExtensions();
     QSettings *getSettings();
 
+    void setSetViewMode(int viewMode, int subViewMode = 0);
+    int getSetsViewMode();
+    int setViewMode = -1;
+
 private:
     QSettings *mainSettings;
     QString setsPath;

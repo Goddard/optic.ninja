@@ -35,11 +35,23 @@ public:
     ~ImageView();
 
     QList<QImage> imageBuffer;
-    QList<QRect> boxBuffer;
+//    QList<QPainterPath> annotationsBuffer;
+    QList<QVariant> annotationsBuffer;
 
     void clearFrame();
     void addBufferFrame(QImage *qImageAdd);
     const QImage *getCurrentBufferImage();
+
+//    QList<QPainterPath> getBufferShapes();
+//    void addBufferShape(QPainterPath path);
+    void moveShape();
+
+    bool inAnnotation();
+    void addAnnotation(QVariant annotation);
+    QList<QVariant> getAnnotations();
+    void clearAnnotationBuffer();
+
+    void paintResize();
     void reDraw(); //QPainter *painter
 
     enum MouseState {
@@ -52,6 +64,9 @@ public:
     };
 
     MouseState mouseState;
+
+    bool changeColor;
+    int selectedShapeId;
 
 private:
     Ui::ImageView *ui;
@@ -77,6 +92,13 @@ private:
 
     QPainter painter;
     QRect testBox;
+
+    //use with zooming to resize QWidget and Image
+    QRectF resizeSource;
+    QRectF resizeTarget;
+
+    double zoomImageWidth = 0.0;
+    double zoomImageHeight = 0.0;
 
 protected:
     void paintEvent(QPaintEvent* event);

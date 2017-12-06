@@ -9,9 +9,16 @@ setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
     //create image viewer
     this->imgView = new ImageView();
 
-    this->setViewMode(QListView::IconMode);
-    this->setIconSize(QSize(105, 105));
+    if(this->appSettingsController->getSetsViewMode() == 0)
+        this->setViewMode(QListView::ListMode);
+    else
+        this->setViewMode(QListView::IconMode);
+
+//    this->setModelColumn();
+    this->setLayoutMode(QListView::Batched);
+    this->setIconSize(QSize(126, 126));
     this->setMaximumWidth(550);
+    this->setBatchSize(100);
 
     connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
 
@@ -33,6 +40,7 @@ void setControl::setItemClicked(int currentRow)
 {
     if(this->setFiles.value(currentRow))
     {
+        this->imgView->clearAnnotationBuffer();
         this->imgView->clearImageBuffer();
         this->imgView->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
 
@@ -51,17 +59,17 @@ void setControl::setItemClicked(int currentRow)
                 QLabel *fileSizeLabel = this->parentWidget()->parentWidget()->findChild<QLabel *>("imageSizeLabel");
                 fileSizeLabel->setText(QString::number((this->setFiles.at(currentRow)->getImageFileInfo().size()) / 1024) + " KB");
 
-                if(this->setFiles.at(currentRow)->getImageStatus() == "Positive")
-                {
-                    QRadioButton *positiveRadioButton = this->parentWidget()->parentWidget()->findChild<QRadioButton *>("positiveImageRadioButton");
-                    positiveRadioButton->setChecked(true);
-                }
+//                if(this->setFiles.at(currentRow)->getImageStatus() == "Positive")
+//                {
+//                    QRadioButton *positiveRadioButton = this->parentWidget()->parentWidget()->findChild<QRadioButton *>("positiveImageRadioButton");
+//                    positiveRadioButton->setChecked(true);
+//                }
 
-                else if(this->setFiles.at(currentRow)->getImageStatus() == "Negative")
-                {
-                    QRadioButton *negativeRadioButton = this->parentWidget()->parentWidget()->findChild<QRadioButton *>("negativeImageRadioButton");
-                    negativeRadioButton->setChecked(true);
-                }
+//                else if(this->setFiles.at(currentRow)->getImageStatus() == "Negative")
+//                {
+//                    QRadioButton *negativeRadioButton = this->parentWidget()->parentWidget()->findChild<QRadioButton *>("negativeImageRadioButton");
+//                    negativeRadioButton->setChecked(true);
+//                }
             }
     }
 }
