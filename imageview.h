@@ -14,7 +14,7 @@
 #include <QSpinBox>
 
 #include <QToolTip>
-#include <QRubberBand>
+//#include <QRubberBand>
 
 #include "bufferThread.h"
 #include "processThread.h"
@@ -26,6 +26,14 @@ namespace Ui {
     class ImageView;
 }
 
+struct Annotation
+{
+  QVariant shape;
+  bool selected = false;
+  QString className = "None";
+  QString color = "red";
+};
+
 class ImageView : public QWidget
 {
     Q_OBJECT
@@ -35,16 +43,19 @@ public:
     ~ImageView();
 
     QList<QImage> imageBuffer;
-    QList<QVariant> annotationsBuffer;
+    QList<Annotation> annotationsBuffer;
 
     void clearFrame();
     void addBufferFrame(QImage *qImageAdd);
     const QImage *getCurrentBufferImage();
 
+    bool inSquare(QRect *rect);
+    QVariant getAnnotationById(int id);
+    QVariant getAnnotationByPosition();
     void moveAnnotation();
-    int inAnnotation();
-    void addAnnotation(QVariant annotation);
-    QList<QVariant> getAnnotations();
+    int annotationExists();
+    void addAnnotation(Annotation annotation);
+    QList<Annotation> getAnnotations();
     void clearAnnotationBuffer();
 
     void paintResize();
@@ -80,6 +91,7 @@ private:
 
     QPoint drawStartPoint;
     QPoint drawEndPoint;
+    QPoint drawMoveDistance;
 
 //    QRect newROI;
 //    QImage setROI;

@@ -28,9 +28,6 @@ ImageView::ImageView(QWidget *parent) :
 
     this->mouseState = None;
     this->drawing = false;
-
-//    this->parentWidget()->parentWidget()->parentWidget()->addAction(act1);
-//    this->parentWidget()->parentWidget()->parentWidget()->addAction(act2);
 }
 
 ImageView::~ImageView()
@@ -52,36 +49,18 @@ void ImageView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         this->mouseState = Left;
-//        int x = event->pos().x() / this->zoomLevel;
-//        int y = event->pos().y() / this->zoomLevel;
-
+        //this is used to draw onto the original non-zoomed image
         this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
-        int inAnnotationReturn = inAnnotation();
-        if(inAnnotationReturn != -1)
+        int annotationId = this->annotationExists();
+        if(annotationId != -1)
         {
             this->changeColor = true;
-            this->selectedShapeId = inAnnotationReturn;
+            this->selectedShapeId = annotationId;
             this->update();
         }
 
-//        int count = 0;
-//        for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
-//        {
-//            QVariant tempVariant = *it;
-//            QRect rect = tempVariant.toRect();
-
-////            qDebug() << "x, y, width, height " << QString::number(rect.x()) << " " << QString::number(rect.y()) << " " << rect.x()+rect.width() << " " << rect.y()+rect.height();
-//            if((x > rect.x() && y > rect.y()) && (x < (rect.width() + rect.x()) && y < (rect.height() + rect.y())))
-//            {
-//                this->changeColor = true;
-//                this->selectedShapeId = count;
-////                this->mouseState = Move;
-//                this->update();
-//            }
-//            count++;
-//        }
-
+        //this test box is used to display to the user even fi zoomed
         this->testBox.setTopLeft(event->pos());
         this->testBox.setBottomRight(event->pos());
     }
@@ -98,11 +77,15 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 
 void ImageView::mouseMoveEvent(QMouseEvent *event)
 {
+    //set Qwidget/ImageView x, y positions
     this->mouseXPosition = event->x();
     this->mouseYPosition = event->y();
 
+    //set image x, y values and disregard zoom value
     this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
     this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+
+    this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
 
     // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
     if(this->imageBuffer.size() > 0)
@@ -113,8 +96,8 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     }
 
     //setCursor(Qt::ArrowCursor);
-    if (event->type() == QEvent::MouseMove && this->inAnnotation() == -1) {
-        this->drawEndPoint = QPoint(event->pos().x() / this->zoomLevel, event->pos().y() / this->zoomLevel);
+    if (event->type() == QEvent::MouseMove && this->annotationExists() == -1 && this->drawMoveDistance.manhattanLength() > 3) {
+        this->drawEndPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
         this->testBox.setBottomRight(event->pos());
         this->update();
     }
@@ -142,51 +125,76 @@ void ImageView::wheelEvent(QWheelEvent * event)
     }
 }
 
-//returns id of clicked shape if exists
-int ImageView::inAnnotation()
+bool ImageView::inSquare(QRect *rect)
 {
-    //account for zooming
-//    int x = this->mouseXPosition / this->zoomLevel;
-//    int y = this->mouseYPosition / this->zoomLevel;
-
-    int count = 0;
-    for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    if((this->mouseXNoZoom > rect->x() && this->mouseYNoZoom > rect->y()) && (this->mouseXNoZoom < (rect->width() + rect->x()) && this->mouseYNoZoom < (rect->height() + rect->y())))
     {
-        QVariant tempVariant = *it;
-        QRect rect = tempVariant.toRect();
+        return true;
+    }
 
-        if((this->mouseXNoZoom > rect.x() && this->mouseYNoZoom > rect.y()) && (this->mouseXNoZoom < (rect.width() + rect.x()) && this->mouseYNoZoom < (rect.height() + rect.y())))
+    return false;
+}
+
+//returns id of clicked shape if exists
+//TODO : should refactor to annotationExists()
+int ImageView::annotationExists()
+{
+    int count = 0;
+    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    {
+        Annotation annotation = *it;
+        QVariant tempVariant = annotation.shape;
+
+        if(tempVariant.type() == QMetaType::QRect)
         {
-            return count;
+            QRect rect = tempVariant.toRect();
+            if(this->inSquare(&rect))
+            {
+                return count;
+            }
         }
+
+        else if(tempVariant.type() == QMetaType::QPolygon)
+        {}
+
         count++;
     }
     return -1;
 }
 
-//int ImageView::clickAnnotationId()
-//{
-//    int x = event->pos().x() / this->zoomLevel;
-//    int y = event->pos().y() / this->zoomLevel;
-
-//    this->drawStartPoint = QPoint(x, y);
-
-//    int count = 0;
-//    for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
-//    {
-//        QVariant tempVariant = *it;
+QVariant ImageView::getAnnotationById(int id)
+{
+    int count = 0;
+    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    {
+        Annotation annotation = *it;
+        QVariant tempVariant = annotation.shape;
 //        QRect rect = tempVariant.toRect();
 
-////            qDebug() << "x, y, width, height " << QString::number(rect.x()) << " " << QString::number(rect.y()) << " " << rect.x()+rect.width() << " " << rect.y()+rect.height();
-//        if((x > rect.x() && y > rect.y()) && (x < (rect.width() + rect.x()) && y < (rect.height() + rect.y())))
-//        {
-//            this->changeColor = true;
-//            this->selectedShapeId = count;
-//            this->update();
-//        }
-//        count++;
-//    }
-//}
+        if(this->selectedShapeId == count)
+        {
+            return tempVariant;
+        }
+        count++;
+    }
+    return false;
+}
+
+QVariant ImageView::getAnnotationByPosition()
+{
+    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    {
+        Annotation annotation = *it;
+        QVariant tempVariant = annotation.shape;
+        QRect rect = tempVariant.toRect();
+
+        if(this->inSquare(&rect))
+        {
+            return tempVariant;
+        }
+    }
+    return false;
+}
 
 void ImageView::moveAnnotation()
 {
@@ -196,9 +204,10 @@ void ImageView::moveAnnotation()
         QImage tempMoveQImage = this->imageBuffer.at(0).copy();
 
         int count = 0;
-        for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+        for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
         {
-            QVariant tempVariant = *it;
+            Annotation annotation = *it;
+            QVariant tempVariant = annotation.shape;
             QRect rect = tempVariant.toRect();
 
             QPen myPen;
@@ -263,13 +272,16 @@ void ImageView::reDraw() //QPainter *painter
 
         // if the user is dont drawing we will store the new image with the annotation in the buffer
         // will have to add another function that pulls data from a store annotation buffer as well
-        if(this->mouseState == LeftRelease && this->inAnnotation() == -1)
+        if(this->mouseState == LeftRelease && this->annotationExists() == -1)
         {
             this->mouseState = None;
 
             QRect tempRect = QRect(this->drawStartPoint, this->drawEndPoint);
             tempPainter.drawRect(tempRect);
-            this->addAnnotation(QVariant(tempRect));
+
+            Annotation tempAnnotation = {};
+            tempAnnotation.shape = QVariant(tempRect);
+            this->addAnnotation(tempAnnotation);
 
             this->addBufferFrame(&tempQImage);
             this->update();
@@ -310,12 +322,12 @@ void ImageView::clearAnnotationBuffer()
     this->annotationsBuffer.clear();
 }
 
-QList<QVariant> ImageView::getAnnotations()
+QList<Annotation> ImageView::getAnnotations()
 {
     return this->annotationsBuffer;
 }
 
-void ImageView::addAnnotation(QVariant annotation)
+void ImageView::addAnnotation(Annotation annotation)
 {
     this->annotationsBuffer.append(annotation);
 
