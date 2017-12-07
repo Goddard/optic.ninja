@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->listWidget->setFocus();
 
     this->setController->repaint();
-//    this->setController->getImageView()->repaint();
+    this->setController->getImageView()->repaint();
 }
 
 MainWindow::~MainWindow()

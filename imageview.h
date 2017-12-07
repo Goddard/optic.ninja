@@ -35,18 +35,14 @@ public:
     ~ImageView();
 
     QList<QImage> imageBuffer;
-//    QList<QPainterPath> annotationsBuffer;
     QList<QVariant> annotationsBuffer;
 
     void clearFrame();
     void addBufferFrame(QImage *qImageAdd);
     const QImage *getCurrentBufferImage();
 
-//    QList<QPainterPath> getBufferShapes();
-//    void addBufferShape(QPainterPath path);
-    void moveShape();
-
-    bool inAnnotation();
+    void moveAnnotation();
+    int inAnnotation();
     void addAnnotation(QVariant annotation);
     QList<QVariant> getAnnotations();
     void clearAnnotationBuffer();
@@ -75,6 +71,9 @@ private:
     int mouseXPosition;
     int mouseYPosition;
 
+    int mouseXNoZoom;
+    int mouseYNoZoom;
+
     QLabel *mousePositionLabel;
 
     int currentBufferImageIndex;
@@ -82,10 +81,10 @@ private:
     QPoint drawStartPoint;
     QPoint drawEndPoint;
 
-    QRect newROI;
-    QImage setROI;
+//    QRect newROI;
+//    QImage setROI;
 
-    QRubberBand *rubberBand {rubberBand = NULL};
+//    QRubberBand *rubberBand {rubberBand = NULL};
 
     bool drawing;
     bool drawSquare = false;

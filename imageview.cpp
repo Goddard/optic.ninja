@@ -38,11 +38,6 @@ ImageView::~ImageView()
     delete ui;
 }
 
-//QRect* ImageView::validSelection()
-//{
-
-//}
-
 void ImageView::zoomChanged(int zoomLevelParm)
 {
     if(zoomLevelParm > 10)
@@ -57,27 +52,35 @@ void ImageView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         this->mouseState = Left;
-        int x = event->pos().x() / this->zoomLevel;
-        int y = event->pos().y() / this->zoomLevel;
+//        int x = event->pos().x() / this->zoomLevel;
+//        int y = event->pos().y() / this->zoomLevel;
 
-        this->drawStartPoint = QPoint(x, y);
+        this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
-        int count = 0;
-        for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+        int inAnnotationReturn = inAnnotation();
+        if(inAnnotationReturn != -1)
         {
-            QVariant tempVariant = *it;
-            QRect rect = tempVariant.toRect();
-
-//            qDebug() << "x, y, width, height " << QString::number(rect.x()) << " " << QString::number(rect.y()) << " " << rect.x()+rect.width() << " " << rect.y()+rect.height();
-            if((x > rect.x() && y > rect.y()) && (x < (rect.width() + rect.x()) && y < (rect.height() + rect.y())))
-            {
-                this->changeColor = true;
-                this->selectedShapeId = count;
-//                this->mouseState = Move;
-                this->update();
-            }
-            count++;
+            this->changeColor = true;
+            this->selectedShapeId = inAnnotationReturn;
+            this->update();
         }
+
+//        int count = 0;
+//        for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+//        {
+//            QVariant tempVariant = *it;
+//            QRect rect = tempVariant.toRect();
+
+////            qDebug() << "x, y, width, height " << QString::number(rect.x()) << " " << QString::number(rect.y()) << " " << rect.x()+rect.width() << " " << rect.y()+rect.height();
+//            if((x > rect.x() && y > rect.y()) && (x < (rect.width() + rect.x()) && y < (rect.height() + rect.y())))
+//            {
+//                this->changeColor = true;
+//                this->selectedShapeId = count;
+////                this->mouseState = Move;
+//                this->update();
+//            }
+//            count++;
+//        }
 
         this->testBox.setTopLeft(event->pos());
         this->testBox.setBottomRight(event->pos());
@@ -90,21 +93,6 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
         this->mouseState = LeftRelease;
     }
 
-//    if (event->button() == Qt::LeftButton) {
-//        newROI = rubberBand->geometry();
-//        if(newROI.isValid())
-//        {
-//            QRect tempRect = QRect(newROI.x() / this->zoomLevel, newROI.y() / this->zoomLevel, newROI.width() / this->zoomLevel, newROI.height() / this->zoomLevel);
-////            this->setROI = this->imageBuffer.at(this->currentBufferImageIndex - 1).copy(tempRect); // this->imageBuffer.count()-1
-////            rubberBand->hide();
-////            this->addBufferFrame(&this->setROI);
-//            this->parentWidget()->repaint();
-//            this->parentWidget()->parentWidget()->repaint();
-//            qApp->processEvents();
-//        }
-//    }
-
-//    this->mouseState = LeftRelease;
     this->update();
 }
 
@@ -113,28 +101,25 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     this->mouseXPosition = event->x();
     this->mouseYPosition = event->y();
 
-    //get frame label 3 levels higher
-//    if(this->parentWidget())
-//        if(this->parentWidget()->parentWidget())
-//            if(this->parentWidget()->parentWidget()->parentWidget())
-//            {
-                // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
-                if(this->imageBuffer.size() > 0)
-                {
-                    QLabel *mouseLocationLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("mouseLocationLabel");
-                    mouseLocationLabel->setText("( " + QString::number(this->mouseXPosition) + ", " + QString::number(this->mouseYPosition) + " )" +
-                                                "[ " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).width()) + " / " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).height()) + " ] ");
-                }
-//            }
+    this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
+    this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+
+    // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
+    if(this->imageBuffer.size() > 0)
+    {
+        QLabel *mouseLocationLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("mouseLocationLabel");
+        mouseLocationLabel->setText("( " + QString::number(this->mouseXPosition) + ", " + QString::number(this->mouseYPosition) + " )" +
+                                    "[ " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).width()) + " / " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).height()) + " ] ");
+    }
 
     //setCursor(Qt::ArrowCursor);
-    if (event->type() == QEvent::MouseMove && this->mouseState != Move) {
+    if (event->type() == QEvent::MouseMove && this->inAnnotation() == -1) {
         this->drawEndPoint = QPoint(event->pos().x() / this->zoomLevel, event->pos().y() / this->zoomLevel);
         this->testBox.setBottomRight(event->pos());
         this->update();
     }
 
-//    else if(event->type() == QEvent::MouseMove && this->mouseState == Move)
+//    else if(event->type() == QEvent::MouseMove && this->inAnnotation())
 //    {
 //        qDebug() << "test move";
 //    }
@@ -142,53 +127,68 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
 
 void ImageView::wheelEvent(QWheelEvent * event)
 {
-//    if(this->parentWidget())
-//        if(this->parentWidget()->parentWidget())
-//            if(this->parentWidget()->parentWidget()->parentWidget())
-            if(this->imageBuffer.size() > 0)
-            {
-                QSpinBox *setImageZoomSpinBox = this->parentWidget()->parentWidget()->parentWidget()->findChild<QSpinBox *>("setImagespinBox");
+    if(this->imageBuffer.size() > 0)
+    {
+        QSpinBox *setImageZoomSpinBox = this->parentWidget()->parentWidget()->parentWidget()->findChild<QSpinBox *>("setImagespinBox");
 
-                int numDegrees = event->delta() / 8;
-                int valueAdded = (numDegrees) + setImageZoomSpinBox->value();
-                if(valueAdded > 10)
-                {
-                    this->zoomChanged(valueAdded);
-                    setImageZoomSpinBox->setValue(valueAdded);
-                }
-            }
+        int numDegrees = event->delta() / 8;
+        int valueAdded = (numDegrees) + setImageZoomSpinBox->value();
+        //lets not zoom if the value is less then 1%
+        if(valueAdded > 10)
+        {
+            this->zoomChanged(valueAdded);
+            setImageZoomSpinBox->setValue(valueAdded);
+        }
+    }
 }
 
-//void ImageView::cropBuffer()
-//{
-//    QImage tempQImage = this->imageBuffer.at(this->currentBufferImageIndex - 1);
-
-//    double widgetWidth = static_cast<double>(this->width()) / this->zoomLevel;
-//    double widgetHeight = static_cast<double>(this->height()) / this->zoomLevel;
-
-//    this->resize(imageSizeWidth, imageSizeHeight);
-//}
-
-bool ImageView::inAnnotation()
+//returns id of clicked shape if exists
+int ImageView::inAnnotation()
 {
     //account for zooming
-    int x = this->mouseXPosition / this->zoomLevel;
-    int y = this->mouseYPosition / this->zoomLevel;
+//    int x = this->mouseXPosition / this->zoomLevel;
+//    int y = this->mouseYPosition / this->zoomLevel;
 
+    int count = 0;
     for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
         QVariant tempVariant = *it;
         QRect rect = tempVariant.toRect();
 
-        if((x > rect.x() && y > rect.y()) && (x < (rect.width() + rect.x()) && y < (rect.height() + rect.y())))
+        if((this->mouseXNoZoom > rect.x() && this->mouseYNoZoom > rect.y()) && (this->mouseXNoZoom < (rect.width() + rect.x()) && this->mouseYNoZoom < (rect.height() + rect.y())))
         {
-            return true;
+            return count;
         }
+        count++;
     }
-    return false;
+    return -1;
 }
 
-void ImageView::moveShape()
+//int ImageView::clickAnnotationId()
+//{
+//    int x = event->pos().x() / this->zoomLevel;
+//    int y = event->pos().y() / this->zoomLevel;
+
+//    this->drawStartPoint = QPoint(x, y);
+
+//    int count = 0;
+//    for(QList<QVariant>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+//    {
+//        QVariant tempVariant = *it;
+//        QRect rect = tempVariant.toRect();
+
+////            qDebug() << "x, y, width, height " << QString::number(rect.x()) << " " << QString::number(rect.y()) << " " << rect.x()+rect.width() << " " << rect.y()+rect.height();
+//        if((x > rect.x() && y > rect.y()) && (x < (rect.width() + rect.x()) && y < (rect.height() + rect.y())))
+//        {
+//            this->changeColor = true;
+//            this->selectedShapeId = count;
+//            this->update();
+//        }
+//        count++;
+//    }
+//}
+
+void ImageView::moveAnnotation()
 {
     if(this->changeColor && this->mouseState == Left)
     {
@@ -263,7 +263,7 @@ void ImageView::reDraw() //QPainter *painter
 
         // if the user is dont drawing we will store the new image with the annotation in the buffer
         // will have to add another function that pulls data from a store annotation buffer as well
-        if(this->mouseState == LeftRelease && !inAnnotation())
+        if(this->mouseState == LeftRelease && this->inAnnotation() == -1)
         {
             this->mouseState = None;
 
@@ -271,13 +271,8 @@ void ImageView::reDraw() //QPainter *painter
             tempPainter.drawRect(tempRect);
             this->addAnnotation(QVariant(tempRect));
 
-//            QPainterPath *painterPath = new QPainterPath();
-//            painterPath->addRect(QRect(this->drawStartPoint, this->drawEndPoint));
-//            this->addBufferShape(*painterPath);
-
-//            QImage tempQImageStoreTest = this->imageBuffer.at(0);
             this->addBufferFrame(&tempQImage);
-//            this->update();
+            this->update();
         }
 
         // if the user is drawing but hasn't released the left button
@@ -303,27 +298,17 @@ void ImageView::paintEvent(QPaintEvent*)
     //resize is first because it isn't dependent on anything else
     this->paintResize();
     //move annotations is after drawing
-    this->moveShape();
+    this->moveAnnotation();
     //redraw will be refactored slowly, but it handles drawing annotations
     this->reDraw();
     this->painter.end();
 }
-
-//void ImageView::addBufferShape(QPainterPath path)
-//{
-//    this->annotationsBuffer.append(path);
-//}
 
 void ImageView::clearAnnotationBuffer()
 {
 //    this->boxBuffer.clear();
     this->annotationsBuffer.clear();
 }
-
-//QList<QPainterPath> ImageView::getBufferShapes()
-//{
-//    return this->annotationsBuffer;
-//}
 
 QList<QVariant> ImageView::getAnnotations()
 {
@@ -346,13 +331,11 @@ void ImageView::addBufferFrame(QImage *qImageAdd)
     this->imageBuffer.append(*qImageAdd);
     this->currentBufferImageIndex = this->imageBuffer.count();
 
-    if(this->parentWidget())
-        if(this->parentWidget()->parentWidget())
-            if(this->parentWidget()->parentWidget()->parentWidget())
-            {
-                QLabel *bufferSizeLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("frameBufferLabel");
-                bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
-            }
+    if(this->imageBuffer.size() > 0)
+    {
+        QLabel *bufferSizeLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("frameBufferLabel");
+        bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
+    }
 }
 
 void ImageView::clearFrame()
