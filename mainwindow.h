@@ -54,6 +54,9 @@ class MainWindow : public QMainWindow
         void regenerateOriginalImage(QString newPath);
 
     private:
+        virtual void keyPressEvent(QKeyEvent *event);
+        virtual void keyReleaseEvent(QKeyEvent * event);
+
         bool stop;
         Mat frame;
         int frameRate;

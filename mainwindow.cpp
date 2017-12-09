@@ -104,6 +104,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent* event){
+    qDebug("\nkey press : %i", event->key());
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent * event)
+{
+    qDebug("\nkey release: %i", event->key());
+}
+
 void MainWindow::playVideoFile()
 {
     // We cannot connect to a camera if devices are already connected and stream synchronization is in progress

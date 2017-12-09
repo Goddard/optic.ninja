@@ -50,8 +50,8 @@ public:
     const QImage *getCurrentBufferImage();
 
     bool inSquare(QRect *rect);
-    QVariant getAnnotationById(int id);
-    QVariant getAnnotationByPosition();
+    Annotation getAnnotationById(int id);
+    Annotation getAnnotationByPosition();
     void moveAnnotation();
     int annotationExists();
     void addAnnotation(Annotation annotation);
@@ -78,10 +78,12 @@ public:
 private:
     Ui::ImageView *ui;
 
+    //qwidget/qimage zoom level
     double zoomLevel;
+    //mouse position with zoom
     int mouseXPosition;
     int mouseYPosition;
-
+    //mouse position without zoom
     int mouseXNoZoom;
     int mouseYNoZoom;
 
@@ -89,8 +91,11 @@ private:
 
     int currentBufferImageIndex;
 
+    //drawing start point
     QPoint drawStartPoint;
+    //drawing end point
     QPoint drawEndPoint;
+    //distance between start and end
     QPoint drawMoveDistance;
 
 //    QRect newROI;
@@ -125,6 +130,8 @@ signals:
 
 public slots:
     void clearImageBuffer();
+//    void keyPress();
+//    void KeyRelease();
 
 private slots:
     void zoomChanged(int zoomLevelParm);

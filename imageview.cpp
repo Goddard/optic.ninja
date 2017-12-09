@@ -12,6 +12,7 @@ ImageView::ImageView(QWidget *parent) :
     this->mouseXPosition = 0;
     this->mouseYPosition = 0;
     this->setMouseTracking(true);
+//    this->setFocusPolicy(Qt::StrongFocus);
 
     this->currentBufferImageIndex = 0;
 
@@ -48,16 +49,23 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        if(event->modifiers() == Qt::ControlModifier)
+            qDebug() << event->modifiers();
+
+//        qDebug() << event->modifiers() << " " << Qt::ControlModifier;
         this->mouseState = Left;
         //this is used to draw onto the original non-zoomed image
         this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
         int annotationId = this->annotationExists();
+        //Qt::ControlModifier
         if(annotationId != -1)
         {
-            this->changeColor = true;
-            this->selectedShapeId = annotationId;
-            this->update();
+            this->annotationsBuffer[annotationId].selected = true;
+            this->annotationsBuffer[annotationId].color = "green";
+//            this->changeColor = true;
+//            this->selectedShapeId = annotationId;
+//            this->update();
         }
 
         //this test box is used to display to the user even fi zoomed
@@ -148,7 +156,9 @@ int ImageView::annotationExists()
         if(tempVariant.type() == QMetaType::QRect)
         {
             QRect rect = tempVariant.toRect();
-            if(this->inSquare(&rect))
+            if(rect.contains(QPoint(this->mouseXPosition, this->mouseYPosition)))
+                qDebug("inside");
+//            if(this->inSquare(&rect))
             {
                 return count;
             }
@@ -162,25 +172,12 @@ int ImageView::annotationExists()
     return -1;
 }
 
-QVariant ImageView::getAnnotationById(int id)
+Annotation ImageView::getAnnotationById(int id)
 {
-    int count = 0;
-    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
-    {
-        Annotation annotation = *it;
-        QVariant tempVariant = annotation.shape;
-//        QRect rect = tempVariant.toRect();
-
-        if(this->selectedShapeId == count)
-        {
-            return tempVariant;
-        }
-        count++;
-    }
-    return false;
+    this->annotationsBuffer[id];
 }
 
-QVariant ImageView::getAnnotationByPosition()
+Annotation ImageView::getAnnotationByPosition()
 {
     for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
@@ -190,10 +187,10 @@ QVariant ImageView::getAnnotationByPosition()
 
         if(this->inSquare(&rect))
         {
-            return tempVariant;
+            return annotation;
         }
     }
-    return false;
+    return {};
 }
 
 void ImageView::moveAnnotation()
