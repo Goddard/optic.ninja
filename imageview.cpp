@@ -49,28 +49,29 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        if(event->modifiers() == Qt::ControlModifier)
-            qDebug() << event->modifiers();
-
-//        qDebug() << event->modifiers() << " " << Qt::ControlModifier;
         this->mouseState = Left;
+
         //this is used to draw onto the original non-zoomed image
         this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
-        int annotationId = this->annotationExists();
-        //Qt::ControlModifier
-        if(annotationId != -1)
-        {
-            this->annotationsBuffer[annotationId].selected = true;
-            this->annotationsBuffer[annotationId].color = "green";
-//            this->changeColor = true;
-//            this->selectedShapeId = annotationId;
-//            this->update();
-        }
-
-        //this test box is used to display to the user even fi zoomed
+        //this test box is used to display to the user even if zoomed
         this->testBox.setTopLeft(event->pos());
         this->testBox.setBottomRight(event->pos());
+
+        int annotationId = this->annotationExists();
+        if(annotationId != -1 && event->modifiers() == Qt::ControlModifier)
+        {
+            Annotation selectedAnnotation = getAnnotationByPosition();
+            selectedAnnotation.selected = true;
+            selectedAnnotation.color = Qt::green;
+        }
+
+        else if(annotationId != -1 && event->modifiers() != Qt::ControlModifier)
+        {
+            setAnnotationsUnselected();
+            this->annotationsBuffer[annotationId].selected = true;
+            this->annotationsBuffer[annotationId].color = Qt::green;
+        }
     }
 }
 
@@ -93,6 +94,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
     this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
 
+    //set draw distance so we can check if it is a large enough shape to car
     this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
 
     // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
@@ -133,16 +135,6 @@ void ImageView::wheelEvent(QWheelEvent * event)
     }
 }
 
-bool ImageView::inSquare(QRect *rect)
-{
-    if((this->mouseXNoZoom > rect->x() && this->mouseYNoZoom > rect->y()) && (this->mouseXNoZoom < (rect->width() + rect->x()) && this->mouseYNoZoom < (rect->height() + rect->y())))
-    {
-        return true;
-    }
-
-    return false;
-}
-
 //returns id of clicked shape if exists
 //TODO : should refactor to annotationExists()
 int ImageView::annotationExists()
@@ -157,8 +149,6 @@ int ImageView::annotationExists()
         {
             QRect rect = tempVariant.toRect();
             if(rect.contains(QPoint(this->mouseXPosition, this->mouseYPosition)))
-                qDebug("inside");
-//            if(this->inSquare(&rect))
             {
                 return count;
             }
@@ -170,6 +160,16 @@ int ImageView::annotationExists()
         count++;
     }
     return -1;
+}
+
+void ImageView::setAnnotationsUnselected()
+{
+    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    {
+        Annotation annotation = *it;
+        annotation.selected = false;
+        annotation.color = Qt::red;
+    }
 }
 
 Annotation ImageView::getAnnotationById(int id)
@@ -185,7 +185,7 @@ Annotation ImageView::getAnnotationByPosition()
         QVariant tempVariant = annotation.shape;
         QRect rect = tempVariant.toRect();
 
-        if(this->inSquare(&rect))
+        if(rect.contains(QPoint(this->mouseXPosition, this->mouseYPosition)))
         {
             return annotation;
         }
@@ -195,36 +195,57 @@ Annotation ImageView::getAnnotationByPosition()
 
 void ImageView::moveAnnotation()
 {
-    if(this->changeColor && this->mouseState == Left)
+//    if(this->changeColor && this->mouseState == Left)
+//    {
+//        this->changeColor = false;
+//        QImage tempMoveQImage = this->imageBuffer.at(0).copy();
+
+//        int count = 0;
+//        for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+//        {
+//            Annotation annotation = *it;
+//            QVariant tempVariant = annotation.shape;
+//            QRect rect = tempVariant.toRect();
+
+//            QPen myPen;
+//            if(this->selectedShapeId == count)
+//            {
+//                myPen.setColor(Qt::green);
+//                myPen.setStyle(Qt::DashLine);
+//            }
+
+//            else
+//            {
+//                myPen.setColor(Qt::red);
+//            }
+
+//            QPainter myPainter(&tempMoveQImage);
+//            myPainter.setPen(myPen);
+//            myPainter.drawRect(rect);
+//            count++;
+//        }
+//        this->addBufferFrame(&tempMoveQImage);
+//    }
+    //loop over annotation buffer
+    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
-        this->changeColor = false;
-        QImage tempMoveQImage = this->imageBuffer.at(0).copy();
+        Annotation annotation = *it;
+        QVariant tempVariant = annotation.shape;
 
-        int count = 0;
-        for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+        //set default as QRect
+        QRect shape;
+        //if we have a QRect
+        if(tempVariant.type() == QMetaType::QRect)
         {
-            Annotation annotation = *it;
-            QVariant tempVariant = annotation.shape;
-            QRect rect = tempVariant.toRect();
-
-            QPen myPen;
-            if(this->selectedShapeId == count)
-            {
-                myPen.setColor(Qt::green);
-                myPen.setStyle(Qt::DashLine);
-            }
-
-            else
-            {
-                myPen.setColor(Qt::red);
-            }
-
-            QPainter myPainter(&tempMoveQImage);
-            myPainter.setPen(myPen);
-            myPainter.drawRect(rect);
-            count++;
+            QRect shape = tempVariant.toRect();
         }
-        this->addBufferFrame(&tempMoveQImage);
+
+        //if the shape is set to selected
+        if(annotation.selected)
+        {
+            //move center of the shape to the drop point
+            shape.moveCenter(this->drawEndPoint);
+        }
     }
 }
 
@@ -248,7 +269,7 @@ void ImageView::reDraw() //QPainter *painter
 {
     QImage tempQImage = this->imageBuffer.at(this->currentBufferImageIndex - 1);
 
-    this->painter.setBrush(Qt::NoBrush);
+//    this->painter.setBrush(Qt::NoBrush);
     this->painter.setPen(Qt::red);
 
     // if user clicked the left button start drawing
@@ -264,7 +285,7 @@ void ImageView::reDraw() //QPainter *painter
         this->drawing = false;
 
         QPainter tempPainter(&tempQImage);
-        tempPainter.setBrush(Qt::NoBrush);
+//        tempPainter.setBrush(Qt::NoBrush);
         tempPainter.setPen(Qt::red);
 
         // if the user is dont drawing we will store the new image with the annotation in the buffer
@@ -304,12 +325,16 @@ void ImageView::paintEvent(QPaintEvent*)
     if (this->imageBuffer.empty()){ return; }
 
     this->painter.begin(this);
+
     //resize is first because it isn't dependent on anything else
     this->paintResize();
+
     //move annotations is after drawing
     this->moveAnnotation();
+
     //redraw will be refactored slowly, but it handles drawing annotations
     this->reDraw();
+
     this->painter.end();
 }
 

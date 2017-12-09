@@ -31,7 +31,7 @@ struct Annotation
   QVariant shape;
   bool selected = false;
   QString className = "None";
-  QString color = "red";
+  QColor color = Qt::red;
 };
 
 class ImageView : public QWidget
@@ -49,7 +49,7 @@ public:
     void addBufferFrame(QImage *qImageAdd);
     const QImage *getCurrentBufferImage();
 
-    bool inSquare(QRect *rect);
+    void setAnnotationsUnselected();
     Annotation getAnnotationById(int id);
     Annotation getAnnotationByPosition();
     void moveAnnotation();
