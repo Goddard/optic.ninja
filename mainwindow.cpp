@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     scrollArea->setGeometry(ui->ImageViewLayout->geometry());
     scrollArea->setWidget(this->setController->getImageView());
-
+//getGraphicsView()
     connect(ui->setImagespinBox, SIGNAL(valueChanged(int)), this->setController->getImageView(), SLOT(zoomChanged(int)));
 
     //add image view widget to main window
@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->listWidget->setFocus();
 
     this->setController->repaint();
-    this->setController->getImageView()->repaint();
+//    this->setController->getImageView()->repaint();
 }
 
 MainWindow::~MainWindow()

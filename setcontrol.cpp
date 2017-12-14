@@ -8,6 +8,7 @@ setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
 
     //create image viewer
     this->imgView = new ImageView();
+    this->imgGView = new imageGraphicsView();
 
     if(this->appSettingsController->getSetsViewMode() == 0)
         this->setViewMode(QListView::ListMode);
@@ -23,6 +24,8 @@ setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
     connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
 
     this->extensionList = this->appSettingsController->getSetImageExtensions().split(",");
+
+    this->USE_GRAPHICS_VIEW = true;
 }
 
 setControl::~setControl()
@@ -40,9 +43,9 @@ void setControl::setItemClicked(int currentRow)
 {
     if(this->setFiles.value(currentRow))
     {
-        this->imgView->clearAnnotationBuffer();
-        this->imgView->clearImageBuffer();
-        this->imgView->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
+        this->getImageView()->clearAnnotationBuffer();
+        this->getImageView()->clearImageBuffer();
+        this->getImageView()->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
 
         //this->sceneContainer->clear();
 
@@ -102,9 +105,12 @@ QStringList setControl::getSetClassDirectories()
     return dir.entryList();
 }
 
-ImageView *setControl::getImageView()
+imageGraphicsView *setControl::getImageView()
 {
-    return this->imgView;
+//    if(!this->USE_GRAPHICS_VIEW)
+//        return this->imgView;
+//    else
+        return this->imgGView;
 }
 
 // TODO : Change to look at the directories only and seperate the functions to pull in images
@@ -183,8 +189,8 @@ QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString view
 
     if(this->setFiles.count() > 0)
     {
-        this->imgView->clearImageBuffer();
-        this->imgView->addBufferFrame(this->setFiles.value(0)->getImageQImage());
+        this->getImageView()->clearImageBuffer();
+        this->getImageView()->addBufferFrame(this->setFiles.value(0)->getImageQImage());
         this->setCurrentRow(0);
     }
 
@@ -202,7 +208,7 @@ bool setControl::setImageStatus(QString setType)
     {
         this->takeItem(index);
         this->setFiles.removeAt(index);
-        this->imgView->clearFrame();
+        this->getImageView()->clearFrame();
     }
 
     else if(moveStatus == true)
@@ -236,7 +242,7 @@ bool setControl::copyImage()
         QFileInfo checkFile(newFileName);
         if(!checkFile.exists())
         {
-            this->imgView->getCurrentBufferImage()->save(newFileName);
+            this->getImageView()->getCurrentBufferImage()->save(newFileName);
             keepTrying = false;
             this->getSetFiles();
             return true;

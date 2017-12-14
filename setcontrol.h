@@ -13,6 +13,7 @@
 #include <appsettings.h>
 #include <setimage.h>
 #include <imageview.h>
+#include <imagegraphicsview.h>
 
 class setControl : public QListWidget
 {
@@ -37,12 +38,13 @@ public:
     void setSetName(QString setNameParam);
     void setViewName(QString setViewParam);
 
-    ImageView *getImageView();
+    imageGraphicsView *getImageView();
 
     struct ThreadStatisticsData statsData;
 
     QPushButton *button;
     void setSetSettingsFile();
+    bool USE_GRAPHICS_VIEW;
 
 private:
     QString setPath;
@@ -53,6 +55,7 @@ private:
     QList<setImage *> setFiles;
     QListWidget *setListWidget;
     ImageView *imgView;
+    imageGraphicsView *imgGView;
     appSettings *appSettingsController;
 
 protected:

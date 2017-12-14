@@ -87,6 +87,8 @@ private:
     int mouseXNoZoom;
     int mouseYNoZoom;
 
+
+
     QLabel *mousePositionLabel;
 
     int currentBufferImageIndex;

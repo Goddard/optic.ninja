@@ -72,7 +72,8 @@ SOURCES += main.cpp \
     createSetDialog.cpp \
     imageview.cpp \
     setcontrol.cpp \
-    appsettings.cpp
+    appsettings.cpp \
+    imagegraphicsview.cpp
 
 HEADERS += \
     camera.h \
@@ -96,7 +97,8 @@ HEADERS += \
     createSetDialog.h \
     imageview.h \
     setcontrol.h \
-    appsettings.h
+    appsettings.h \
+    imagegraphicsview.h
 
 OTHER_FILES += \
     README
@@ -108,7 +110,8 @@ FORMS += \
     ImageProcessingSettingsDialog.ui \
     playvideodialog.ui \
     createsetdialog.ui \
-    imageview.ui
+    imageview.ui \
+    imagegraphicsview.ui
 
 QMAKE_CXXFLAGS += -Wall -std=gnu++11
 

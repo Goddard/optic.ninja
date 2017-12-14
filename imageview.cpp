@@ -55,23 +55,62 @@ void ImageView::mousePressEvent(QMouseEvent *event)
         this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
         //this test box is used to display to the user even if zoomed
-        this->testBox.setTopLeft(event->pos());
-        this->testBox.setBottomRight(event->pos());
+        // TODO : remove for state driven instead..I think
+//        this->testBox.setTopLeft(event->pos());
+//        this->testBox.setBottomRight(event->pos());
 
+        //check if current position is within existing annotation
         int annotationId = this->annotationExists();
+        //if annotation exists and we are pressing ctrl do something
         if(annotationId != -1 && event->modifiers() == Qt::ControlModifier)
         {
+            //get the annotation for this position
             Annotation selectedAnnotation = getAnnotationByPosition();
+            //lets set the annotation to true
             selectedAnnotation.selected = true;
+            //lets set the color for this selection, good to have the option to change for possible future purposes
             selectedAnnotation.color = Qt::green;
         }
 
+        //if annotation exists and we aren't pressing ctrl do something
         else if(annotationId != -1 && event->modifiers() != Qt::ControlModifier)
         {
+            //lets reset all annotations to selected false and change color to red
             setAnnotationsUnselected();
+            //lets take the annotation we found and set it as select and green
             this->annotationsBuffer[annotationId].selected = true;
             this->annotationsBuffer[annotationId].color = Qt::green;
         }
+
+        //we didn't find an annotation here
+        else if(annotationId == -1)
+        {
+            //lets reset all annotations to selected false and change color to red
+            //since we are drawing in a new spot we will auto "unselect" annotations
+            setAnnotationsUnselected();
+
+            //lets create a new annotation
+            Annotation newAnnotation = {};
+            //set selected to false
+            newAnnotation.selected = false;
+            //set color to red
+            newAnnotation.color = Qt::red;
+
+            //create shape object
+            // TODO : need to change this to some kind of generic because we also might need polygons or lines
+            QRect rect;
+            //set current position for top left and bottom right, will update bottom right as we draw
+            rect.setTopLeft(event->pos());
+            rect.setBottomRight(event->pos());
+            //assign the shape to our annotation
+            newAnnotation.shape = QVariant(rect);
+
+            this->addAnnotation(newAnnotation);
+
+            this->drawing = true;
+            qDebug("mouse pressed");
+        }
+        this->update();
     }
 }
 
@@ -79,6 +118,7 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         this->mouseState = LeftRelease;
+        this->drawing = false;
     }
 
     this->update();
@@ -106,16 +146,27 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     }
 
     //setCursor(Qt::ArrowCursor);
-    if (event->type() == QEvent::MouseMove && this->annotationExists() == -1 && this->drawMoveDistance.manhattanLength() > 3) {
-        this->drawEndPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
-        this->testBox.setBottomRight(event->pos());
-        this->update();
-    }
+//    if (event->type() == QEvent::MouseMove && this->annotationExists() == -1 && this->drawMoveDistance.manhattanLength() > 3) {
+//        this->drawEndPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
+//        this->testBox.setBottomRight(event->pos());
+//        this->update();
+//    }
 
 //    else if(event->type() == QEvent::MouseMove && this->inAnnotation())
 //    {
 //        qDebug() << "test move";
 //    }
+
+//    qDebug() << "drawing " << QString::number(this->drawing);
+    if(this->drawing && !this->annotationsBuffer.isEmpty())
+    {
+//        qDebug() << "mouse moved" << event->x() << " " << event->y();
+//        this->annotationsBuffer.last().shape.toRect().setBottomRight(event->pos());
+        int annotationBufferSize = this->annotationsBuffer.size() - 1;
+
+        this->annotationsBuffer[annotationBufferSize].shape.toRect().setBottomRight(event->pos());
+        this->update();
+    }
 }
 
 void ImageView::wheelEvent(QWheelEvent * event)
@@ -195,37 +246,6 @@ Annotation ImageView::getAnnotationByPosition()
 
 void ImageView::moveAnnotation()
 {
-//    if(this->changeColor && this->mouseState == Left)
-//    {
-//        this->changeColor = false;
-//        QImage tempMoveQImage = this->imageBuffer.at(0).copy();
-
-//        int count = 0;
-//        for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
-//        {
-//            Annotation annotation = *it;
-//            QVariant tempVariant = annotation.shape;
-//            QRect rect = tempVariant.toRect();
-
-//            QPen myPen;
-//            if(this->selectedShapeId == count)
-//            {
-//                myPen.setColor(Qt::green);
-//                myPen.setStyle(Qt::DashLine);
-//            }
-
-//            else
-//            {
-//                myPen.setColor(Qt::red);
-//            }
-
-//            QPainter myPainter(&tempMoveQImage);
-//            myPainter.setPen(myPen);
-//            myPainter.drawRect(rect);
-//            count++;
-//        }
-//        this->addBufferFrame(&tempMoveQImage);
-//    }
     //loop over annotation buffer
     for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
@@ -237,7 +257,7 @@ void ImageView::moveAnnotation()
         //if we have a QRect
         if(tempVariant.type() == QMetaType::QRect)
         {
-            QRect shape = tempVariant.toRect();
+            shape = tempVariant.toRect();
         }
 
         //if the shape is set to selected
@@ -268,56 +288,39 @@ void ImageView::paintResize()
 void ImageView::reDraw() //QPainter *painter
 {
     QImage tempQImage = this->imageBuffer.at(this->currentBufferImageIndex - 1);
+//    this->mouseState = None;
 
-//    this->painter.setBrush(Qt::NoBrush);
-    this->painter.setPen(Qt::red);
+    if(this->imageBuffer.empty()) { return; }
 
-    // if user clicked the left button start drawing
-    if(this->mouseState == Left)
+    QPainter tempPainter(&tempQImage);
+    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
-        this->painter.drawRect(this->testBox);
-        this->drawing = true;
-    }
+        Annotation annotation = *it;
+        QVariant tempVariant = annotation.shape;
+        QRect rect = tempVariant.toRect();
 
-    // if the user is dragging continuously paint
-    else if(this->drawing)
-    {
-        this->drawing = false;
-
-        QPainter tempPainter(&tempQImage);
-//        tempPainter.setBrush(Qt::NoBrush);
-        tempPainter.setPen(Qt::red);
-
-        // if the user is dont drawing we will store the new image with the annotation in the buffer
-        // will have to add another function that pulls data from a store annotation buffer as well
-        if(this->mouseState == LeftRelease && this->annotationExists() == -1)
+//        qDebug() << "drawing " << QString::number(this->drawing);
+        if(this->mouseState == LeftRelease)
         {
             this->mouseState = None;
-
-            QRect tempRect = QRect(this->drawStartPoint, this->drawEndPoint);
-            tempPainter.drawRect(tempRect);
-
-            Annotation tempAnnotation = {};
-            tempAnnotation.shape = QVariant(tempRect);
-            this->addAnnotation(tempAnnotation);
-
-            this->addBufferFrame(&tempQImage);
-            this->update();
+            qDebug() << "mouse moved" << rect.bottomRight().x() << " " << rect.bottomRight().y();
         }
 
-        // if the user is drawing but hasn't released the left button
-        else
-        {
-            tempPainter.drawRect(this->testBox);
-        }
+        tempPainter.setPen(annotation.color);
+        tempPainter.drawRect(rect);
     }
+
+
+//    this->addBufferFrame(&tempQImage);
+    this->update();
+}
+
 //    QPainter p(this);
 //    painter->setPen(QPen(Qt::black,2));
 //    if(size().width() >10 && size().height() >10)
 //    {
 //        painter->drawText(20,20,QString("%1,%2").arg(size().width()).arg(size().height()));
 //    }
-}
 
 void ImageView::paintEvent(QPaintEvent*)
 {
