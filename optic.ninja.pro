@@ -73,7 +73,8 @@ SOURCES += main.cpp \
     imageview.cpp \
     setcontrol.cpp \
     appsettings.cpp \
-    imagegraphicsview.cpp
+    imagegraphicsview.cpp \
+    imageview/opticrectangle.cpp
 
 HEADERS += \
     camera.h \
@@ -98,7 +99,8 @@ HEADERS += \
     imageview.h \
     setcontrol.h \
     appsettings.h \
-    imagegraphicsview.h
+    imagegraphicsview.h \
+    imageview/opticrectangle.h
 
 OTHER_FILES += \
     README

@@ -11,6 +11,7 @@
 #include <QSpinBox>
 #include <QWheelEvent>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsSceneMouseEvent>
 
 namespace Ui {
 class imageGraphicsView;
@@ -46,6 +47,7 @@ public:
     double zoomLevel;
     void paintResize();
     QGraphicsView *getGraphicsView();
+    void addItem();
 
 private:
     Ui::imageGraphicsView *ui;

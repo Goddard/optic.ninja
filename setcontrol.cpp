@@ -105,12 +105,11 @@ QStringList setControl::getSetClassDirectories()
     return dir.entryList();
 }
 
-imageGraphicsView *setControl::getImageView()
+ImageView *setControl::getImageView()
+//imageGraphicsView *setControl::getImageView()
 {
-//    if(!this->USE_GRAPHICS_VIEW)
-//        return this->imgView;
-//    else
-        return this->imgGView;
+      return this->imgView;
+//        return this->imgGView;
 }
 
 // TODO : Change to look at the directories only and seperate the functions to pull in images

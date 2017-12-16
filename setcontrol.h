@@ -38,7 +38,8 @@ public:
     void setSetName(QString setNameParam);
     void setViewName(QString setViewParam);
 
-    imageGraphicsView *getImageView();
+    ImageView *getImageView();
+//    imageGraphicsView *getImageView();
 
     struct ThreadStatisticsData statsData;
 

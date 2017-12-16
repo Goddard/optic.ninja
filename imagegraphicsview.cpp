@@ -27,6 +27,7 @@ imageGraphicsView::imageGraphicsView(QWidget *parent) :
     view->fitInView(0, 0, scene->width(), scene->height());
     view->setFrameStyle(0);
 //    view->setSceneRect(0, 0, scene->width(), scene->height());
+    view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 
     QGridLayout* vl = new QGridLayout();
     vl->setContentsMargins(0, 0, 0, 0);
@@ -43,6 +44,11 @@ imageGraphicsView::imageGraphicsView(QWidget *parent) :
 imageGraphicsView::~imageGraphicsView()
 {
     delete ui;
+}
+
+void imageGraphicsView::addItem()
+{
+
 }
 
 QGraphicsView *imageGraphicsView::getGraphicsView()
@@ -94,7 +100,7 @@ void imageGraphicsView::addBufferFrame(QImage *qImageAdd)
         bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
     }
 
-    QGraphicsPixmapItem* pi = scene->addPixmap(QPixmap::fromImage(*qImageAdd).scaled(QSize(this->zoomImageWidth, this->zoomImageHeight)));
+    scene->addPixmap(QPixmap::fromImage(*qImageAdd).scaled(QSize(this->zoomImageWidth, this->zoomImageHeight)));
 //    pi->setFlag(QGraphicsItem::ItemIsMovable,true);
 //    pi->setFlag(QGraphicsItem::ItemIsSelectable,true);
     this->update();
@@ -124,7 +130,7 @@ void imageGraphicsView::paintResize()
     this->resize(this->zoomImageWidth, this->zoomImageHeight);
     this->scene->clear();
 
-    QGraphicsPixmapItem* pi = this->scene->addPixmap(QPixmap::fromImage(tempQImage).scaled(QSize(this->zoomImageWidth, this->zoomImageHeight)));
+    this->scene->addPixmap(QPixmap::fromImage(tempQImage).scaled(QSize(this->zoomImageWidth, this->zoomImageHeight)));
     this->view->setSceneRect(0, 0, this->zoomImageWidth, this->zoomImageHeight);
 }
 
@@ -135,9 +141,33 @@ void imageGraphicsView::paintEvent(QPaintEvent*)
 
 bool imageGraphicsView::eventFilter(QObject *obj, QEvent *event)
 {
-//    if (event->type() == QEvent::MouseMove) {
-        QMouseEvent *keyEvent = static_cast<QMouseEvent *>(event);
-        qDebug() << "Ate key press" << keyEvent->pos().x();
+    if (obj == scene)
+    {
+        if (event->type() == QEvent::GraphicsSceneMouseMove)
+        {
+            const QGraphicsSceneMouseEvent* me = static_cast<const QGraphicsSceneMouseEvent*>(event);
+            const QPointF position = me->scenePos();
+
+            //set Qwidget/ImageView x, y positions
+            this->mouseXPosition = position.x();
+            this->mouseYPosition = position.y();
+
+            //set image x, y values and disregard zoom value
+            this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
+            this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+
+            //set draw distance so we can check if it is a large enough shape to car
+            this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
+
+            // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
+            if(this->imageBuffer.size() > 0)
+            {
+                QLabel *mouseLocationLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("mouseLocationLabel");
+                mouseLocationLabel->setText("( " + QString::number(this->mouseXPosition) + ", " + QString::number(this->mouseYPosition) + " )" +
+                                            "[ " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).width()) + " / " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).height()) + " ] ");
+            }
+        }
+    }
 //        return true;
 //    } else {
 //        // standard event processing
@@ -147,24 +177,24 @@ bool imageGraphicsView::eventFilter(QObject *obj, QEvent *event)
 
 void imageGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    //set Qwidget/ImageView x, y positions
-    this->mouseXPosition = event->x();
-    this->mouseYPosition = event->y();
+//    //set Qwidget/ImageView x, y positions
+//    this->mouseXPosition = event->x();
+//    this->mouseYPosition = event->y();
 
-    //set image x, y values and disregard zoom value
-    this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
-    this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+//    //set image x, y values and disregard zoom value
+//    this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
+//    this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
 
-    //set draw distance so we can check if it is a large enough shape to car
-    this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
+//    //set draw distance so we can check if it is a large enough shape to car
+//    this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
 
-    // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
-    if(this->imageBuffer.size() > 0)
-    {
-        QLabel *mouseLocationLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("mouseLocationLabel");
-        mouseLocationLabel->setText("( " + QString::number(this->mouseXPosition) + ", " + QString::number(this->mouseYPosition) + " )" +
-                                    "[ " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).width()) + " / " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).height()) + " ] ");
-    }
+//    // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
+//    if(this->imageBuffer.size() > 0)
+//    {
+//        QLabel *mouseLocationLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("mouseLocationLabel");
+//        mouseLocationLabel->setText("( " + QString::number(this->mouseXPosition) + ", " + QString::number(this->mouseYPosition) + " )" +
+//                                    "[ " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).width()) + " / " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).height()) + " ] ");
+//    }
 }
 
 void imageGraphicsView::mousePressEvent(QMouseEvent *event)

@@ -160,11 +160,16 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
 //    qDebug() << "drawing " << QString::number(this->drawing);
     if(this->drawing && !this->annotationsBuffer.isEmpty())
     {
+        qDebug() << "drawing";
 //        qDebug() << "mouse moved" << event->x() << " " << event->y();
 //        this->annotationsBuffer.last().shape.toRect().setBottomRight(event->pos());
         int annotationBufferSize = this->annotationsBuffer.size() - 1;
 
-        this->annotationsBuffer[annotationBufferSize].shape.toRect().setBottomRight(event->pos());
+        QRect tempRect = QRect(this->drawStartPoint, event->pos());
+        this->annotationsBuffer[annotationBufferSize].shape = QVariant::fromValue(tempRect);
+
+//        this->annotationsBuffer[annotationBufferSize].shape.toRect().setBottomRight(event->pos());
+        qDebug() << this->mouseXPosition << " " << this->annotationsBuffer[annotationBufferSize].shape.toRect().x();
         this->update();
     }
 }
@@ -287,12 +292,10 @@ void ImageView::paintResize()
 
 void ImageView::reDraw() //QPainter *painter
 {
-    QImage tempQImage = this->imageBuffer.at(this->currentBufferImageIndex - 1);
 //    this->mouseState = None;
 
     if(this->imageBuffer.empty()) { return; }
 
-    QPainter tempPainter(&tempQImage);
     for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
         Annotation annotation = *it;
@@ -306,13 +309,11 @@ void ImageView::reDraw() //QPainter *painter
             qDebug() << "mouse moved" << rect.bottomRight().x() << " " << rect.bottomRight().y();
         }
 
-        tempPainter.setPen(annotation.color);
-        tempPainter.drawRect(rect);
+        this->painter.setPen(annotation.color);
+        this->painter.drawRect(rect);
     }
 
-
 //    this->addBufferFrame(&tempQImage);
-    this->update();
 }
 
 //    QPainter p(this);
