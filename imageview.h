@@ -32,6 +32,7 @@ struct Annotation
   bool selected = false;
   QString className = "None";
   QColor color = Qt::red;
+//  QPoint position;
 };
 
 class ImageView : public QWidget
@@ -59,7 +60,7 @@ public:
     void clearAnnotationBuffer();
 
     void paintResize();
-    void reDraw(); //QPainter *painter
+    void reDraw();
 
     enum MouseState {
         Left,
@@ -69,10 +70,14 @@ public:
         Move,
         None
     };
-
     MouseState mouseState;
 
-    bool changeColor;
+    enum KeyboardState {
+        Ctrl,
+        KeyNone
+    };
+    KeyboardState keyboardState;
+
     int selectedShapeId;
 
 private:
@@ -86,8 +91,6 @@ private:
     //mouse position without zoom
     int mouseXNoZoom;
     int mouseYNoZoom;
-
-
 
     QLabel *mousePositionLabel;
 
@@ -109,7 +112,6 @@ private:
     bool drawSquare = false;
 
     QPainter painter;
-    QRect testBox;
 
     //use with zooming to resize QWidget and Image
     QRectF resizeSource;
@@ -128,6 +130,9 @@ protected:
     void wheelEvent(QWheelEvent * event);
     bool wheelBool;
 
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+
 signals:
 
 public slots:
@@ -139,6 +144,7 @@ private slots:
     void zoomChanged(int zoomLevelParm);
     void moveBufferForward();
     void moveBufferBackward();
+    void deleteSelected();
 };
 
 #endif // IMAGEVIEW_H

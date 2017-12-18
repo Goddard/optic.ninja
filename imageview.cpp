@@ -12,6 +12,7 @@ ImageView::ImageView(QWidget *parent) :
     this->mouseXPosition = 0;
     this->mouseYPosition = 0;
     this->setMouseTracking(true);
+    this->setFocusPolicy(Qt::ClickFocus);
 //    this->setFocusPolicy(Qt::StrongFocus);
 
     this->currentBufferImageIndex = 0;
@@ -24,10 +25,15 @@ ImageView::ImageView(QWidget *parent) :
     act2->setShortcut(QKeySequence::Undo);
     connect(act2, SIGNAL(triggered()), this, SLOT(moveBufferBackward()));
 
+    QAction *act3 = new QAction(this);
+    act3->setShortcut(QKeySequence::Delete);
+    connect(act3, SIGNAL(triggered()), this, SLOT(deleteSelected()));
+
     this->addAction(act1);
     this->addAction(act2);
 
     this->mouseState = None;
+    // TODO: add annotation copy buffer
     this->drawing = false;
 }
 
@@ -35,6 +41,11 @@ ImageView::~ImageView()
 {
     delete ui;
 }
+
+//void ImageView::createExpansionPoints()
+//{
+//    QLine line;
+//}
 
 void ImageView::zoomChanged(int zoomLevelParm)
 {
@@ -45,6 +56,40 @@ void ImageView::zoomChanged(int zoomLevelParm)
     }
 }
 
+void ImageView::deleteSelected()
+{
+    QList<Annotation>::iterator it = this->annotationsBuffer.begin();
+    while (it != this->annotationsBuffer.end()) {
+        Annotation annotation = *it;
+        if(annotation.selected == true)
+        {
+            it = this->annotationsBuffer.erase(it);
+        }
+        else
+            ++it;
+    }
+}
+
+void ImageView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::CTRL)
+        this->keyboardState = Ctrl;
+}
+
+void ImageView::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::CTRL)
+        this->keyboardState = KeyNone;
+
+    if(event->key() == Qt::Key_Delete)
+    {
+        qDebug() << "delete pressed";
+
+        this->deleteSelected();
+    }
+    this->repaint();
+}
+
 void ImageView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
@@ -53,30 +98,26 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 
         //this is used to draw onto the original non-zoomed image
         this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
-
-        //this test box is used to display to the user even if zoomed
-        // TODO : remove for state driven instead..I think
-//        this->testBox.setTopLeft(event->pos());
-//        this->testBox.setBottomRight(event->pos());
+        this->drawEndPoint = event->pos();
 
         //check if current position is within existing annotation
         int annotationId = this->annotationExists();
         //if annotation exists and we are pressing ctrl do something
         if(annotationId != -1 && event->modifiers() == Qt::ControlModifier)
         {
-            //get the annotation for this position
-            Annotation selectedAnnotation = getAnnotationByPosition();
+            qDebug() << "modifier selected";
             //lets set the annotation to true
-            selectedAnnotation.selected = true;
+            this->annotationsBuffer[annotationId].selected = true;
             //lets set the color for this selection, good to have the option to change for possible future purposes
-            selectedAnnotation.color = Qt::green;
+            this->annotationsBuffer[annotationId].color = Qt::green;
         }
 
         //if annotation exists and we aren't pressing ctrl do something
         else if(annotationId != -1 && event->modifiers() != Qt::ControlModifier)
         {
+            qDebug() << "modifier not selected";
             //lets reset all annotations to selected false and change color to red
-            setAnnotationsUnselected();
+            this->setAnnotationsUnselected();
             //lets take the annotation we found and set it as select and green
             this->annotationsBuffer[annotationId].selected = true;
             this->annotationsBuffer[annotationId].color = Qt::green;
@@ -85,9 +126,10 @@ void ImageView::mousePressEvent(QMouseEvent *event)
         //we didn't find an annotation here
         else if(annotationId == -1)
         {
+            qDebug() << "no annotation";
             //lets reset all annotations to selected false and change color to red
             //since we are drawing in a new spot we will auto "unselect" annotations
-            setAnnotationsUnselected();
+            this->setAnnotationsUnselected();
 
             //lets create a new annotation
             Annotation newAnnotation = {};
@@ -110,17 +152,17 @@ void ImageView::mousePressEvent(QMouseEvent *event)
             this->drawing = true;
             qDebug("mouse pressed");
         }
-        this->update();
     }
+    this->update();
 }
 
 void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         this->mouseState = LeftRelease;
+        this->drawEndPoint = event->pos();
         this->drawing = false;
     }
-
     this->update();
 }
 
@@ -133,6 +175,8 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     //set image x, y values and disregard zoom value
     this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
     this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+
+    this->drawEndPoint = event->pos();
 
     //set draw distance so we can check if it is a large enough shape to car
     this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
@@ -192,7 +236,6 @@ void ImageView::wheelEvent(QWheelEvent * event)
 }
 
 //returns id of clicked shape if exists
-//TODO : should refactor to annotationExists()
 int ImageView::annotationExists()
 {
     int count = 0;
@@ -211,7 +254,9 @@ int ImageView::annotationExists()
         }
 
         else if(tempVariant.type() == QMetaType::QPolygon)
-        {}
+        {
+            QPolygon shape;
+        }
 
         count++;
     }
@@ -220,11 +265,10 @@ int ImageView::annotationExists()
 
 void ImageView::setAnnotationsUnselected()
 {
-    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    for(int i = 0; i < this->annotationsBuffer.size(); i++)
     {
-        Annotation annotation = *it;
-        annotation.selected = false;
-        annotation.color = Qt::red;
+        this->annotationsBuffer[i].selected = false;
+        this->annotationsBuffer[i].color = Qt::red;
     }
 }
 
@@ -252,24 +296,32 @@ Annotation ImageView::getAnnotationByPosition()
 void ImageView::moveAnnotation()
 {
     //loop over annotation buffer
-    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+    for(int i = 0; i < this->annotationsBuffer.size(); i++)
     {
-        Annotation annotation = *it;
-        QVariant tempVariant = annotation.shape;
+//        this->annotationsBuffer[i].selected = false;
+//    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
+//    {
+//        Annotation annotation = *it;
+//        QVariant tempVariant = this->annotationsBuffer[i].shape;
 
         //set default as QRect
         QRect shape;
         //if we have a QRect
-        if(tempVariant.type() == QMetaType::QRect)
+        if(this->annotationsBuffer[i].shape.type() == QMetaType::QRect)
         {
-            shape = tempVariant.toRect();
+            shape = this->annotationsBuffer[i].shape.toRect();
         }
 
         //if the shape is set to selected
-        if(annotation.selected)
+        if(this->annotationsBuffer[i].selected && this->mouseState == Left) // && this->keyboardState == KeyNone && this->mouseState == Left
         {
+//            setCursor(Qt::ClosedHandCursor);
             //move center of the shape to the drop point
-            shape.moveCenter(this->drawEndPoint);
+            qDebug() << (this->drawStartPoint.x() - this->drawEndPoint.x()) << " " << (this->drawStartPoint.y() - this->drawEndPoint.y());
+            QPoint moveDistance = QPoint((this->drawStartPoint.x() - this->drawEndPoint.x()), (this->drawStartPoint.y() - this->drawEndPoint.y()));
+            //this->drawMoveDistance
+            shape.moveCenter(moveDistance);
+            this->annotationsBuffer[i].shape = shape;
         }
     }
 }
@@ -290,30 +342,34 @@ void ImageView::paintResize()
     this->painter.drawImage(this->resizeSource, tempQImage, this->resizeTarget);
 }
 
-void ImageView::reDraw() //QPainter *painter
+void ImageView::reDraw()
 {
-//    this->mouseState = None;
-
-    if(this->imageBuffer.empty()) { return; }
-
     for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
     {
         Annotation annotation = *it;
         QVariant tempVariant = annotation.shape;
         QRect rect = tempVariant.toRect();
 
-//        qDebug() << "drawing " << QString::number(this->drawing);
-        if(this->mouseState == LeftRelease)
-        {
-            this->mouseState = None;
-            qDebug() << "mouse moved" << rect.bottomRight().x() << " " << rect.bottomRight().y();
-        }
+//        if(annotation.color == Qt::red)
+//        {
+//            QBrush brush(Qt::red, Qt::CrossPattern);
+//            this->painter.setBrush(brush);
+//        }
 
         this->painter.setPen(annotation.color);
         this->painter.drawRect(rect);
     }
 
-//    this->addBufferFrame(&tempQImage);
+//    this->painter.setPen(QPen(Qt::red));
+//    this->painter.setBrush(QBrush(Qt::red, Qt::NoBrush));
+
+    if(this->mouseState == LeftRelease)
+    {
+        this->mouseState = None;
+        qDebug() << "mouse release and state reset";
+    }
+
+    this->update();
 }
 
 //    QPainter p(this);
