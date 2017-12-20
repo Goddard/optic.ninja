@@ -11,6 +11,10 @@ ImageView::ImageView(QWidget *parent) :
     this->zoomLevel = 1;
     this->mouseXPosition = 0;
     this->mouseYPosition = 0;
+
+    this->mouseXNoZoom = 0;
+    this->mouseYNoZoom = 0;
+
     this->setMouseTracking(true);
     this->setFocusPolicy(Qt::ClickFocus);
 //    this->setFocusPolicy(Qt::StrongFocus);
@@ -42,16 +46,34 @@ ImageView::~ImageView()
     delete ui;
 }
 
-//void ImageView::createExpansionPoints()
-//{
-//    QLine line;
-//}
+void ImageView::createExpansionPoints()
+{
+    int expansionSize = 10;
+    for(int i = 0; i < this->annotationsBuffer.size(); i++)
+    {
+        if(this->annotationsBuffer[i].selected == true)
+        {
+            QRect rect1 = this->annotationsBuffer[i].shape.toRect().normalized();
+            rect1.setHeight(rect1.height()+expansionSize);
+            rect1.setWidth(rect1.width()+expansionSize);
+            rect1.translate(-expansionSize, -expansionSize);
+            rect1.setHeight(rect1.height()+expansionSize);
+            rect1.setWidth(rect1.width()+expansionSize);
+
+//            rect1.setTopLeft(QPoint(this->annotationsBuffer[i].shape.toRect().topLeft().x() - expansionSize, this->annotationsBuffer[i].shape.toRect().topLeft().y() - expansionSize));
+//            rect1.setBottomRight(QPoint(this->annotationsBuffer[i].shape.toRect().bottomRight().x() + expansionSize, this->annotationsBuffer[i].shape.toRect().bottomRight().y() + expansionSize));
+
+            this->painter.drawRect(rect1);
+        }
+    }
+}
 
 void ImageView::zoomChanged(int zoomLevelParm)
 {
     if(zoomLevelParm > 10)
     {
         this->zoomLevel = static_cast<double>(zoomLevelParm) / 100;
+        this->updateAnnotationGeomotry();
         this->update();
     }
 }
@@ -90,15 +112,60 @@ void ImageView::keyReleaseEvent(QKeyEvent *event)
     this->repaint();
 }
 
+//if we didn't draw points from topleft to bottomRight lets reorder
+void ImageView::orderPoints()
+{
+    for(int i = 0; i < this->annotationsBuffer.size(); i++)
+    {
+        QList<QPoint> points;
+        points.append(this->annotationsBuffer[i].shape.toRect().topLeft());
+        points.append(this->annotationsBuffer[i].shape.toRect().bottomLeft());
+
+        points.append(this->annotationsBuffer[i].shape.toRect().topRight());
+        points.append(this->annotationsBuffer[i].shape.toRect().bottomRight());
+
+        int lowestX = 100000;
+        int lowestY = 100000;
+
+        int hightestX = 0;
+        int hightestY = 0;
+        for(int j = 0; j < points.size(); j++)
+        {
+            if(points[j].x() < lowestX)
+                lowestX = points[j].x();
+
+            if(points[j].y() < lowestY)
+                lowestY = points[j].y();
+
+            if(points[j].x() > hightestX)
+                hightestX = points[j].x();
+
+            if(points[j].y() > hightestY)
+                hightestY = points[j].y();
+        }
+
+//        QPoint(lowestX, hightestY), QPoint(hightestX, lowestY)
+        QRect tempRect;
+        tempRect.setTopLeft(QPoint(lowestX, hightestY));
+        tempRect.setHeight(this->annotationsBuffer[i].shape.toRect().height());
+        tempRect.setWidth(this->annotationsBuffer[i].shape.toRect().width());
+        this->annotationsBuffer[i].shape = QVariant::fromValue(tempRect);
+    }
+}
+
 void ImageView::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton && this->mouseState != Move)
     {
         this->mouseState = Left;
 
+        //this is used to draw onto the zoomed image
+        this->drawStartPoint = QPoint(this->mouseXPosition, this->mouseYPosition);
+        this->drawEndPoint = QPoint(this->mouseXPosition, this->mouseYPosition);
+
         //this is used to draw onto the original non-zoomed image
-        this->drawStartPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
-        this->drawEndPoint = event->pos();
+        this->drawStartPointNoZoom = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
+        this->drawEndPointNoZoom = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
         //check if current position is within existing annotation
         int annotationId = this->annotationExists();
@@ -113,7 +180,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
         }
 
         //if annotation exists and we aren't pressing ctrl do something
-        else if(annotationId != -1 && event->modifiers() != Qt::ControlModifier)
+        else if(annotationId != -1 && event->modifiers() != Qt::ControlModifier && this->annotationsBuffer[annotationId].selected == false)
         {
             qDebug() << "modifier not selected";
             //lets reset all annotations to selected false and change color to red
@@ -121,6 +188,12 @@ void ImageView::mousePressEvent(QMouseEvent *event)
             //lets take the annotation we found and set it as select and green
             this->annotationsBuffer[annotationId].selected = true;
             this->annotationsBuffer[annotationId].color = Qt::green;
+        }
+
+        // when we want to move an annotation lets set the mouse state so we can react to it
+        else if(annotationId != -1 && event->modifiers() != Qt::ControlModifier && this->annotationsBuffer[annotationId].selected == true)
+        {
+            this->mouseState = Move;
         }
 
         //we didn't find an annotation here
@@ -140,13 +213,24 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 
             //create shape object
             // TODO : need to change this to some kind of generic because we also might need polygons or lines
-            QRect rect;
-            //set current position for top left and bottom right, will update bottom right as we draw
-            rect.setTopLeft(event->pos());
-            rect.setBottomRight(event->pos());
-            //assign the shape to our annotation
-            newAnnotation.shape = QVariant(rect);
 
+            //set current position for top left and bottom right, will update bottom right as we draw
+            QRect rectReal;
+            QRect rectZoom;
+            //this extra checks needs to be done to assign the points properly otherwise it effects other
+            //calculations
+
+                rectReal.setTopLeft(this->drawStartPointNoZoom);
+                rectZoom.setTopLeft(this->drawStartPoint);
+
+
+                rectReal.setBottomRight(this->drawEndPointNoZoom);
+                rectZoom.setBottomRight(this->drawEndPoint);
+
+
+            //assign the shape to our annotation
+            newAnnotation.shape = QVariant(rectZoom.normalized());
+            newAnnotation.real = QVariant(rectReal.normalized());
             this->addAnnotation(newAnnotation);
 
             this->drawing = true;
@@ -158,9 +242,13 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 
 void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton)
+    {
         this->mouseState = LeftRelease;
-        this->drawEndPoint = event->pos();
+
+        this->drawEndPoint = QPoint(this->mouseXPosition, this->mouseYPosition);
+        this->drawEndPointNoZoom = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
+
         this->drawing = false;
     }
     this->update();
@@ -172,14 +260,18 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     this->mouseXPosition = event->x();
     this->mouseYPosition = event->y();
 
-    //set image x, y values and disregard zoom value
-    this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
-    this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+    //lets check our zoom level and set the none zoom mouse positions properly
+    if(this->zoomLevel > 1)
+    {
+        this->mouseXNoZoom = this->mouseXPosition / this->zoomLevel;
+        this->mouseYNoZoom = this->mouseYPosition / this->zoomLevel;
+    }
 
-    this->drawEndPoint = event->pos();
-
-    //set draw distance so we can check if it is a large enough shape to car
-    this->drawMoveDistance = QPoint(this->mouseXNoZoom, this->mouseYNoZoom) - this->drawStartPoint;
+    else
+    {
+        this->mouseXNoZoom = this->mouseXPosition * this->zoomLevel;
+        this->mouseYNoZoom = this->mouseYPosition * this->zoomLevel;
+    }
 
     // make sure the image buffer is allocated so we don't get index out of range could of used .empty()
     if(this->imageBuffer.size() > 0)
@@ -189,30 +281,29 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
                                     "[ " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).width()) + " / " + QString::number(this->imageBuffer.at(this->currentBufferImageIndex-1).height()) + " ] ");
     }
 
-    //setCursor(Qt::ArrowCursor);
-//    if (event->type() == QEvent::MouseMove && this->annotationExists() == -1 && this->drawMoveDistance.manhattanLength() > 3) {
-//        this->drawEndPoint = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
-//        this->testBox.setBottomRight(event->pos());
-//        this->update();
-//    }
+    //lets only set the "end point" for drawing when we release the left mouse button
+    if(this->mouseState == LeftRelease)
+    {
+        this->drawEndPoint = QPoint(this->mouseXPosition, this->mouseYPosition);
+        //this is used to draw onto the original non-zoomed image
+        this->drawEndPointNoZoom = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
-//    else if(event->type() == QEvent::MouseMove && this->inAnnotation())
-//    {
-//        qDebug() << "test move";
-//    }
+        //set draw distance so we can check if it is a large enough shape to car
+        this->drawMoveDistance = this->drawStartPoint - this->drawEndPoint;
+    }
 
-//    qDebug() << "drawing " << QString::number(this->drawing);
     if(this->drawing && !this->annotationsBuffer.isEmpty())
     {
         qDebug() << "drawing";
-//        qDebug() << "mouse moved" << event->x() << " " << event->y();
-//        this->annotationsBuffer.last().shape.toRect().setBottomRight(event->pos());
         int annotationBufferSize = this->annotationsBuffer.size() - 1;
 
-        QRect tempRect = QRect(this->drawStartPoint, event->pos());
-        this->annotationsBuffer[annotationBufferSize].shape = QVariant::fromValue(tempRect);
+        QRect tempRect = QRect(this->drawStartPoint, event->pos()).normalized();
 
-//        this->annotationsBuffer[annotationBufferSize].shape.toRect().setBottomRight(event->pos());
+        QRect tempRectNoZoom = QRect(this->drawStartPointNoZoom, QPoint(this->mouseXNoZoom, this->mouseYNoZoom)).normalized();
+        this->annotationsBuffer[annotationBufferSize].shape = QVariant::fromValue(tempRect);
+        this->annotationsBuffer[annotationBufferSize].real = QVariant::fromValue(tempRectNoZoom);
+
+
         qDebug() << this->mouseXPosition << " " << this->annotationsBuffer[annotationBufferSize].shape.toRect().x();
         this->update();
     }
@@ -234,6 +325,18 @@ void ImageView::wheelEvent(QWheelEvent * event)
         }
     }
 }
+
+//int ImageView::annotationSelected()
+//{
+//    for(int i = 0; i < this->annotationsBuffer.size(); i++)
+//    {
+//        if(this->annotationsBuffer[i].selected)
+//        {
+//            return i;
+//        }
+//    }
+//    return -1;
+//}
 
 //returns id of clicked shape if exists
 int ImageView::annotationExists()
@@ -298,30 +401,59 @@ void ImageView::moveAnnotation()
     //loop over annotation buffer
     for(int i = 0; i < this->annotationsBuffer.size(); i++)
     {
-//        this->annotationsBuffer[i].selected = false;
-//    for(QList<Annotation>::iterator it = this->annotationsBuffer.begin(); it != this->annotationsBuffer.end(); ++it)
-//    {
-//        Annotation annotation = *it;
-//        QVariant tempVariant = this->annotationsBuffer[i].shape;
+        //if the shape is set to selected
+        if(this->annotationsBuffer[i].selected && this->mouseState == Move) // && this->keyboardState == KeyNone && this->mouseState == Left
+        {
+            //set default as QRect
+            QRect shape;
+            QRect real;
+            //if we have a QRect
+            if(this->annotationsBuffer[i].shape.type() == QMetaType::QRect)
+            {
+                shape = this->annotationsBuffer[i].shape.toRect();
+                real = this->annotationsBuffer[i].real.toRect();
+            }
 
-        //set default as QRect
-        QRect shape;
+//            setCursor(Qt::ClosedHandCursor);
+            //move center of the shape to the drop point
+            qDebug() << this->drawStartPoint.x() << ", " << this->drawStartPoint.y();
+            QPoint moveDistance = QPoint(this->mouseXPosition - this->drawStartPoint.x(), this->mouseYPosition - this->drawStartPoint.y());
+            QPoint rectPosition = QPoint(shape.center().x() + moveDistance.x(), shape.center().y() + moveDistance.y());
+            shape.moveCenter(rectPosition);
+            this->annotationsBuffer[i].shape = shape;
+
+            QPoint moveDistanceNoZoom = QPoint(this->mouseXNoZoom - this->drawStartPointNoZoom.x(), this->mouseYNoZoom - this->drawStartPointNoZoom.y());
+            QPoint rectPositionNoZoom = QPoint(real.center().x() + moveDistanceNoZoom.x(), real.center().y() + moveDistanceNoZoom.y());
+            real.moveCenter(rectPositionNoZoom);
+            this->annotationsBuffer[i].real = real;
+        }
+    }
+
+    if(this->mouseState == Move)
+    {
+        this->drawStartPoint = QPoint(this->mouseXPosition, this->mouseYPosition);
+        this->drawStartPointNoZoom = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
+    }
+}
+
+void ImageView::updateAnnotationGeomotry()
+{
+    for(int i = 0; i < this->annotationsBuffer.size(); i++)
+    {
         //if we have a QRect
         if(this->annotationsBuffer[i].shape.type() == QMetaType::QRect)
         {
-            shape = this->annotationsBuffer[i].shape.toRect();
-        }
+            QPoint topLeft = this->annotationsBuffer[i].real.toRect().topLeft();
+            QPoint bottomRight = this->annotationsBuffer[i].real.toRect().bottomRight();
 
-        //if the shape is set to selected
-        if(this->annotationsBuffer[i].selected && this->mouseState == Left) // && this->keyboardState == KeyNone && this->mouseState == Left
-        {
-//            setCursor(Qt::ClosedHandCursor);
-            //move center of the shape to the drop point
-            qDebug() << (this->drawStartPoint.x() - this->drawEndPoint.x()) << " " << (this->drawStartPoint.y() - this->drawEndPoint.y());
-            QPoint moveDistance = QPoint((this->drawStartPoint.x() - this->drawEndPoint.x()), (this->drawStartPoint.y() - this->drawEndPoint.y()));
-            //this->drawMoveDistance
-            shape.moveCenter(moveDistance);
-            this->annotationsBuffer[i].shape = shape;
+            topLeft.setX(topLeft.x() * this->zoomLevel);
+            topLeft.setY(topLeft.y() * this->zoomLevel);
+
+            bottomRight.setX(bottomRight.x() * this->zoomLevel);
+            bottomRight.setY(bottomRight.y() * this->zoomLevel);
+            qDebug() << this->zoomLevel << " " << bottomRight.x() << " " << bottomRight.y();
+
+            this->annotationsBuffer[i].shape = QVariant::fromValue(QRect(topLeft, bottomRight));
         }
     }
 }
@@ -394,6 +526,13 @@ void ImageView::paintEvent(QPaintEvent*)
 
     //redraw will be refactored slowly, but it handles drawing annotations
     this->reDraw();
+
+    //add expansion sqaures
+    this->createExpansionPoints();
+
+    if (!this->annotationsBuffer.empty()){
+    qDebug() << this->annotationsBuffer[0].shape.toRect().topLeft().x() << "," << this->annotationsBuffer[0].shape.toRect().topLeft().y() << ", " << this->annotationsBuffer[0].shape.toRect().bottomRight().x() << "," << this->annotationsBuffer[0].shape.toRect().bottomRight().y();
+    }
 
     this->painter.end();
 }

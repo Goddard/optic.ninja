@@ -29,10 +29,10 @@ namespace Ui {
 struct Annotation
 {
   QVariant shape;
+  QVariant real;
   bool selected = false;
   QString className = "None";
   QColor color = Qt::red;
-//  QPoint position;
 };
 
 class ImageView : public QWidget
@@ -58,6 +58,9 @@ public:
     void addAnnotation(Annotation annotation);
     QList<Annotation> getAnnotations();
     void clearAnnotationBuffer();
+    void updateAnnotationGeomotry();
+
+    void createExpansionPoints();
 
     void paintResize();
     void reDraw();
@@ -103,10 +106,13 @@ private:
     //distance between start and end
     QPoint drawMoveDistance;
 
+    //drawing start point no zoom
+    QPoint drawStartPointNoZoom;
+    //drawing end point no zoom
+    QPoint drawEndPointNoZoom;
+
 //    QRect newROI;
 //    QImage setROI;
-
-//    QRubberBand *rubberBand {rubberBand = NULL};
 
     bool drawing;
     bool drawSquare = false;
@@ -123,12 +129,10 @@ private:
 protected:
     void paintEvent(QPaintEvent* event);
     void mouseMoveEvent(QMouseEvent *event);
-    bool mouseMoveBool;
 
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent * event);
-    bool wheelBool;
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
