@@ -26,10 +26,18 @@ namespace Ui {
     class ImageView;
 }
 
+enum drawingMethod
+{
+    draw_square,
+    draw_circle,
+    draw_line
+};
+
 struct Annotation
 {
   QVariant shape;
   QVariant real;
+  drawingMethod drawn;
   bool selected = false;
   QString className = "None";
   QColor color = Qt::red;
@@ -55,6 +63,7 @@ public:
     Annotation getAnnotationByPosition();
     void moveAnnotation();
     int annotationExists();
+    int annotationExpansionExists();
     void addAnnotation(Annotation annotation);
     QList<Annotation> getAnnotations();
     void clearAnnotationBuffer();
@@ -65,12 +74,29 @@ public:
     void paintResize();
     void reDraw();
 
+    void setDrawingTool(drawingMethod drawTool);
+
+    enum Drag {
+        DragLeft,
+        DragRight,
+        DragTop,
+        DragBottom,
+        DragNone
+    };
+    Drag DragState;
+
     enum MouseState {
         Left,
         LeftRelease,
         Right,
-        Drag,
+
+        HoverLeft,
+        HoverTop,
+        HoverRight,
+        HoverBottom,
+
         Move,
+
         None
     };
     MouseState mouseState;
@@ -82,6 +108,8 @@ public:
     KeyboardState keyboardState;
 
     int selectedShapeId;
+
+    const int expansionSize = 10;
 
 private:
     Ui::ImageView *ui;
@@ -125,6 +153,8 @@ private:
 
     double zoomImageWidth = 0.0;
     double zoomImageHeight = 0.0;
+
+    drawingMethod drawTool;
 
 protected:
     void paintEvent(QPaintEvent* event);

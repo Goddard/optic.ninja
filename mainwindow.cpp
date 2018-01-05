@@ -96,6 +96,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setController->repaint();
 //    this->setController->getImageView()->repaint();
+
+    this->drawTool = draw_square;
 }
 
 MainWindow::~MainWindow()
@@ -469,15 +471,15 @@ void MainWindow::on_deleteImageButton_clicked()
     }
 }
 
-void MainWindow::on_positiveImageRadioButton_clicked()
-{
-//    this->setController->setImageStatus("positive");
-}
+//void MainWindow::on_positiveImageRadioButton_clicked()
+//{
+////    this->setController->setImageStatus("positive");
+//}
 
-void MainWindow::on_negativeImageRadioButton_clicked()
-{
-//    this->setController->setImageStatus("negative");
-}
+//void MainWindow::on_negativeImageRadioButton_clicked()
+//{
+////    this->setController->setImageStatus("negative");
+//}
 
 void MainWindow::on_saveImageButton_clicked()
 {
@@ -508,4 +510,22 @@ void MainWindow::on_actionIcon_View_triggered()
 {
     this->setController->setViewMode(QListView::IconMode);
     this->appSettingsController->setSetViewMode(QListView::IconMode);
+}
+
+void MainWindow::on_squareDrawRadioButton_clicked()
+{
+//    this->drawTool = draw_square;
+    this->setController->getImageView()->setDrawingTool(draw_square);
+}
+
+void MainWindow::on_lineDrawRadioButton_clicked()
+{
+//    this->drawTool = draw_line;
+    this->setController->getImageView()->setDrawingTool(draw_line);
+}
+
+void MainWindow::on_circalDrawRadioButton_clicked()
+{
+//    this->drawTool = draw_circle;
+    this->setController->getImageView()->setDrawingTool(draw_circle);
 }

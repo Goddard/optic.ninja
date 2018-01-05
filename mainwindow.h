@@ -44,6 +44,13 @@ namespace Ui {
     class MainWindow;
 }
 
+//enum drawingMethod
+//{
+//    draw_square,
+//    draw_circle,
+//    draw_line
+//};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -91,6 +98,8 @@ class MainWindow : public QMainWindow
 //        int SET_IMAGE;
         QMessageBox *tempMessageBox;
 
+        drawingMethod drawTool;
+
     public slots:
         void connectToCamera();
         void playVideoFile();
@@ -107,9 +116,9 @@ class MainWindow : public QMainWindow
 
         void on_deleteImageButton_clicked();
 
-        void on_positiveImageRadioButton_clicked();
+//        void on_positiveImageRadioButton_clicked();
 
-        void on_negativeImageRadioButton_clicked();
+//        void on_negativeImageRadioButton_clicked();
 
         void on_saveImageButton_clicked();
 
@@ -124,6 +133,12 @@ class MainWindow : public QMainWindow
         void on_actionList_View_triggered();
 
         void on_actionIcon_View_triggered();
+
+        void on_squareDrawRadioButton_clicked();
+
+        void on_lineDrawRadioButton_clicked();
+
+        void on_circalDrawRadioButton_clicked();
 
 signals:
         void newFrame(const Mat &matFrame);
