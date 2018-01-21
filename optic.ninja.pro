@@ -16,6 +16,8 @@ TARGET = optic.ninja
 TEMPLATE = app
 
 unix {
+#INCLUDEPATH += /usr/local/include
+#LIBS += /usr/local/lib
     message("Linux Build")
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
