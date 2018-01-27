@@ -9,15 +9,13 @@ USECV3 = 1
 DEFINES += APP_VERSION=\\\"1.0.0\\\" \
             USECV3=1
 
-QT       += core gui
+QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = optic.ninja
 
 TEMPLATE = app
 
 unix {
-#INCLUDEPATH += /usr/local/include
-#LIBS += /usr/local/lib
     message("Linux Build")
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
@@ -76,7 +74,8 @@ SOURCES += main.cpp \
     setcontrol.cpp \
     appsettings.cpp \
     imagegraphicsview.cpp \
-    imageview/opticrectangle.cpp
+    imageview/opticrectangle.cpp \
+    datalocal.cpp
 
 HEADERS += \
     camera.h \
@@ -102,7 +101,8 @@ HEADERS += \
     setcontrol.h \
     appsettings.h \
     imagegraphicsview.h \
-    imageview/opticrectangle.h
+    imageview/opticrectangle.h \
+    datalocal.h
 
 OTHER_FILES += \
     README

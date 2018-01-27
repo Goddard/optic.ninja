@@ -110,7 +110,7 @@ class MainWindow : public QMainWindow
 
     private slots:
         void on_saveAppSettingsButton_clicked();
-        void on_createSetButton_clicked();
+//        void on_createSetButton_clicked();
         void on_setComboBox_currentIndexChanged(const QString &arg1);
 //        void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
 

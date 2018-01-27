@@ -420,12 +420,12 @@ void MainWindow::on_saveAppSettingsButton_clicked()
     this->appSettingsController->setSetImageExtensions(ui->setImageExtensionTextEdit->text());
 }
 
-void MainWindow::on_createSetButton_clicked()
-{
-    createSetDialog *setDialog = new createSetDialog(this);
-    connect(setDialog, SIGNAL(sendString(QString)), this, SLOT(recieveSetText(QString)));
-    setDialog->show();
-}
+//void MainWindow::on_createSetButton_clicked()
+//{
+//    createSetDialog *setDialog = new createSetDialog(this);
+//    connect(setDialog, SIGNAL(sendString(QString)), this, SLOT(recieveSetText(QString)));
+//    setDialog->show();
+//}
 
 void MainWindow::recieveSetText(const QString &newText)
 {

@@ -83,6 +83,7 @@ public:
         DragBottom,
         DragNone
     };
+    Q_ENUM(Drag)
     Drag DragState;
 
     enum MouseState {
@@ -99,12 +100,14 @@ public:
 
         None
     };
+    Q_ENUM(MouseState)
     MouseState mouseState;
 
     enum KeyboardState {
         Ctrl,
         KeyNone
     };
+    Q_ENUM(KeyboardState)
     KeyboardState keyboardState;
 
     int selectedShapeId;

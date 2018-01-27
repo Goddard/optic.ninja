@@ -216,11 +216,12 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                     QPolygon polyReal = this->annotationsBuffer[this->annotationsBuffer.count()-1].real.value<QPolygon>();
                     QPolygon polyZoom = this->annotationsBuffer[this->annotationsBuffer.count()-1].shape.value<QPolygon>();
 
-                    polyReal << this->drawStartPoint;
-                    polyZoom << this->drawStartPointNoZoom;
+                    polyReal << this->drawStartPointNoZoom;
+                    polyZoom << this->drawStartPoint;
 
                     this->annotationsBuffer[this->annotationsBuffer.count()-1].real = QVariant::fromValue(polyReal);
                     this->annotationsBuffer[this->annotationsBuffer.count()-1].shape = QVariant::fromValue(polyZoom);
+                    qDebug() << "test1";
                 }
 
                 else
@@ -236,14 +237,15 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                     newAnnotation.drawn = this->drawTool;
 
                     QPolygon polyReal;
-                    polyReal << this->drawStartPointNoZoom; // << this->drawEndPointNoZoom
+                    polyReal << this->drawStartPointNoZoom;// << this->drawEndPointNoZoom;
                     newAnnotation.real = QVariant::fromValue(polyReal);
 
                     QPolygon polyZoom;
-                    polyZoom << this->drawStartPoint; // << this->drawEndPoint
+                    polyZoom << this->drawStartPoint;// << this->drawEndPoint;
                     newAnnotation.shape = QVariant::fromValue(polyZoom);
 
                     this->addAnnotation(newAnnotation);
+                    qDebug() << "test2";
                 }
             }
 
@@ -324,8 +326,8 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
             QPolygon polyReal = this->annotationsBuffer[bufferSize].real.value<QPolygon>();
             QPolygon polyZoom = this->annotationsBuffer[bufferSize].shape.value<QPolygon>();
 
-            polyReal << this->drawEndPoint;
-            polyZoom << this->drawEndPointNoZoom;
+            polyReal << this->drawEndPointNoZoom;
+            polyZoom << this->drawEndPoint;
 
             this->annotationsBuffer[bufferSize].real = QVariant::fromValue(polyReal);
             this->annotationsBuffer[bufferSize].shape = QVariant::fromValue(polyZoom);
