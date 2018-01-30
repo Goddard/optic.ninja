@@ -3,12 +3,16 @@
 DataLocal::DataLocal(QObject *parent, QString set_name, QString home_path) : QObject(parent)
 {
     this->set_name = set_name;
-    this->home_path = home_path;
+    this->sets_path = home_path;
 
-    if(this->open())
+    if(this->open()) {
         qDebug("Database opened successfully");
+    }
+
     else
-        qDebug("Database opening was unsucessful");
+    {
+        qDebug("Database opening failed");
+    }
 
     this->createSchema();
 }
@@ -17,20 +21,23 @@ DataLocal::~DataLocal()
 {
     db.close();
     qDebug("Database closed");
+}
 
-//    delete this->set_name;
-//    delete this->home_path;
+void DataLocal::close()
+{
+    db.close();
 }
 
 QString DataLocal::getPath()
 {
-    // NOTE: We have to store database file into user home folder in Linux
-//    QString path(QDir::home().path());
-    QString path(this->home_path);
-    path.append(QDir::separator()).append("optic.ninja");
+    //    QString path(QDir::home().path());
+    QString path(this->sets_path);
     path.append(QDir::separator()).append(this->set_name);
     path.append(QDir::separator()).append(this->set_name).append(".db.sqlite");
     path = QDir::toNativeSeparators(path);
+
+    qDebug() << path;
+
     return path;
 }
 
@@ -99,11 +106,11 @@ void DataLocal::createSchema()
     }
 }
 
-QSqlTableModel* DataLocal::getSetsModel(QSqlTableModel *client_model)
+QSqlTableModel* DataLocal::getSetsModel(QSqlTableModel *set_model)
 {
-    client_model->setTable("sets");
-    client_model->select();
-    return client_model;
+    set_model->setTable("sets");
+    set_model->select();
+    return set_model;
 }
 
 QSqlQueryModel* DataLocal::getPathsModel(QSqlQueryModel *object_path_model, int set_id)

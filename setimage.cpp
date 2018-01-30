@@ -4,12 +4,13 @@ setImage::setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, Q
     QObject(parent)
 {
     this->fileInfo = fileInfoParm;
-    this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
-    this->fileImage = MatToQImage(this->fileMat);
-    this->filePixmap = QPixmap::fromImage(fileImage);
-    this->fileIcon = QIcon(this->filePixmap); // this->fileInfo.absoluteFilePath()
+    this->index = index;
+//    this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
+//    this->fileImage = MatToQImage(this->fileMat);
+//    this->filePixmap = QPixmap::fromImage(fileImage);
+//    this->fileIcon = QIcon(this->filePixmap); // this->fileInfo.absoluteFilePath()
     this->fileSetType = fileSetTypeParm;
-    this->fileWidgetItem = new QListWidgetItem(this->fileIcon, QString::number(index));
+//    this->fileWidgetItem = new QListWidgetItem(this->fileIcon, QString::number(index));
 
 //    qDebug() << "Set Image Created : " + this->fileInfo.baseName();
 }
@@ -23,25 +24,29 @@ setImage::~setImage()
 //    delete filePixmap;
 }
 
-Mat *setImage::getImageMat()
+Mat setImage::getImageMat()
 {
-    return &this->fileMat;
+    return imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
 }
 
 
-QIcon *setImage::getImageQIcon()
+QIcon setImage::getImageQIcon()
 {
-    return &this->fileIcon;
+//    return &this->fileIcon;
+    Mat src;
+    resize(getImageMat(), src, Size(64, 64), CV_INTER_AREA);
+    return QIcon(QPixmap::fromImage(MatToQImage(src)));
+//    return QIcon(this->getImageQPixmap());
 }
 
-QImage *setImage::getImageQImage()
+QImage setImage::getImageQImage()
 {
-    return &this->fileImage;
+    return MatToQImage(getImageMat());
 }
 
-QPixmap *setImage::getImageQPixmap()
+QPixmap setImage::getImageQPixmap()
 {
-    return &this->filePixmap;
+    return QPixmap::fromImage(getImageQImage());
 }
 
 QFileInfo setImage::getImageFileInfo() const
@@ -51,7 +56,11 @@ QFileInfo setImage::getImageFileInfo() const
 
 QListWidgetItem *setImage::getImageWidgetItem()
 {
+//    return this->fileWidgetItem;
+    this->fileWidgetItem = new QListWidgetItem(getImageQIcon(), QString::number(this->index));
+
     return this->fileWidgetItem;
+//    return new QListWidgetItem(getImageQIcon(), QString::number(this->index));
 }
 
 QString setImage::getImageStatus()

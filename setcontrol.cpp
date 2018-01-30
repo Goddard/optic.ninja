@@ -1,7 +1,12 @@
 #include "setcontrol.h"
 
-setControl::setControl(appSettings *appSettingsParm, QListWidget *parent) :
+setControl::setControl(QWidget *parent) :
     QListWidget(parent)
+{
+
+}
+
+void setControl::initalize(appSettings *appSettingsParm)
 {
     this->appSettingsController = appSettingsParm;
     this->setPath = this->appSettingsController->getSetsPath();
@@ -45,7 +50,8 @@ void setControl::setItemClicked(int currentRow)
     {
         this->getImageView()->clearAnnotationBuffer();
         this->getImageView()->clearImageBuffer();
-        this->getImageView()->addBufferFrame(this->setFiles.at(currentRow)->getImageQImage());
+        QImage tempImage = this->setFiles.at(currentRow)->getImageQImage();
+        this->getImageView()->addBufferFrame(&tempImage);
 
         //this->sceneContainer->clear();
 
@@ -81,6 +87,12 @@ void setControl::setItemClicked(int currentRow)
 void setControl::setSetName(QString setNameParam)
 {
     this->setName = setNameParam;
+
+    if(this->db != NULL && this->db->open())
+        this->db->close();
+
+    this->db = new DataLocal(this, this->setName, this->setPath);
+    this->imgView->setDatabase(db);
 }
 
 //this is the current dataset class
@@ -112,20 +124,9 @@ ImageView *setControl::getImageView()
 //        return this->imgGView;
 }
 
-// TODO : Change to look at the directories only and seperate the functions to pull in images
-// also separate the set directories from the "class" directories inside the set directories.
-// this neesd to include the ability to create an import function that will read different
-// dataset structures such as one folder filled and only an annotations file.
-
 //gets the set files list in a qlist
 QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString viewTypeParm
 {
-    //dont need this any more because it needs to be set in the setter method
-    //set setname globally
-//    this->setName = setNameParm;
-    //this stands for the class now--need to refactor for naming clearity...
-//    this->viewType = viewTypeParm;
-
     //set settings file and get initial values
     this->setSetSettingsFile();
 
@@ -136,17 +137,12 @@ QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     this->clear();
 
     QString setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + this->viewType;
-//    QString positiveView = "positive";
-//    QString negativeView = "negative";
-//    QString completeView = "complete";
 
     QDir dir(setBasePath);
     dir.setFilter(QDir::Files);
     dir.setNameFilters(this->extensionList);
     dir.setSorting(QDir::Time);
 
-//    if(viewType == "NULL" || viewType == "Undefined")
-//    {
     dir.setPath(setBasePath);
     tempFileInfoList = dir.entryInfoList();
     for (int i = 0; i < tempFileInfoList.count(); ++i)
@@ -154,47 +150,37 @@ QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString view
 //        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
         this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
     }
-//    }
-
-//    if(viewType == "Positive")
-//    {
-//        dir.setPath(setBasePath + QDir::separator() + positiveView);
-//        tempFileInfoList += dir.entryInfoList();
-//        for (int i = 0; i < tempFileInfoList.count(); ++i)
-//        {
-//            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Positive"), i));
-//        }
-//    }
-
-//    if(viewType == "Negative")
-//    {
-//        dir.setPath(setBasePath + QDir::separator() + negativeView);
-//        tempFileInfoList += dir.entryInfoList();
-//        for (int i = 0; i < tempFileInfoList.count(); ++i)
-//        {
-//            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Negative"), i));
-//        }
-//    }
-
-//    if(viewType == "Complete")
-//    {
-//        dir.setPath(setBasePath + QDir::separator() + completeView);
-//        tempFileInfoList += dir.entryInfoList();
-//        for (int i = 0; i < tempFileInfoList.count(); ++i)
-//        {
-//            this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Complete"), i));
-//        }
-//    }
 
     if(this->setFiles.count() > 0)
     {
         this->getImageView()->clearImageBuffer();
-        this->getImageView()->addBufferFrame(this->setFiles.value(0)->getImageQImage());
+        QImage tempImage = this->setFiles.value(0)->getImageQImage();
+        this->getImageView()->addBufferFrame(&tempImage);
         this->setCurrentRow(0);
     }
 
     tempFileInfoList.clear();
     return &this->setFiles;
+}
+
+void setControl::scrollContentsBy(int dx, int dy)
+{
+    QListWidget::scrollContentsBy(dx, dy);
+
+    bool scrolled_top = false;
+    if(this->verticalScrollBar()->value() == this->verticalScrollBar()->minimum())
+        scrolled_top = true;
+
+    bool scrolled_bottom = false;
+    if(this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum())
+        scrolled_bottom = true;
+
+
+    if(scrolled_top)
+        qDebug() << "FIRE FIRE FIRE FIRE!!!";
+
+    if(scrolled_bottom)
+        qDebug() << "WATER WATER WATER WATER!!!";
 }
 
 //sets the image set as either being positive or negative sample

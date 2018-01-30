@@ -10,6 +10,8 @@
 #include <QSqlRelationalTableModel>
 #include <QDateTime>
 
+#include <QDebug>
+
 class DataLocal : public QObject
 {
     Q_OBJECT
@@ -20,11 +22,12 @@ public:
   bool open();
   bool destroy();
   bool exists();
+  void close();
 
   QString getPath();
   QSqlError lastError();
 
-  QSqlTableModel* getSetsModel(QSqlTableModel *client_model);
+  QSqlTableModel* getSetsModel(QSqlTableModel *set_model);
   QSqlQueryModel* getPathsModel(QSqlQueryModel *object_path_model, int set_id);
   QSqlQueryModel* getClassesModel(QSqlQueryModel *classes_model, int set_id);
   QSqlQueryModel* getAnnotationsModel(QSqlQueryModel *annotations_model, int object_id);
@@ -43,7 +46,7 @@ private:
   QSqlDatabase db;
   bool dbExists;
   QString set_name;
-  QString home_path;
+  QString sets_path;
   void createSchema();
 
 };

@@ -9,6 +9,7 @@ USECV3 = 1
 DEFINES += APP_VERSION=\\\"1.0.0\\\" \
             USECV3=1
 
+#CONFIG += console
 QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = optic.ninja
@@ -117,7 +118,7 @@ FORMS += \
     imageview.ui \
     imagegraphicsview.ui
 
-QMAKE_CXXFLAGS += -Wall -std=gnu++11
+QMAKE_CXXFLAGS += -Wall
 
 RESOURCES += \
     irconresource.qrc

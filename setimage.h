@@ -17,6 +17,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "MatToQImage.h"
 
@@ -37,10 +38,10 @@ public:
 //    setImage& operator=( const setImage& ){}
     ~setImage();
 
-    QIcon *getImageQIcon();
-    Mat *getImageMat();
-    QImage *getImageQImage();
-    QPixmap *getImageQPixmap();
+    QIcon getImageQIcon();
+    Mat getImageMat();
+    QImage getImageQImage();
+    QPixmap getImageQPixmap();
     QFileInfo getImageFileInfo() const;
     QListWidgetItem *getImageWidgetItem();
     QString getImageStatus();
@@ -56,6 +57,7 @@ private:
     QPixmap filePixmap;
     QString fileSetType;
     QListWidgetItem *fileWidgetItem;
+    int index;
 
 signals:
 

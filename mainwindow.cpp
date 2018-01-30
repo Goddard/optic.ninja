@@ -56,10 +56,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setImageExtensionTextEdit->setText(this->appSettingsController->getSetImageExtensions());
 
     //create set controller
-    this->setController = new setControl(appSettingsController);
-    ui->SetViewLayout->addWidget(this->setController);
+    this->setController = ui->SetViewWidget;
+    this->setController->initalize(appSettingsController);
 
-    //add sets to ui combo selection drop down
+    // add sets to ui combo selection drop down
     // only need to call this function on initalization because it also
     // initalizes the class view drop down due to the nature of using the slot
     // on_index_changed fro Qt framework
@@ -528,4 +528,33 @@ void MainWindow::on_circalDrawRadioButton_clicked()
 {
 //    this->drawTool = draw_circle;
     this->setController->getImageView()->setDrawingTool(draw_circle);
+}
+
+void MainWindow::on_addClassButton_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                         tr("User name:"), QLineEdit::Normal,
+                                         QDir::home().dirName(), &ok);
+    if (ok && !text.isEmpty())
+    {
+//        colorDialogOptionsWidget = new DialogOptionsWidget;
+//        colorDialogOptionsWidget->addCheckBox(doNotUseNativeDialog, QColorDialog::DontUseNativeDialog);
+//        colorDialogOptionsWidget->addCheckBox(tr("Show alpha channel") , QColorDialog::ShowAlphaChannel);
+//        colorDialogOptionsWidget->addCheckBox(tr("No buttons") , QColorDialog::NoButtons);
+
+        qDebug() << text;
+
+//        const QColorDialog::ColorDialogOptions options = QFlag(colorDialogOptionsWidget->value());
+        const QColor color = QColorDialog::getColor(Qt::green, this, "Select Color");
+
+        if (color.isValid()) {
+//            colorLabel->setText(color.name());
+//            colorLabel->setPalette(QPalette(color));
+//            colorLabel->setAutoFillBackground(true);
+
+            qDebug() << color.name();
+        }
+    }
+//        textLabel->setText(text);
 }

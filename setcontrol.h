@@ -9,8 +9,10 @@
 #include <QDirModel>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QScrollBar>
 
 #include <appsettings.h>
+#include <datalocal.h>
 #include <setimage.h>
 #include <imageview.h>
 #include <imagegraphicsview.h>
@@ -19,7 +21,7 @@ class setControl : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit setControl(appSettings *appSettingsParm, QListWidget *parent = 0);
+    explicit setControl(QWidget *parent = 0);
     ~setControl();
     void addSetItem(int index, setImage *setImage);
 
@@ -37,6 +39,7 @@ public:
 
     void setSetName(QString setNameParam);
     void setViewName(QString setViewParam);
+    void initalize(appSettings *appSettingsParm);
 
     ImageView *getImageView();
 //    imageGraphicsView *getImageView();
@@ -59,8 +62,11 @@ private:
     imageGraphicsView *imgGView;
     appSettings *appSettingsController;
 
+    DataLocal *db = NULL;
+
 protected:
 //    virtual void currentRowChanged(int currentRow);
+    void scrollContentsBy(int dx, int dy);
 
 signals:
 //        void newFrame(QPixmap *pixmapFrame);

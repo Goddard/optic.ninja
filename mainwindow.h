@@ -14,7 +14,8 @@
 #include <QDirModel>
 #include <QListWidgetItem>
 #include <QScrollArea>
-
+#include <QInputDialog>
+#include <QColorDialog>
 #include <QGraphicsProxyWidget>
 
 // OpenCV
@@ -98,7 +99,7 @@ class MainWindow : public QMainWindow
 //        int SET_IMAGE;
         QMessageBox *tempMessageBox;
 
-        drawingMethod drawTool;
+        DrawingTool drawTool;
 
     public slots:
         void connectToCamera();
@@ -139,6 +140,8 @@ class MainWindow : public QMainWindow
         void on_lineDrawRadioButton_clicked();
 
         void on_circalDrawRadioButton_clicked();
+
+        void on_addClassButton_clicked();
 
 signals:
         void newFrame(const Mat &matFrame);

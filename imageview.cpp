@@ -48,7 +48,12 @@ ImageView::~ImageView()
     delete ui;
 }
 
-void ImageView::setDrawingTool(drawingMethod drawToolParam)
+void ImageView::setDatabase(DataLocal *db)
+{
+    this->db = db;
+}
+
+void ImageView::setDrawingTool(DrawingTool drawToolParam)
 {
     this->drawTool = drawToolParam;
 }
@@ -124,6 +129,7 @@ void ImageView::keyReleaseEvent(QKeyEvent *event)
 
 void ImageView::mousePressEvent(QMouseEvent *event)
 {
+    //left mouse button is pressed and we are not moving
     if (event->button() == Qt::LeftButton && this->mouseState != Move)
     {
         this->DragState = DragNone;
@@ -186,7 +192,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                 //set color to red
                 newAnnotation.color = Qt::red;
                 //lets record which drawing tool we are using
-                newAnnotation.drawn = this->drawTool;
+                newAnnotation.tool = this->drawTool;
 
                 //set current position for top left and bottom right, will update bottom right as we draw
                 QRect rectReal;
@@ -205,6 +211,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                 newAnnotation.real = QVariant(rectReal.normalized());
 
                 this->addAnnotation(newAnnotation);
+
             }
 
             //if we are trying to draw a straight set of lines that eventually connect
@@ -221,7 +228,6 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 
                     this->annotationsBuffer[this->annotationsBuffer.count()-1].real = QVariant::fromValue(polyReal);
                     this->annotationsBuffer[this->annotationsBuffer.count()-1].shape = QVariant::fromValue(polyZoom);
-                    qDebug() << "test1";
                 }
 
                 else
@@ -234,7 +240,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                     //set color to red
                     newAnnotation.color = Qt::red;
                     //lets record which drawing tool we are using
-                    newAnnotation.drawn = this->drawTool;
+                    newAnnotation.tool = this->drawTool;
 
                     QPolygon polyReal;
                     polyReal << this->drawStartPointNoZoom;// << this->drawEndPointNoZoom;
@@ -245,7 +251,6 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                     newAnnotation.shape = QVariant::fromValue(polyZoom);
 
                     this->addAnnotation(newAnnotation);
-                    qDebug() << "test2";
                 }
             }
 
@@ -397,7 +402,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
         qDebug() << "drawing";
         int annotationBufferSize = this->annotationsBuffer.size() - 1;
 
-        if(this->annotationsBuffer[annotationBufferSize].drawn == draw_square || this->annotationsBuffer[annotationBufferSize].drawn == draw_circle)
+        if(this->annotationsBuffer[annotationBufferSize].tool == draw_square || this->annotationsBuffer[annotationBufferSize].tool == draw_circle)
         {
             QRect tempRect = QRect(this->drawStartPoint, event->pos()).normalized();
 
@@ -406,7 +411,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
             this->annotationsBuffer[annotationBufferSize].real = QVariant::fromValue(tempRectNoZoom);
         }
 
-        else if(this->annotationsBuffer[annotationBufferSize].drawn == draw_line)
+        else if(this->annotationsBuffer[annotationBufferSize].tool == draw_line)
         {
             QPolygon polyReal = this->annotationsBuffer[annotationBufferSize].real.value<QPolygon>();
             QPolygon polyZoom = this->annotationsBuffer[annotationBufferSize].shape.value<QPolygon>();
@@ -422,7 +427,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
 
     else if(!this->drawing && this->DragState != DragNone && annotationHoverId != -1)
     {
-        if(this->annotationsBuffer[annotationHoverId].drawn == draw_square || this->annotationsBuffer[annotationHoverId].drawn == draw_circle)
+        if(this->annotationsBuffer[annotationHoverId].tool == draw_square || this->annotationsBuffer[annotationHoverId].tool == draw_circle)
         {
             QRect rectZoom;
             rectZoom = this->annotationsBuffer[annotationHoverId].shape.toRect();
@@ -737,7 +742,7 @@ void ImageView::reDraw()
         QVariant tempVariant = this->annotationsBuffer.at(i).shape;
         this->painter.setPen(this->annotationsBuffer.at(i).color);
 
-        if(this->annotationsBuffer.at(i).drawn == draw_square)
+        if(this->annotationsBuffer.at(i).tool == draw_square)
         {
             QRect rect = tempVariant.toRect();
 
@@ -750,13 +755,13 @@ void ImageView::reDraw()
             this->painter.drawRect(rect);
         }
 
-        else if(this->annotationsBuffer.at(i).drawn == draw_circle)
+        else if(this->annotationsBuffer.at(i).tool == draw_circle)
         {
             QRect rect = tempVariant.toRect();
             this->painter.drawEllipse(rect);
         }
 
-        else if(this->annotationsBuffer.at(i).drawn == draw_line)
+        else if(this->annotationsBuffer.at(i).tool == draw_line)
         {
             QPolygon polygon = tempVariant.value<QPolygon>();
 

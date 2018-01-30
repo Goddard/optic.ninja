@@ -22,11 +22,13 @@
 
 #include "setimage.h"
 
+#include <datalocal.h>
+
 namespace Ui {
     class ImageView;
 }
 
-enum drawingMethod
+enum DrawingTool
 {
     draw_square,
     draw_circle,
@@ -37,7 +39,7 @@ struct Annotation
 {
   QVariant shape;
   QVariant real;
-  drawingMethod drawn;
+  DrawingTool tool;
   bool selected = false;
   QString className = "None";
   QColor color = Qt::red;
@@ -74,7 +76,9 @@ public:
     void paintResize();
     void reDraw();
 
-    void setDrawingTool(drawingMethod drawTool);
+    void setDrawingTool(DrawingTool drawTool);
+
+    void setDatabase(DataLocal *db);
 
     enum Drag {
         DragLeft,
@@ -157,7 +161,9 @@ private:
     double zoomImageWidth = 0.0;
     double zoomImageHeight = 0.0;
 
-    drawingMethod drawTool;
+    DrawingTool drawTool;
+
+    DataLocal *db;
 
 protected:
     void paintEvent(QPaintEvent* event);
