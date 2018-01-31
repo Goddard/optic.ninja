@@ -106,6 +106,22 @@ QStringList setControl::getSetDirectories()
     QDir dir(this->setPath);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
     this->setName = dir.entryList().at(0);
+
+//    QSqlTableModel *set_model = new QSqlTableModel(this);
+//    this->db->getSetsModel(set_model);
+//    for(int i = 0; i < set_model->rowCount(); i++)
+//    {
+//        qDebug() << set_model->data(i, 0);
+//    }
+
+//    QSqlQuery query("SELECT * FROM sets");
+//    QSqlRecord record = query.record();
+
+//    int nameCol = record.indexOf("name");
+//    while (query.next()) {
+//        qDebug() << "Name : " << record.value(nameCol).toString();
+//    }
+
     return dir.entryList();
 }
 
@@ -114,7 +130,10 @@ QStringList setControl::getSetClassDirectories()
     QDir dir(this->setPath + QDir::separator() + this->setName);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
     this->viewType = dir.entryList().at(0);
-    return dir.entryList();
+
+    QStringList addAllEntry = dir.entryList();
+    addAllEntry.push_front("**ALL**");
+    return addAllEntry;
 }
 
 ImageView *setControl::getImageView()
@@ -136,19 +155,28 @@ QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     this->setFiles.clear();
     this->clear();
 
-    QString setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + this->viewType;
+    QString setBasePath = "";
+//    if(this->viewType == "**ALL**")
+        setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + "images";
+//    else
+//        setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + this->viewType;
 
     QDir dir(setBasePath);
-    dir.setFilter(QDir::Files);
+
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+
     dir.setNameFilters(this->extensionList);
     dir.setSorting(QDir::Time);
-
     dir.setPath(setBasePath);
+
     tempFileInfoList = dir.entryInfoList();
     for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
-//        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
+        if(tempFileInfoList.value(i).filePath() != ""){
+             qDebug() << tempFileInfoList.value(i).filePath();
+        //        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
         this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
+        }
     }
 
     if(this->setFiles.count() > 0)

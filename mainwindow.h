@@ -60,6 +60,7 @@ class MainWindow : public QMainWindow
         explicit MainWindow(QWidget *parent = 0);
         ~MainWindow();
         void regenerateOriginalImage(QString newPath);
+        void setClassComboBox();
 
     private:
         virtual void keyPressEvent(QKeyEvent *event);
@@ -142,6 +143,8 @@ class MainWindow : public QMainWindow
         void on_circalDrawRadioButton_clicked();
 
         void on_addClassButton_clicked();
+
+        void on_removeClassButton_clicked();
 
 signals:
         void newFrame(const Mat &matFrame);

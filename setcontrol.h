@@ -10,6 +10,9 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QScrollBar>
+#include <QDirIterator>
+
+#include <QSqlRecord>
 
 #include <appsettings.h>
 #include <datalocal.h>
@@ -50,6 +53,8 @@ public:
     void setSetSettingsFile();
     bool USE_GRAPHICS_VIEW;
 
+    DataLocal *db = NULL;
+
 private:
     QString setPath;
     QString setName;
@@ -62,7 +67,7 @@ private:
     imageGraphicsView *imgGView;
     appSettings *appSettingsController;
 
-    DataLocal *db = NULL;
+
 
 protected:
 //    virtual void currentRowChanged(int currentRow);

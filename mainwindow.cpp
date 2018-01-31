@@ -105,6 +105,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::setClassComboBox()
+{
+    QSqlQueryModel *class_model = new QSqlQueryModel(this);
+    this->setController->db->getClassesModel(class_model, 0);
+
+    if(class_model != 0)
+        ui->setComboBox->setModel(class_model);
+    else
+        ui->setComboBox->addItem("Nothing Yet");
+}
+
 void MainWindow::keyPressEvent(QKeyEvent* event){
     qDebug("\nkey press : %i", event->key());
 }
@@ -557,4 +568,9 @@ void MainWindow::on_addClassButton_clicked()
         }
     }
 //        textLabel->setText(text);
+}
+
+void MainWindow::on_removeClassButton_clicked()
+{
+
 }
