@@ -89,11 +89,11 @@ void DataLocal::createSchema()
     if(!this->dbExists)
     {
         QSqlQuery query;
-        query.exec("create table sets(id INTEGER PRIMARY KEY, set_name VARCHAR(60) UNIQUE, modified DATETIME)");
+//        query.exec("create table sets(id INTEGER PRIMARY KEY, set_name VARCHAR(60) UNIQUE, modified DATETIME)");
 
-        query.exec("create table object_paths(id INTEGER PRIMARY KEY, set_id INTEGER, object_path TEXT, modified DATETIME)");
+        query.exec("create table object_paths(id INTEGER PRIMARY KEY, object_path TEXT, modified DATETIME)");
 
-        query.exec("create table classes(id INTEGER PRIMARY KEY, set_id INTEGER, class_name VARCHAR(60) UNIQUE, class_color VARCHAR(6), modified DATETIME)");
+        query.exec("create table classes(id INTEGER PRIMARY KEY, class_name VARCHAR(60) UNIQUE, class_color VARCHAR(7), modified DATETIME)");
 
         query.exec("create table annotations(id INTEGER PRIMARY KEY, object_id INTEGER, class_id INTEGER, annotation TEXT, modified DATETIME)");
 
@@ -106,23 +106,57 @@ void DataLocal::createSchema()
     }
 }
 
-QSqlTableModel* DataLocal::getSetsModel(QSqlTableModel *set_model)
+QMap<QString, QString> DataLocal::getClasses()
 {
-    set_model->setTable("sets");
-    set_model->select();
-    return set_model;
+    QMap<QString, QString> class_data;
+    QSqlQuery class_query("SELECT * FROM classes");
+
+    bool exec = class_query.exec("SELECT * FROM classes");
+    if(!exec)
+    {
+        qDebug() << "GET CLASSES FAILED";
+    }
+
+    else
+    {
+        qDebug() << "GET CLASSES SUCCESS";
+
+        QSqlRecord record = class_query.record();
+        int class_name = record.indexOf("class_name");
+        int class_color = record.indexOf("class_color");
+
+        while(class_query.next()) {
+            QString key = class_query.value(class_name).toString();
+            QString value = class_query.value(class_color).toString();
+
+            class_data.insert(key, value);
+        }
+    }
+
+    return class_data;
 }
 
-QSqlQueryModel* DataLocal::getPathsModel(QSqlQueryModel *object_path_model, int set_id)
+//QSqlQuery* DataLocal::getSetsQuery()
+//{
+//    QSqlQuery *set_query = new QSqlQuery("SELECT * FROM sets");
+//    set_query->exec();
+//    return set_query;
+////    while (query.next()) {
+////        QSqlRecord record = query.record();
+////        qDebug() << "Date : " << record.value(date).toString();
+////    }
+//}
+
+QSqlQueryModel* DataLocal::getPathsModel(QSqlQueryModel *object_path_model)
 {
-    object_path_model->setQuery("SELECT * FROM object_paths WHERE set_id = " + QString::number(set_id));
+    object_path_model->setQuery("SELECT * FROM object_paths");
     object_path_model->query();
     return object_path_model;
 }
 
-QSqlQueryModel* DataLocal::getClassesModel(QSqlQueryModel *classes_model, int set_id)
+QSqlQueryModel* DataLocal::getClassesModel(QSqlQueryModel *classes_model)
 {
-    classes_model->setQuery("SELECT * FROM classes WHERE set_id = " + QString::number(set_id));
+    classes_model->setQuery("SELECT * FROM classes");
     classes_model->query();
     return classes_model;
 }
@@ -134,38 +168,13 @@ QSqlQueryModel* DataLocal::getAnnotationsModel(QSqlQueryModel *annotations_model
     return annotations_model;
 }
 
-int DataLocal::insertSet(QString set_name)
-{
-    QSqlQuery add_set;
-    QString date_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-
-    add_set.prepare("INSERT INTO sets (set_name, modified) VALUES (:set_name, :modified)");
-    add_set.bindValue(":set_name", set_name);
-    add_set.bindValue(":modified", date_time);
-
-    if(add_set.exec())
-    {
-        qDebug("Object Path Added Successfully");
-        if(add_set.lastInsertId().type() != QMetaType::QVariant)
-            return add_set.lastInsertId().toInt();
-        else
-            return 0;
-    }
-
-    else
-    {
-        return 0;
-    }
-}
-
-int DataLocal::insertObjectPath(QString object_path, int set_id)
+int DataLocal::insertObjectPath(QString object_path)
 {
     QSqlQuery add_object_path;
     QString date_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
-    add_object_path.prepare("INSERT INTO object_paths (object_path, set_id, modified) VALUES (:object_path, :set_id, :modified)");
+    add_object_path.prepare("INSERT INTO object_paths (object_path, modified) VALUES (:object_path, :modified)");
     add_object_path.bindValue(":object_path", object_path);
-    add_object_path.bindValue(":set_id", set_id);
     add_object_path.bindValue(":modified", date_time);
 
     if(add_object_path.exec())
@@ -183,14 +192,14 @@ int DataLocal::insertObjectPath(QString object_path, int set_id)
     }
 }
 
-int DataLocal::insertClass(QString class_name, int set_id)
+int DataLocal::insertClass(QString class_name, QString class_color)
 {
     QSqlQuery add_class;
     QString date_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
-    add_class.prepare("INSERT INTO object_paths (object_path, set_id, modified) VALUES (:class_name, :set_id, :modified)");
-    add_class.bindValue(":object_path", class_name);
-    add_class.bindValue(":set_id", set_id);
+    add_class.prepare("INSERT INTO classes (class_name, class_color, modified) VALUES (:class_name, :class_color, :modified)");
+    add_class.bindValue(":class_name", class_name);
+    add_class.bindValue(":class_color", class_color);
     add_class.bindValue(":modified", date_time);
 
     if(add_class.exec())
@@ -234,27 +243,6 @@ int DataLocal::insertAnnotation(QString annotation, int object_id, int class_id)
     }
 }
 
-int DataLocal::updateSet(int set_id, QString set_name)
-{
-    QSqlQuery update_set;
-    QString modified = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-
-    update_set.prepare("UPDATE sets SET set_name = :set_name, modified = :modified WHERE id = :set_id");
-    update_set.bindValue(":set_id", set_id);
-    update_set.bindValue(":set_name", set_name);
-    update_set.bindValue(":modified", modified);
-
-    if(update_set.exec())
-    {
-        qDebug("Set Updated Successfully : %s", qPrintable(modified));
-    }
-
-    else
-    {
-        qDebug(qPrintable(update_set.lastError().text()));
-    }
-}
-
 int DataLocal::updateObjectPath(int object_id, QString object_path)
 {
     QSqlQuery update_object_path;
@@ -276,14 +264,15 @@ int DataLocal::updateObjectPath(int object_id, QString object_path)
     }
 }
 
-int DataLocal::updateClass(int class_id, QString class_name)
+int DataLocal::updateClass(int class_id, QString class_name, int class_color)
 {
     QSqlQuery update_class;
     QString modified = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
-    update_class.prepare("UPDATE classes SET class_name = :class_name, modified = :modified WHERE id = :class_id");
+    update_class.prepare("UPDATE classes SET class_name = :class_name, class_color = :class_color, modified = :modified WHERE id = :class_id");
     update_class.bindValue(":class_id", class_id);
     update_class.bindValue(":class_name", class_name);
+    update_class.bindValue(":class_color", class_color);
     update_class.bindValue(":modified", modified);
 
     if(update_class.exec())

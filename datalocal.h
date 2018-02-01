@@ -5,6 +5,8 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QSqlRecord>
+
 #include <QFile>
 #include <QDir>
 #include <QSqlRelationalTableModel>
@@ -27,19 +29,18 @@ public:
   QString getPath();
   QSqlError lastError();
 
-  QSqlTableModel* getSetsModel(QSqlTableModel *set_model);
-  QSqlQueryModel* getPathsModel(QSqlQueryModel *object_path_model, int set_id);
-  QSqlQueryModel* getClassesModel(QSqlQueryModel *classes_model, int set_id);
+  QMap<QString, QString> getClasses();
+
+  QSqlQueryModel* getPathsModel(QSqlQueryModel *object_path_model);
+  QSqlQueryModel* getClassesModel(QSqlQueryModel *classes_model);
   QSqlQueryModel* getAnnotationsModel(QSqlQueryModel *annotations_model, int object_id);
 
-  int insertSet(QString set_name);
-  int insertObjectPath(QString object_path, int set_id);
-  int insertClass(QString class_name, int set_id);
+  int insertObjectPath(QString object_path);
+  int insertClass(QString class_name, QString class_color);
   int insertAnnotation(QString annotation, int object_id, int class_id);
 
-  int updateSet(int set_id, QString set_name);
   int updateObjectPath(int object_id, QString object_path);
-  int updateClass(int class_id, QString class_name);
+  int updateClass(int class_id, QString class_name, int class_color);
   int updateAnnotation(int annotation_id, int class_id, QString annotation);
 
 private:

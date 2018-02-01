@@ -63,11 +63,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // only need to call this function on initalization because it also
     // initalizes the class view drop down due to the nature of using the slot
     // on_index_changed fro Qt framework
-    ui->setComboBox->addItems(this->setController->getSetDirectories());
+    ui->setComboBox->addItems(this->setController->sets);
 //    this->setController->getSetDirectories();
     //add set classes to ui combo selection drop down
 //    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
-    this->setController->getSetClassDirectories();
+//    this->setController->getSetClassDirectories();
 
 //    this->setController->setSetName(ui->setComboBox->currentText());
 //    this->setController->setViewName(ui->viewComboBox->currentText());
@@ -107,13 +107,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::setClassComboBox()
 {
-    QSqlQueryModel *class_model = new QSqlQueryModel(this);
-    this->setController->db->getClassesModel(class_model, 0);
+    ui->classComboBox->clear();
 
-    if(class_model != 0)
-        ui->setComboBox->setModel(class_model);
-    else
-        ui->setComboBox->addItem("Nothing Yet");
+//    ui->classComboBox->setModel(this->setController->db->getClassesModel(new QSqlQueryModel(this)));
+    QMap<QString, QString> map = this->setController->db->getClasses();
+    for(QMap<QString, QString>::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
+      qDebug() << "KEY " << iter.key() << "VALUE " << iter.value();
+
+      QPixmap pixmap(25, 25);
+      pixmap.fill(QColor(iter.value()));
+      QIcon icon(pixmap);
+      QLabel label;
+      label.setText(iter.key());
+      QVariant tempVariant = iter.key();
+      ui->classComboBox->addItem(icon, tempVariant.toString());
+    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event){
@@ -452,13 +460,11 @@ void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
     //clear the set class combo dropdown box
     ui->viewComboBox->clear();
-//    this->currentSet = arg1;
     this->setController->setSetName(arg1);
-//    this->setController->setSetName(this->currentSet);
-
     ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
     //removed because now the set files needs to be taken when the class view is changed
 //    this->setController->getSetFiles(currentSet); //, currentView
+    this->setClassComboBox();
 }
 
 void MainWindow::on_viewComboBox_currentIndexChanged(const QString &arg1)
@@ -554,7 +560,7 @@ void MainWindow::on_addClassButton_clicked()
 //        colorDialogOptionsWidget->addCheckBox(tr("Show alpha channel") , QColorDialog::ShowAlphaChannel);
 //        colorDialogOptionsWidget->addCheckBox(tr("No buttons") , QColorDialog::NoButtons);
 
-        qDebug() << text;
+        qDebug() << "CLASS NAME " << text;
 
 //        const QColorDialog::ColorDialogOptions options = QFlag(colorDialogOptionsWidget->value());
         const QColor color = QColorDialog::getColor(Qt::green, this, "Select Color");
@@ -563,8 +569,14 @@ void MainWindow::on_addClassButton_clicked()
 //            colorLabel->setText(color.name());
 //            colorLabel->setPalette(QPalette(color));
 //            colorLabel->setAutoFillBackground(true);
+            if(this->setController->db->insertClass(text, color.name()) == 0)
+                qDebug() << "INSERT CLASS FAILED";
+            else
+                qDebug() << "INSERT CLASS SUCCESS";
 
-            qDebug() << color.name();
+            qDebug() << "CLASS COLOR " << color.name();
+
+            this->setClassComboBox();
         }
     }
 //        textLabel->setText(text);

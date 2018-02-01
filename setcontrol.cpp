@@ -3,7 +3,13 @@
 setControl::setControl(QWidget *parent) :
     QListWidget(parent)
 {
+    connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
 
+    //create image viewer
+    if(this->USE_GRAPHICS_VIEW)
+        this->imgGView = new imageGraphicsView();
+    else
+        this->imgView = new ImageView();
 }
 
 void setControl::initalize(appSettings *appSettingsParm)
@@ -11,26 +17,44 @@ void setControl::initalize(appSettings *appSettingsParm)
     this->appSettingsController = appSettingsParm;
     this->setPath = this->appSettingsController->getSetsPath();
 
-    //create image viewer
-    this->imgView = new ImageView();
-    this->imgGView = new imageGraphicsView();
+    this->sets = this->getSetDirectories();
 
     if(this->appSettingsController->getSetsViewMode() == 0)
         this->setViewMode(QListView::ListMode);
     else
         this->setViewMode(QListView::IconMode);
 
-//    this->setModelColumn();
     this->setLayoutMode(QListView::Batched);
     this->setIconSize(QSize(126, 126));
     this->setMaximumWidth(550);
     this->setBatchSize(100);
 
-    connect(this, SIGNAL(currentRowChanged(int)), this, SLOT(setItemClicked(int)));
-
     this->extensionList = this->appSettingsController->getSetImageExtensions().split(",");
 
-    this->USE_GRAPHICS_VIEW = true;
+//    this->checkFileSystem();
+}
+
+QStringList setControl::checkFileSystem()
+{
+//    QSqlQuery *query = this->db->getSetsQuery();
+//    foreach(QString name, this->sets)
+//    {
+//        while(query->next()) {
+//            QSqlRecord record = query->record();
+////            QString key = record.fieldName(index);
+////            QVariant value = record.value(index);
+
+//            if(record.value("set_name") != name)
+//            {
+//                qDebug() << "SET NAME NOT IN DB " << name;
+//                this->db->insertSet(name);
+//            }
+
+//            qDebug() << "SET NAME " << name;
+//        }
+//        qDebug() << "SET NAME FILE SYS " << name;
+//    }
+//    return tempList;
 }
 
 setControl::~setControl()
@@ -131,9 +155,7 @@ QStringList setControl::getSetClassDirectories()
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
     this->viewType = dir.entryList().at(0);
 
-    QStringList addAllEntry = dir.entryList();
-    addAllEntry.push_front("**ALL**");
-    return addAllEntry;
+    return dir.entryList();
 }
 
 ImageView *setControl::getImageView()
@@ -155,28 +177,18 @@ QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     this->setFiles.clear();
     this->clear();
 
-    QString setBasePath = "";
-//    if(this->viewType == "**ALL**")
-        setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + "images";
-//    else
-//        setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + this->viewType;
-
+    QString setBasePath = this->setPath + QDir::separator() + this->setName + QDir::separator() + "images";
     QDir dir(setBasePath);
-
     dir.setFilter(QDir::Files | QDir::NoSymLinks);
-
     dir.setNameFilters(this->extensionList);
     dir.setSorting(QDir::Time);
-    dir.setPath(setBasePath);
+//    dir.setPath(setBasePath);
 
     tempFileInfoList = dir.entryInfoList();
     for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
-        if(tempFileInfoList.value(i).filePath() != ""){
-             qDebug() << tempFileInfoList.value(i).filePath();
         //        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
         this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
-        }
     }
 
     if(this->setFiles.count() > 0)

@@ -851,11 +851,12 @@ void ImageView::addBufferFrame(QImage *qImageAdd)
     this->imageBuffer.append(*qImageAdd);
     this->currentBufferImageIndex = this->imageBuffer.count();
 
-    if(this->imageBuffer.size() > 0)
-    {
-        QLabel *bufferSizeLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("frameBufferLabel");
-        bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
-    }
+    //had to comment because of some error...not sure why yet.
+//    if(this->imageBuffer.size() > 0)
+//    {
+//        QLabel *bufferSizeLabel = this->parentWidget()->parentWidget()->parentWidget()->findChild<QLabel *>("frameBufferLabel");
+//        bufferSizeLabel->setText("[ " + QString::number(this->imageBuffer.count()) + " / " + QString::number(this->currentBufferImageIndex) + " ]");
+//    }
 }
 
 void ImageView::clearFrame()

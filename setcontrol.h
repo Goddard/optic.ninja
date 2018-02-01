@@ -44,6 +44,8 @@ public:
     void setViewName(QString setViewParam);
     void initalize(appSettings *appSettingsParm);
 
+    QStringList checkFileSystem();
+
     ImageView *getImageView();
 //    imageGraphicsView *getImageView();
 
@@ -51,9 +53,10 @@ public:
 
     QPushButton *button;
     void setSetSettingsFile();
-    bool USE_GRAPHICS_VIEW;
+    bool USE_GRAPHICS_VIEW = false;
 
     DataLocal *db = NULL;
+    QStringList sets;
 
 private:
     QString setPath;
@@ -66,8 +69,6 @@ private:
     ImageView *imgView;
     imageGraphicsView *imgGView;
     appSettings *appSettingsController;
-
-
 
 protected:
 //    virtual void currentRowChanged(int currentRow);
