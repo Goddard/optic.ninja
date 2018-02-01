@@ -109,18 +109,16 @@ void MainWindow::setClassComboBox()
 {
     ui->classComboBox->clear();
 
-//    ui->classComboBox->setModel(this->setController->db->getClassesModel(new QSqlQueryModel(this)));
     QMap<QString, QString> map = this->setController->db->getClasses();
+    int index = 0;
     for(QMap<QString, QString>::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
-      qDebug() << "KEY " << iter.key() << "VALUE " << iter.value();
-
       QPixmap pixmap(25, 25);
       pixmap.fill(QColor(iter.value()));
       QIcon icon(pixmap);
-      QLabel label;
-      label.setText(iter.key());
+
       QVariant tempVariant = iter.key();
-      ui->classComboBox->addItem(icon, tempVariant.toString());
+      ui->classComboBox->insertItem(index, icon, tempVariant.toString());
+      index++;
     }
 }
 
@@ -584,5 +582,7 @@ void MainWindow::on_addClassButton_clicked()
 
 void MainWindow::on_removeClassButton_clicked()
 {
-
+    qDebug() << "REMOVE ID " << ui->classComboBox->currentText();
+    this->setController->db->removeClass(ui->classComboBox->currentText());
+    this->setClassComboBox();
 }

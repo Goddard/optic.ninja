@@ -307,3 +307,24 @@ int DataLocal::updateAnnotation(int annotation_id, int class_id, QString annotat
         qDebug(qPrintable(update_class.lastError().text()));
     }
 }
+
+bool DataLocal::removeClass(QString class_name)
+{
+    QSqlQuery remove_class;
+
+    remove_class.prepare("DELETE FROM classes WHERE class_name = :class_name");
+    remove_class.bindValue(":class_name", class_name);
+
+    if(remove_class.exec())
+    {
+        qDebug("Class Removed Successfully");
+        return true;
+    }
+
+    else
+    {
+        qDebug(qPrintable(remove_class.lastError().text()));
+    }
+
+    return false;
+}

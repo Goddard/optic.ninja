@@ -43,6 +43,8 @@ public:
   int updateClass(int class_id, QString class_name, int class_color);
   int updateAnnotation(int annotation_id, int class_id, QString annotation);
 
+  bool removeClass(QString class_name);
+
 private:
   QSqlDatabase db;
   bool dbExists;

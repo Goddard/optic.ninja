@@ -149,15 +149,15 @@ void ImageProcessingSettingsDialog::smoothTypeChange(QAbstractButton *input)
         ui->smoothParam3Edit->setEnabled(false);
         ui->smoothParam4Edit->setEnabled(false);
         // Set parameter range labels
-        ui->smoothParam1RangeLabel->setText("[1-999]");
-        ui->smoothParam2RangeLabel->setText("[1-999]");
-        ui->smoothParam3RangeLabel->setText("");
-        ui->smoothParam4RangeLabel->setText("");
-        // Set parameter labels
-        ui->smoothParam1Label->setText("Kernel Width");
-        ui->smoothParam2Label->setText("Kernel Height");
-        ui->smoothParam3Label->setText("");
-        ui->smoothParam4Label->setText("");
+//        ui->smoothParam1RangeLabel->setText("[1-999]");
+//        ui->smoothParam2RangeLabel->setText("[1-999]");
+//        ui->smoothParam3RangeLabel->setText("");
+//        ui->smoothParam4RangeLabel->setText("");
+//        // Set parameter labels
+//        ui->smoothParam1Label->setText("Kernel Width");
+//        ui->smoothParam2Label->setText("Kernel Height");
+//        ui->smoothParam3Label->setText("");
+//        ui->smoothParam4Label->setText("");
     }
     else if(input==(QAbstractButton*)ui->smoothGaussianButton)
     {
@@ -179,15 +179,15 @@ void ImageProcessingSettingsDialog::smoothTypeChange(QAbstractButton *input)
         ui->smoothParam3Edit->setEnabled(true);
         ui->smoothParam4Edit->setEnabled(true);
         // Set parameter range labels
-        ui->smoothParam1RangeLabel->setText("[0-99]");
-        ui->smoothParam2RangeLabel->setText("[0-99]");
-        ui->smoothParam3RangeLabel->setText("[0.00-99.99]");
-        ui->smoothParam4RangeLabel->setText("[0.00-99.99]");
-        // Set parameter labels
-        ui->smoothParam1Label->setText("Kernel Width");
-        ui->smoothParam2Label->setText("Kernel Height");
-        ui->smoothParam3Label->setText("Sigma X");
-        ui->smoothParam4Label->setText("Sigma Y");
+//        ui->smoothParam1RangeLabel->setText("[0-99]");
+//        ui->smoothParam2RangeLabel->setText("[0-99]");
+//        ui->smoothParam3RangeLabel->setText("[0.00-99.99]");
+//        ui->smoothParam4RangeLabel->setText("[0.00-99.99]");
+//        // Set parameter labels
+//        ui->smoothParam1Label->setText("Kernel Width");
+//        ui->smoothParam2Label->setText("Kernel Height");
+//        ui->smoothParam3Label->setText("Sigma X");
+//        ui->smoothParam4Label->setText("Sigma Y");
     }
     else if(input==(QAbstractButton*)ui->smoothMedianButton)
     {
@@ -201,15 +201,15 @@ void ImageProcessingSettingsDialog::smoothTypeChange(QAbstractButton *input)
         ui->smoothParam3Edit->setEnabled(false);
         ui->smoothParam4Edit->setEnabled(false);
         // Set parameter range labels
-        ui->smoothParam1RangeLabel->setText("[1-99]");
-        ui->smoothParam2RangeLabel->setText("");
-        ui->smoothParam3RangeLabel->setText("");
-        ui->smoothParam4RangeLabel->setText("");
-        // Set parameter labels
-        ui->smoothParam1Label->setText("Kernel (Square)");
-        ui->smoothParam2Label->setText("");
-        ui->smoothParam3Label->setText("");
-        ui->smoothParam4Label->setText("");
+//        ui->smoothParam1RangeLabel->setText("[1-99]");
+//        ui->smoothParam2RangeLabel->setText("");
+//        ui->smoothParam3RangeLabel->setText("");
+//        ui->smoothParam4RangeLabel->setText("");
+//        // Set parameter labels
+//        ui->smoothParam1Label->setText("Kernel (Square)");
+//        ui->smoothParam2Label->setText("");
+//        ui->smoothParam3Label->setText("");
+//        ui->smoothParam4Label->setText("");
     }
 }
 
