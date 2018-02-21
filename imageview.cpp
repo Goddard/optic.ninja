@@ -38,7 +38,7 @@ ImageView::ImageView(QWidget *parent) :
 
     this->mouseState = None;
     this->DragState = DragNone;
-    this->drawTool = draw_square;
+    this->drawTool = Annotation::draw_square;
     // TODO: add annotation copy buffer
     this->drawing = false;
 }
@@ -53,7 +53,7 @@ void ImageView::setDatabase(DataLocal *db)
     this->db = db;
 }
 
-void ImageView::setDrawingTool(DrawingTool drawToolParam)
+void ImageView::setDrawingTool(qint8 drawToolParam)
 {
     this->drawTool = drawToolParam;
 }
@@ -64,6 +64,9 @@ void ImageView::createExpansionPoints()
     {
         if(this->annotationsBuffer[i].selected == true)
         {
+            this->painter.setPen(this->annotationsBuffer[i].color);
+//            this->painter.setBrush(Qt::NoBrush);
+
             QRect topRect = QRect(QPoint(this->annotationsBuffer[i].shape.toRect().normalized().topLeft().x(), this->annotationsBuffer[i].shape.toRect().normalized().topLeft().y() - this->expansionSize),
                                   this->annotationsBuffer[i].shape.toRect().normalized().topRight());
             this->painter.drawRect(topRect);
@@ -95,15 +98,19 @@ void ImageView::zoomChanged(int zoomLevelParm)
 
 void ImageView::deleteSelected()
 {
+    int index = 1;
     QList<Annotation>::iterator it = this->annotationsBuffer.begin();
     while (it != this->annotationsBuffer.end()) {
         Annotation annotation = *it;
         if(annotation.selected == true)
         {
+            this->db->removeAnnotation(this->current_image_id, index);
             it = this->annotationsBuffer.erase(it);
         }
         else
             ++it;
+
+        index++;
     }
 }
 
@@ -153,7 +160,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
             //lets set the annotation to true
             this->annotationsBuffer[annotationId].selected = true;
             //lets set the color for this selection, good to have the option to change for possible future purposes
-            this->annotationsBuffer[annotationId].color = Qt::green;
+//            this->annotationsBuffer[annotationId].color = Qt::green;
         }
 
         //if annotation exists and we aren't pressing ctrl do something
@@ -164,7 +171,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
             this->setAnnotationsUnselected();
             //lets take the annotation we found and set it as select and green
             this->annotationsBuffer[annotationId].selected = true;
-            this->annotationsBuffer[annotationId].color = Qt::green;
+//            this->annotationsBuffer[annotationId].color = Qt::green;
         }
 
         // when we want to move an annotation lets set the mouse state so we can react to it
@@ -183,16 +190,18 @@ void ImageView::mousePressEvent(QMouseEvent *event)
             this->setAnnotationsUnselected();
 
             //if we are using the draw sqaure or circle tool
-            if(this->drawTool == draw_square || this->drawTool == draw_circle)
+            if(this->drawTool == Annotation::draw_square || this->drawTool == Annotation::draw_circle)
             {
                 //lets create a new annotation
                 Annotation newAnnotation = {};
                 //set selected to false
                 newAnnotation.selected = false;
                 //set color to red
-                newAnnotation.color = Qt::red;
+                newAnnotation.color = QColor(this->current_color);//Qt::red;
                 //lets record which drawing tool we are using
                 newAnnotation.tool = this->drawTool;
+                //note the class used to draw
+                newAnnotation.class_name = this->current_class;
 
                 //set current position for top left and bottom right, will update bottom right as we draw
                 QRect rectReal;
@@ -211,11 +220,10 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                 newAnnotation.real = QVariant(rectReal.normalized());
 
                 this->addAnnotation(newAnnotation);
-
             }
 
             //if we are trying to draw a straight set of lines that eventually connect
-            else if(this->drawTool == draw_line && annotationId == -1 && annotationHoverId == -1)
+            else if(this->drawTool == Annotation::draw_line && annotationId == -1 && annotationHoverId == -1)
             {
                 if(this->drawing)
                 {
@@ -238,9 +246,11 @@ void ImageView::mousePressEvent(QMouseEvent *event)
                     //set selected to false
                     newAnnotation.selected = false;
                     //set color to red
-                    newAnnotation.color = Qt::red;
+                    newAnnotation.color = QColor(this->current_color);//Qt::red;
                     //lets record which drawing tool we are using
                     newAnnotation.tool = this->drawTool;
+                    //note the class used to draw
+                    newAnnotation.class_name = this->current_class;
 
                     QPolygon polyReal;
                     polyReal << this->drawStartPointNoZoom;// << this->drawEndPointNoZoom;
@@ -308,6 +318,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 
 void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
+    int bufferSize = this->annotationsBuffer.count()-1;
     if (event->button() == Qt::LeftButton)
     {
         //check if current position is within existing annotation
@@ -319,15 +330,20 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
         this->drawEndPoint = QPoint(this->mouseXPosition, this->mouseYPosition);
         this->drawEndPointNoZoom = QPoint(this->mouseXNoZoom, this->mouseYNoZoom);
 
-        if(this->drawTool == draw_square || this->drawTool == draw_circle)
+        if(this->drawTool == Annotation::draw_square || this->drawTool == Annotation::draw_circle)
         {
             this->drawing = false;
             this->DragState = DragNone;
+
+            if(this->annotationsBuffer[bufferSize].id == -1)
+                //insert annotation to db
+                this->annotationsBuffer[bufferSize].id = this->db->insertAnnotation(this->annotationsBuffer[bufferSize], this->current_image_id, this->current_class_id);
+            else
+                this->db->updateAnnotation(this->annotationsBuffer[bufferSize], this->annotationsBuffer[bufferSize].id, this->current_class_id);
         }
 
-        else if(this->drawTool == draw_line && annotationId == -1 && annotationHoverId == -1)
+        else if(this->drawTool == Annotation::draw_line && annotationId == -1 && annotationHoverId == -1)
         {
-            int bufferSize = this->annotationsBuffer.count()-1;
             QPolygon polyReal = this->annotationsBuffer[bufferSize].real.value<QPolygon>();
             QPolygon polyZoom = this->annotationsBuffer[bufferSize].shape.value<QPolygon>();
 
@@ -341,9 +357,13 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 
     else if(event->button() == Qt::RightButton)
     {
+        this->setAnnotationsUnselected();
         if(this->drawing)
         {
             this->drawing = false;
+
+            //insert annotation to db
+            this->annotationsBuffer[bufferSize].id = this->db->insertAnnotation(this->annotationsBuffer[bufferSize], this->current_image_id, this->current_class_id);
         }
     }
 
@@ -402,7 +422,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
         qDebug() << "drawing";
         int annotationBufferSize = this->annotationsBuffer.size() - 1;
 
-        if(this->annotationsBuffer[annotationBufferSize].tool == draw_square || this->annotationsBuffer[annotationBufferSize].tool == draw_circle)
+        if(this->annotationsBuffer[annotationBufferSize].tool == Annotation::draw_square || this->annotationsBuffer[annotationBufferSize].tool == Annotation::draw_circle)
         {
             QRect tempRect = QRect(this->drawStartPoint, event->pos()).normalized();
 
@@ -411,7 +431,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
             this->annotationsBuffer[annotationBufferSize].real = QVariant::fromValue(tempRectNoZoom);
         }
 
-        else if(this->annotationsBuffer[annotationBufferSize].tool == draw_line)
+        else if(this->annotationsBuffer[annotationBufferSize].tool == Annotation::draw_line)
         {
             QPolygon polyReal = this->annotationsBuffer[annotationBufferSize].real.value<QPolygon>();
             QPolygon polyZoom = this->annotationsBuffer[annotationBufferSize].shape.value<QPolygon>();
@@ -425,9 +445,10 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
         }
     }
 
+    //if we are resizing an annotation
     else if(!this->drawing && this->DragState != DragNone && annotationHoverId != -1)
     {
-        if(this->annotationsBuffer[annotationHoverId].tool == draw_square || this->annotationsBuffer[annotationHoverId].tool == draw_circle)
+        if(this->annotationsBuffer[annotationHoverId].tool == Annotation::draw_square || this->annotationsBuffer[annotationHoverId].tool == Annotation::draw_circle)
         {
             QRect rectZoom;
             rectZoom = this->annotationsBuffer[annotationHoverId].shape.toRect();
@@ -495,7 +516,6 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     else if(this->mouseState != Move)
     {
         setCursor(Qt::ArrowCursor);
-        qDebug() << "arrow";
     }
 }
 
@@ -555,7 +575,6 @@ int ImageView::annotationExpansionExists()
     {
         if(this->annotationsBuffer[i].shape.type() == QMetaType::QRect)
         {
-
             QRect topRect = QRect(QPoint(this->annotationsBuffer[i].shape.toRect().normalized().topLeft().x(), this->annotationsBuffer[i].shape.toRect().normalized().topLeft().y() - this->expansionSize),
                                   this->annotationsBuffer[i].shape.toRect().normalized().topRight());
 
@@ -610,7 +629,7 @@ void ImageView::setAnnotationsUnselected()
     for(int i = 0; i < this->annotationsBuffer.size(); i++)
     {
         this->annotationsBuffer[i].selected = false;
-        this->annotationsBuffer[i].color = Qt::red;
+//        this->annotationsBuffer[i].color = Qt::red;
     }
 }
 
@@ -742,7 +761,7 @@ void ImageView::reDraw()
         QVariant tempVariant = this->annotationsBuffer.at(i).shape;
         this->painter.setPen(this->annotationsBuffer.at(i).color);
 
-        if(this->annotationsBuffer.at(i).tool == draw_square)
+        if(this->annotationsBuffer.at(i).tool == Annotation::draw_square)
         {
             QRect rect = tempVariant.toRect();
 
@@ -755,13 +774,13 @@ void ImageView::reDraw()
             this->painter.drawRect(rect);
         }
 
-        else if(this->annotationsBuffer.at(i).tool == draw_circle)
+        else if(this->annotationsBuffer.at(i).tool == Annotation::draw_circle)
         {
             QRect rect = tempVariant.toRect();
             this->painter.drawEllipse(rect);
         }
 
-        else if(this->annotationsBuffer.at(i).tool == draw_line)
+        else if(this->annotationsBuffer.at(i).tool == Annotation::draw_line)
         {
             QPolygon polygon = tempVariant.value<QPolygon>();
 
@@ -846,10 +865,17 @@ void ImageView::addAnnotation(Annotation annotation)
 //set when setimage first set - most likely done from setControl
 //execute when any changes are made on processing thread or roi function
 //clear when set image changes - done from image setControl also
-void ImageView::addBufferFrame(QImage *qImageAdd)
+void ImageView::addBufferFrame(SetImage *setImage)
 {
-    this->imageBuffer.append(*qImageAdd);
+    this->imageBuffer.append(setImage->getImageQImage()); //*qImageAdd
     this->currentBufferImageIndex = this->imageBuffer.count();
+
+    qDebug() << " set Image index " << setImage->index;
+    for(Annotation annotation: this->db->getAnnotation(setImage->index+1))
+    {
+        this->addAnnotation(annotation);
+    }
+//    this->db->getAnnotationsModel();
 
     //had to comment because of some error...not sure why yet.
 //    if(this->imageBuffer.size() > 0)

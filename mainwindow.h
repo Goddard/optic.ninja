@@ -100,7 +100,7 @@ class MainWindow : public QMainWindow
 //        int SET_IMAGE;
         QMessageBox *tempMessageBox;
 
-        DrawingTool drawTool;
+        qint8 drawTool;
 
     public slots:
         void connectToCamera();
@@ -145,6 +145,8 @@ class MainWindow : public QMainWindow
         void on_addClassButton_clicked();
 
         void on_removeClassButton_clicked();
+
+        void on_classComboBox_currentIndexChanged(const QString &arg1);
 
 signals:
         void newFrame(const Mat &matFrame);

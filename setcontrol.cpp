@@ -32,6 +32,32 @@ void setControl::initalize(appSettings *appSettingsParm)
     this->extensionList = this->appSettingsController->getSetImageExtensions().split(",");
 
 //    this->checkFileSystem();
+    this->addItem(this->setFiles.at(index)->getImageWidgetItem());
+}
+
+void setControl::initalizeSetItems()
+{
+    if(this->setFiles.size() > 0)
+    {
+        QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
+
+        //check if we do not have this image in the db and if not we insert it
+        if(path_data.count() <= 0)
+        {
+            qDebug() << setImage->getImageFileInfo().absoluteFilePath();
+            this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
+        }
+
+        //lets add the db id to the setImage variable
+        else
+        {
+            setImage->object_path_id = QString(path_data[0]).toInt();
+        }
+
+        this->setFiles.append(setImage);
+
+        this->addItem(this->setFiles.at(index)->getImageWidgetItem());
+    }
 }
 
 QStringList setControl::checkFileSystem()
@@ -62,9 +88,50 @@ setControl::~setControl()
     delete imgView;
 }
 
-void setControl::addSetItem(int index, setImage *setImage)
+void setControl::loadMore()
 {
+    if(this->setFiles.size() > high_index)
+    {
+        QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
+
+        //check if we do not have this image in the db and if not we insert it
+        if(path_data.count() <= 0)
+        {
+            qDebug() << setImage->getImageFileInfo().absoluteFilePath();
+            this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
+        }
+
+        //lets add the db id to the setImage variable
+        else
+        {
+            setImage->object_path_id = QString(path_data[0]).toInt();
+        }
+
+        this->setFiles.append(setImage);
+
+        this->addItem(this->setFiles.at(index)->getImageWidgetItem());
+    }
+}
+
+void setControl::addSetItem(int index, SetImage *setImage)
+{
+    QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
+
+    //check if we do not have this image in the db and if not we insert it
+    if(path_data.count() <= 0)
+    {
+        qDebug() << setImage->getImageFileInfo().absoluteFilePath();
+        this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
+    }
+
+    //lets add the db id to the setImage variable
+    else
+    {
+        setImage->object_path_id = QString(path_data[0]).toInt();
+    }
+
     this->setFiles.append(setImage);
+
     this->addItem(this->setFiles.at(index)->getImageWidgetItem());
 }
 
@@ -72,10 +139,11 @@ void setControl::setItemClicked(int currentRow)
 {
     if(this->setFiles.value(currentRow))
     {
+        this->getImageView()->current_image_id = this->setFiles.value(currentRow)->object_path_id;
         this->getImageView()->clearAnnotationBuffer();
         this->getImageView()->clearImageBuffer();
-        QImage tempImage = this->setFiles.at(currentRow)->getImageQImage();
-        this->getImageView()->addBufferFrame(&tempImage);
+//        QImage tempImage = this->setFiles.at(currentRow)->getImageQImage();
+        this->getImageView()->addBufferFrame(this->setFiles[currentRow]);
 
         //this->sceneContainer->clear();
 
@@ -153,7 +221,7 @@ QStringList setControl::getSetClassDirectories()
 {
     QDir dir(this->setPath + QDir::separator() + this->setName);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-    this->viewType = dir.entryList().at(0);
+//    this->viewType = dir.entryList().at(0);
 
     return dir.entryList();
 }
@@ -166,7 +234,7 @@ ImageView *setControl::getImageView()
 }
 
 //gets the set files list in a qlist
-QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString viewTypeParm
+QList<SetImage *> *setControl::getSetFiles() //QString setNameParm, QString viewTypeParm
 {
     //set settings file and get initial values
     this->setSetSettingsFile();
@@ -188,14 +256,14 @@ QList<setImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
         //        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
-        this->addSetItem(i, new setImage(tempFileInfoList.value(i), QString("Undefined"), i));
+        this->addSetItem(i, new SetImage(tempFileInfoList.value(i), QString("Undefined"), i));
     }
 
     if(this->setFiles.count() > 0)
     {
         this->getImageView()->clearImageBuffer();
-        QImage tempImage = this->setFiles.value(0)->getImageQImage();
-        this->getImageView()->addBufferFrame(&tempImage);
+//        QImage tempImage = this->setFiles.value(0)->getImageQImage();
+        this->getImageView()->addBufferFrame(this->setFiles[0]);
         this->setCurrentRow(0);
     }
 
@@ -208,11 +276,14 @@ void setControl::scrollContentsBy(int dx, int dy)
     QListWidget::scrollContentsBy(dx, dy);
 
     bool scrolled_top = false;
-    if(this->verticalScrollBar()->value() == this->verticalScrollBar()->minimum())
+    //previous_scroll_y < dy &&
+    //(this->verticalScrollBar()->minimum() + this->reload_scroll_distance)
+    if(this->verticalScrollBar()->value() <= this->verticalScrollBar()->minimum())
         scrolled_top = true;
 
     bool scrolled_bottom = false;
-    if(this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum())
+    // - this->reload_scroll_distance)
+    if(this->verticalScrollBar()->value() >= this->verticalScrollBar()->maximum())
         scrolled_bottom = true;
 
 
@@ -221,6 +292,9 @@ void setControl::scrollContentsBy(int dx, int dy)
 
     if(scrolled_bottom)
         qDebug() << "WATER WATER WATER WATER!!!";
+
+    this->previous_scroll_x = dx;
+    this->previous_scroll_y = dy;
 }
 
 //sets the image set as either being positive or negative sample

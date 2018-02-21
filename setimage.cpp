@@ -1,6 +1,6 @@
 #include "setimage.h"
 
-setImage::setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent) :
+SetImage::SetImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent) :
     QObject(parent)
 {
     this->fileInfo = fileInfoParm;
@@ -15,7 +15,7 @@ setImage::setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, Q
 //    qDebug() << "Set Image Created : " + this->fileInfo.baseName();
 }
 
-setImage::~setImage()
+SetImage::~SetImage()
 {
 //    delete fileInfo;
 //    delete fileIcon;
@@ -24,13 +24,13 @@ setImage::~setImage()
 //    delete filePixmap;
 }
 
-Mat setImage::getImageMat()
+Mat SetImage::getImageMat()
 {
     return imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
 }
 
 
-QIcon setImage::getImageQIcon()
+QIcon SetImage::getImageQIcon()
 {
 //    return &this->fileIcon;
     Mat src;
@@ -39,22 +39,22 @@ QIcon setImage::getImageQIcon()
 //    return QIcon(this->getImageQPixmap());
 }
 
-QImage setImage::getImageQImage()
+QImage SetImage::getImageQImage()
 {
     return MatToQImage(getImageMat());
 }
 
-QPixmap setImage::getImageQPixmap()
+QPixmap SetImage::getImageQPixmap()
 {
     return QPixmap::fromImage(getImageQImage());
 }
 
-QFileInfo setImage::getImageFileInfo() const
+QFileInfo SetImage::getImageFileInfo() const
 {
     return this->fileInfo;
 }
 
-QListWidgetItem *setImage::getImageWidgetItem()
+QListWidgetItem *SetImage::getImageWidgetItem()
 {
 //    return this->fileWidgetItem;
     this->fileWidgetItem = new QListWidgetItem(getImageQIcon(), QString::number(this->index));
@@ -63,19 +63,19 @@ QListWidgetItem *setImage::getImageWidgetItem()
 //    return new QListWidgetItem(getImageQIcon(), QString::number(this->index));
 }
 
-QString setImage::getImageStatus()
+QString SetImage::getImageStatus()
 {
     return this->fileSetType;
 }
 
-void setImage::setImageFileInfo(QFileInfo fileInfoParm)
+void SetImage::setImageFileInfo(QFileInfo fileInfoParm)
 {
     this->fileInfo = fileInfoParm;
     this->resetImageMat();
 }
 
 
-void setImage::resetImageMat()
+void SetImage::resetImageMat()
 {
     this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
 }

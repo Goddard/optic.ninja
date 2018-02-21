@@ -28,23 +28,6 @@ namespace Ui {
     class ImageView;
 }
 
-enum DrawingTool
-{
-    draw_square,
-    draw_circle,
-    draw_line
-};
-
-struct Annotation
-{
-  QVariant shape;
-  QVariant real;
-  DrawingTool tool;
-  bool selected = false;
-  QString className = "None";
-  QColor color = Qt::red;
-};
-
 class ImageView : public QWidget
 {
     Q_OBJECT
@@ -57,7 +40,7 @@ public:
     QList<Annotation> annotationsBuffer;
 
     void clearFrame();
-    void addBufferFrame(QImage *qImageAdd);
+    void addBufferFrame(SetImage *setImage); //QImage *qImageAdd
     const QImage *getCurrentBufferImage();
 
     void setAnnotationsUnselected();
@@ -76,7 +59,7 @@ public:
     void paintResize();
     void reDraw();
 
-    void setDrawingTool(DrawingTool drawTool);
+    void setDrawingTool(qint8 drawTool);
 
     void setDatabase(DataLocal *db);
 
@@ -117,6 +100,12 @@ public:
     int selectedShapeId;
 
     const int expansionSize = 10;
+
+    int current_class_id;
+    QString current_class;
+    QString current_color;
+
+    int current_image_id;
 
 private:
     Ui::ImageView *ui;
@@ -161,7 +150,7 @@ private:
     double zoomImageWidth = 0.0;
     double zoomImageHeight = 0.0;
 
-    DrawingTool drawTool;
+    qint8 drawTool;
 
     DataLocal *db;
 

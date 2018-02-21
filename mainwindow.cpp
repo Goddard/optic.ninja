@@ -97,7 +97,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setController->repaint();
 //    this->setController->getImageView()->repaint();
 
-    this->drawTool = draw_square;
+    this->drawTool = Annotation::draw_square;
 }
 
 MainWindow::~MainWindow()
@@ -530,19 +530,19 @@ void MainWindow::on_actionIcon_View_triggered()
 void MainWindow::on_squareDrawRadioButton_clicked()
 {
 //    this->drawTool = draw_square;
-    this->setController->getImageView()->setDrawingTool(draw_square);
+    this->setController->getImageView()->setDrawingTool(Annotation::draw_square);
 }
 
 void MainWindow::on_lineDrawRadioButton_clicked()
 {
 //    this->drawTool = draw_line;
-    this->setController->getImageView()->setDrawingTool(draw_line);
+    this->setController->getImageView()->setDrawingTool(Annotation::draw_line);
 }
 
 void MainWindow::on_circalDrawRadioButton_clicked()
 {
 //    this->drawTool = draw_circle;
-    this->setController->getImageView()->setDrawingTool(draw_circle);
+    this->setController->getImageView()->setDrawingTool(Annotation::draw_circle);
 }
 
 void MainWindow::on_addClassButton_clicked()
@@ -585,4 +585,16 @@ void MainWindow::on_removeClassButton_clicked()
     qDebug() << "REMOVE ID " << ui->classComboBox->currentText();
     this->setController->db->removeClass(ui->classComboBox->currentText());
     this->setClassComboBox();
+}
+
+void MainWindow::on_classComboBox_currentIndexChanged(const QString &arg1)
+{
+    QStringList class_data = this->setController->db->getClass(arg1);
+
+    if(class_data.count() > 0)
+    {
+        this->setController->getImageView()->current_class_id = QString(class_data[0]).toInt();
+        this->setController->getImageView()->current_class = class_data[1];
+        this->setController->getImageView()->current_color = class_data[2];
+    }
 }

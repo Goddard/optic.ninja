@@ -27,16 +27,16 @@
 
 using namespace cv;
 
-class setImage : public QObject
+class SetImage : public QObject
 {
 Q_OBJECT
 
 public:
-    setImage() {}
+    SetImage() {}
     //setImage(const setImage&) {}
-    explicit setImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent = 0);
+    explicit SetImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent = 0);
 //    setImage& operator=( const setImage& ){}
-    ~setImage();
+    ~SetImage();
 
     QIcon getImageQIcon();
     Mat getImageMat();
@@ -49,6 +49,9 @@ public:
     void setImageFileInfo(QFileInfo fileInfoParm);
     void resetImageMat();
 
+    int object_path_id;
+    int index;
+
 private:
     QFileInfo fileInfo;
     QIcon fileIcon;
@@ -57,7 +60,7 @@ private:
     QPixmap filePixmap;
     QString fileSetType;
     QListWidgetItem *fileWidgetItem;
-    int index;
+
 
 signals:
 
