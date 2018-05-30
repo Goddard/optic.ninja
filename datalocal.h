@@ -30,6 +30,7 @@ struct Annotation
 
     qint64 id = -1;
     QVariant shape;
+    //represents the real annotation dimensions without zooming
     QVariant real;
     qint8 tool;
     bool selected = false;
@@ -54,6 +55,7 @@ public:
   QSqlError lastError();
 
   QStringList getPath(QString path);
+  QStringList getClass(int class_id);
   QStringList getClass(QString class_name);
   QList<Annotation> getAnnotation(int object_id);
 

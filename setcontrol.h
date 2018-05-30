@@ -26,7 +26,7 @@ class setControl : public QListWidget
 public:
     explicit setControl(QWidget *parent = 0);
     ~setControl();
-    void addSetItem(int index, SetImage *SetImage);
+    void addSetItem(int index);
 
     QList<SetImage *> *getSetFiles();
     bool setImageStatus(QString setType);
@@ -37,6 +37,9 @@ public:
     QString getImageBufferSize();
     void getSetFileNames(QString setName);
 
+    QString getSetName();
+    QString getSetPath();
+
     QStringList getSetDirectories();
     QStringList getSetClassDirectories();
 
@@ -44,7 +47,7 @@ public:
     void setViewName(QString setViewParam);
     void initalize(appSettings *appSettingsParm);
 
-    void initalizeSetItems();
+    void loadMore();
 
     QStringList checkFileSystem();
 
@@ -65,8 +68,8 @@ private:
     int previous_scroll_x = 0;
     int previous_scroll_y = 0;
     int low_index = 0;
-    //we start at fifty because it is a safe amount for load speed
-    int high_index = 50;
+    int high_index = 0;
+    int add_count = 100;
 
     QString setPath;
     QString setName;

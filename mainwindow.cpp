@@ -457,20 +457,17 @@ void MainWindow::recieveSetText(const QString &newText)
 void MainWindow::on_setComboBox_currentIndexChanged(const QString &arg1)
 {
     //clear the set class combo dropdown box
-    ui->viewComboBox->clear();
+//    ui->viewComboBox->clear();
     this->setController->setSetName(arg1);
-    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
+//    ui->viewComboBox->addItems(this->setController->getSetClassDirectories());
     //removed because now the set files needs to be taken when the class view is changed
 //    this->setController->getSetFiles(currentSet); //, currentView
     this->setClassComboBox();
-}
 
-void MainWindow::on_viewComboBox_currentIndexChanged(const QString &arg1)
-{
-//    this->currentView = arg1;
-    this->setController->setViewName(arg1);
+    this->setController->setViewName("images");
     this->setController->getSetFiles();
 }
+
 
 void MainWindow::on_deleteImageButton_clicked()
 {
@@ -501,13 +498,6 @@ void MainWindow::on_saveImageButton_clicked()
     this->setController->saveImage();
     //bool returnValue = this->setController->getImageView()->imageBuffer.last().save(appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + ui->imageListWidget->currentItem()->text());
     //this->setController->currentItem()->setIcon(QIcon(this->appSettingsController->getSetsPath() + "\\" + ui->setComboBox->currentText() + "\\" + this->setController->currentItem()->text()));
-}
-
-void MainWindow::on_viewComboBox_activated(const QString &arg1)
-{
-//    this->currentView = arg1;
-//    this->currentSet = ui->setComboBox->currentText();
-//    setController->getSetFiles(); //currentSet, currentView
 }
 
 void MainWindow::on_copySetImageButton_clicked()
@@ -596,5 +586,35 @@ void MainWindow::on_classComboBox_currentIndexChanged(const QString &arg1)
         this->setController->getImageView()->current_class_id = QString(class_data[0]).toInt();
         this->setController->getImageView()->current_class = class_data[1];
         this->setController->getImageView()->current_color = class_data[2];
+    }
+}
+
+void MainWindow::on_actionExport_Dataset_triggered()
+{
+    ExportDataSet *exportData = new ExportDataSet();
+    if(exportData->setDatabase(this->setController->db)) {
+        exportData->setBasePath(this->setController->getSetPath());
+        qDebug () << "SET PATH YO " << this->setController->getSetPath();
+        //QString(appSettingsController->getSetsPath()).append("/").append(setControl.setName)
+        QString write_success = exportData->writeCSVData();
+        if(write_success != "fail")
+        {
+            const QString title = "Export Data";
+            const QString message = QString("Your data set data has been exported to a file located at : \n").append(write_success);
+            QMessageBox::information(
+                        this,
+                        title,
+                        message);
+        }
+
+        else
+        {
+            const QString title = "Export Data";
+            const QString message = QString("Data export failed.");
+            QMessageBox::information(
+                        this,
+                        title,
+                        message);
+        }
     }
 }

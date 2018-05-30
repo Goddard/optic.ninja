@@ -313,22 +313,6 @@
               <property name="sizeConstraint">
                <enum>QLayout::SetMaximumSize</enum>
               </property>
-              <item row="1" column="2">
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;View Type :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="textFormat">
-                 <enum>Qt::RichText</enum>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QComboBox" name="viewComboBox"/>
-              </item>
               <item row="1" column="1">
                <widget class="QComboBox" name="setComboBox">
                 <property name="sizePolicy">
@@ -734,6 +718,7 @@ padding: 10px; color: white;
     <property name="title">
      <string>Fi&amp;le</string>
     </property>
+    <addaction name="actionExport_Dataset"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -833,6 +818,11 @@ padding: 10px; color: white;
   <action name="actionIcon_View">
    <property name="text">
     <string>Icon View</string>
+   </property>
+  </action>
+  <action name="actionExport_Dataset">
+   <property name="text">
+    <string>Export Dataset</string>
    </property>
   </action>
  </widget>

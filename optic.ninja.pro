@@ -77,7 +77,9 @@ SOURCES += main.cpp \
     imagegraphicsview.cpp \
     imageview/opticrectangle.cpp \
     datalocal.cpp \
-    annotation.cpp
+    annotation.cpp \
+    filelistmodel.cpp \
+    exportdataset.cpp
 
 HEADERS += \
     camera.h \
@@ -105,7 +107,9 @@ HEADERS += \
     imagegraphicsview.h \
     imageview/opticrectangle.h \
     datalocal.h \
-    annotation.h
+    annotation.h \
+    filelistmodel.h \
+    exportdataset.h
 
 OTHER_FILES += \
     README

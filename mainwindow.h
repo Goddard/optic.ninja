@@ -36,6 +36,7 @@
 #include "imageview.h"
 #include "setcontrol.h"
 #include "setimage.h"
+#include "exportdataset.h"
 
 #if USECV3 == 0
     using namespace cv::ocl;
@@ -124,13 +125,9 @@ class MainWindow : public QMainWindow
 
         void on_saveImageButton_clicked();
 
-        void on_viewComboBox_activated(const QString &arg1);
-
         void on_listWidget_clicked(const QModelIndex &index);
 
         void on_copySetImageButton_clicked();
-
-        void on_viewComboBox_currentIndexChanged(const QString &arg1);
 
         void on_actionList_View_triggered();
 
@@ -147,6 +144,8 @@ class MainWindow : public QMainWindow
         void on_removeClassButton_clicked();
 
         void on_classComboBox_currentIndexChanged(const QString &arg1);
+
+        void on_actionExport_Dataset_triggered();
 
 signals:
         void newFrame(const Mat &matFrame);

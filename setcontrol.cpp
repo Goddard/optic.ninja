@@ -24,7 +24,7 @@ void setControl::initalize(appSettings *appSettingsParm)
     else
         this->setViewMode(QListView::IconMode);
 
-    this->setLayoutMode(QListView::Batched);
+//    this->setLayoutMode(QListView::Batched);
     this->setIconSize(QSize(126, 126));
     this->setMaximumWidth(550);
     this->setBatchSize(100);
@@ -32,33 +32,33 @@ void setControl::initalize(appSettings *appSettingsParm)
     this->extensionList = this->appSettingsController->getSetImageExtensions().split(",");
 
 //    this->checkFileSystem();
-    this->addItem(this->setFiles.at(index)->getImageWidgetItem());
+//    this->addItem(this->setFiles.at(index)->getImageWidgetItem());
 }
 
-void setControl::initalizeSetItems()
-{
-    if(this->setFiles.size() > 0)
-    {
-        QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
+//void setControl::initalizeSetItems()
+//{
+//    if(this->setFiles.size() > 0)
+//    {
+//        QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
 
-        //check if we do not have this image in the db and if not we insert it
-        if(path_data.count() <= 0)
-        {
-            qDebug() << setImage->getImageFileInfo().absoluteFilePath();
-            this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
-        }
+//        //check if we do not have this image in the db and if not we insert it
+//        if(path_data.count() <= 0)
+//        {
+//            qDebug() << setImage->getImageFileInfo().absoluteFilePath();
+//            this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
+//        }
 
-        //lets add the db id to the setImage variable
-        else
-        {
-            setImage->object_path_id = QString(path_data[0]).toInt();
-        }
+//        //lets add the db id to the setImage variable
+//        else
+//        {
+//            setImage->object_path_id = QString(path_data[0]).toInt();
+//        }
 
-        this->setFiles.append(setImage);
+//        this->setFiles.append(setImage);
 
-        this->addItem(this->setFiles.at(index)->getImageWidgetItem());
-    }
-}
+//        this->addItem(this->setFiles.at(index)->getImageWidgetItem());
+//    }
+//}
 
 QStringList setControl::checkFileSystem()
 {
@@ -90,48 +90,30 @@ setControl::~setControl()
 
 void setControl::loadMore()
 {
-    if(this->setFiles.size() > high_index)
+    qDebug() << " SIZE : " << this->setFiles.size() << " HIGH - ADD : " << (this->high_index + this->add_count) << " HIGH + COUNT - SIZE : " << ((this->high_index + this->add_count) - this->setFiles.size());
+    if(this->setFiles.size() > (this->high_index + this->add_count))
     {
-        QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
-
-        //check if we do not have this image in the db and if not we insert it
-        if(path_data.count() <= 0)
+        for(int i = 0; i < this->add_count; i++)
         {
-            qDebug() << setImage->getImageFileInfo().absoluteFilePath();
-            this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
+            this->addSetItem(this->high_index);
+            this->high_index++;
         }
+    }
 
-        //lets add the db id to the setImage variable
-        else
+    else if(( - this->setFiles.size() - (this->high_index + this->add_count)) > 0)
+    {
+        for(int i = 0; i < (this->setFiles.size() - (this->high_index + this->add_count)); i++)
         {
-            setImage->object_path_id = QString(path_data[0]).toInt();
+            this->addSetItem(this->high_index);
+            this->high_index++;
         }
-
-        this->setFiles.append(setImage);
-
-        this->addItem(this->setFiles.at(index)->getImageWidgetItem());
     }
 }
 
-void setControl::addSetItem(int index, SetImage *setImage)
+void setControl::addSetItem(int index)
 {
-    QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
-
-    //check if we do not have this image in the db and if not we insert it
-    if(path_data.count() <= 0)
-    {
-        qDebug() << setImage->getImageFileInfo().absoluteFilePath();
-        this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
-    }
-
-    //lets add the db id to the setImage variable
-    else
-    {
-        setImage->object_path_id = QString(path_data[0]).toInt();
-    }
-
-    this->setFiles.append(setImage);
-
+//    this->scrollToItem(this->setFiles.at(index)->getImageWidgetItem(), EnsureVisible);
+//    QListWidget::scrollToItem(this->setFiles.at(index)->getImageWidgetItem(), EnsureVisible);
     this->addItem(this->setFiles.at(index)->getImageWidgetItem());
 }
 
@@ -187,6 +169,17 @@ void setControl::setSetName(QString setNameParam)
     this->imgView->setDatabase(db);
 }
 
+QString setControl::getSetName() {
+    return this->setName;
+}
+
+QString setControl::getSetPath() {
+    QString path(this->setPath);
+    path.append(QDir::separator()).append(this->setName);
+    path = QDir::toNativeSeparators(path);
+    return path;
+}
+
 //this is the current dataset class
 void setControl::setViewName(QString viewNameParam)
 {
@@ -240,7 +233,6 @@ QList<SetImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     this->setSetSettingsFile();
 
     //clear setfiles, fileinfo, and qlistitems
-    QList<QFileInfo> tempFileInfoList;
     qDeleteAll(this->setFiles.begin(), this->setFiles.end());
     this->setFiles.clear();
     this->clear();
@@ -252,11 +244,39 @@ QList<SetImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     dir.setSorting(QDir::Time);
 //    dir.setPath(setBasePath);
 
+    QList<QFileInfo> tempFileInfoList;
     tempFileInfoList = dir.entryInfoList();
     for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
+        SetImage *setImage = new SetImage(tempFileInfoList.value(i), QString("Undefined"), i);
+        QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
+
+        //check if we do not have this image in the db and if not we insert it
+        if(path_data.count() <= 0)
+        {
+            qDebug() << setImage->getImageFileInfo().absoluteFilePath();
+            this->db->insertObjectPath(setImage->getImageFileInfo().absoluteFilePath());
+        }
+
+        //lets add the db id to the setImage variable
+        else
+        {
+            setImage->object_path_id = QString(path_data[0]).toInt();
+        }
+
+        this->setFiles.append(setImage);
+
+        if(i < this->add_count)
+        {
+            this->addSetItem(i);
+        }
+
+        else if(i == this->add_count)
+        {
+            this->high_index = this->add_count;
+        }
         //        QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent
-        this->addSetItem(i, new SetImage(tempFileInfoList.value(i), QString("Undefined"), i));
+//        this->addSetItem(i, new SetImage(tempFileInfoList.value(i), QString("Undefined"), i));
     }
 
     if(this->setFiles.count() > 0)
@@ -291,7 +311,10 @@ void setControl::scrollContentsBy(int dx, int dy)
         qDebug() << "FIRE FIRE FIRE FIRE!!!";
 
     if(scrolled_bottom)
+    {
         qDebug() << "WATER WATER WATER WATER!!!";
+        this->loadMore();
+    }
 
     this->previous_scroll_x = dx;
     this->previous_scroll_y = dy;

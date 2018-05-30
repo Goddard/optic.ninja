@@ -35,6 +35,7 @@ private:
     bool selected = false;
     QString class_name = "None";
     QColor color = Qt::red;
+    int class_id;
 };
 
 #endif // ANNOTATION_H

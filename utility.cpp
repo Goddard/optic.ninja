@@ -49,3 +49,4 @@ QString utility::createImage(int imgWidth, int imgHeight)
 
     //destroyWindow("MyWindow"); //destroy the window with the name, "MyWindow"
 }
+

@@ -141,6 +141,46 @@ QStringList DataLocal::getPath(QString path)
     return path_data;
 }
 
+QStringList DataLocal::getClass(int class_id)
+{
+    QStringList class_data;
+    QSqlQuery class_query;
+
+    class_query.prepare("SELECT * FROM classes WHERE id = :class_id");
+    class_query.bindValue(":class_id", class_id);
+
+    bool exec = class_query.exec();
+    if(!exec)
+    {
+        qDebug() << "GET CLASSES FAILED";
+    }
+
+    else
+    {
+        qDebug() << "GET CLASSES SUCCESS";
+
+        QSqlRecord record = class_query.record();
+        int id = record.indexOf("id");
+        int class_name = record.indexOf("class_name");
+        int class_color = record.indexOf("class_color");
+        int modified = record.indexOf("modified");
+
+        while(class_query.next()) {
+            QString id_value = class_query.value(id).toString();
+            QString class_name_value = class_query.value(class_name).toString();
+            QString class_color_value = class_query.value(class_color).toString();
+            QString modified_value = class_query.value(modified).toString();
+
+            class_data.append(id_value);
+            class_data.append(class_name_value);
+            class_data.append(class_color_value);
+            class_data.append(modified_value);
+        }
+    }
+
+    return class_data;
+}
+
 QStringList DataLocal::getClass(QString class_name)
 {
     QStringList class_data;
@@ -206,6 +246,34 @@ QDataStream &operator>>(QDataStream &in, Annotation &annotation)
   return in;
 }
 
+//int DataLocal::getClassId(QString class_name)
+//{
+//    int id = -1;
+//    QSqlQuery class_query;
+
+//    class_query.prepare("SELECT id FROM classes WHERE class_name = :class_name");
+//    class_query.bindValue(":class_name", class_name);
+
+//    bool exec = class_query.exec();
+//    if(!exec)
+//    {
+//        qDebug() << "GET CLASS ID FAILED";
+//    }
+
+//    else
+//    {
+//        qDebug() << "GET CLASS ID SUCCESS";
+
+//        QSqlRecord record = class_query.record();
+//        int class_id = record.indexOf("id");
+
+//        int id = class_query.value(class_id).toString();
+//    }
+
+//    return id;
+//}
+
+
 QList<Annotation> DataLocal::getAnnotation(int object_id)
 {
     QList<Annotation> annotation_data;
@@ -222,7 +290,7 @@ QList<Annotation> DataLocal::getAnnotation(int object_id)
 
     else
     {
-        qDebug() << "GET ANNOTATION SUCCESS";
+//        qDebug() << "GET ANNOTATION SUCCESS";
 
         QSqlRecord record = annotation_query.record();
         int id = record.indexOf("id");

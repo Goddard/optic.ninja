@@ -98,19 +98,16 @@ void ImageView::zoomChanged(int zoomLevelParm)
 
 void ImageView::deleteSelected()
 {
-    int index = 1;
     QList<Annotation>::iterator it = this->annotationsBuffer.begin();
     while (it != this->annotationsBuffer.end()) {
         Annotation annotation = *it;
         if(annotation.selected == true)
         {
-            this->db->removeAnnotation(this->current_image_id, index);
+            this->db->removeAnnotation(this->current_image_id, annotation.id);
             it = this->annotationsBuffer.erase(it);
         }
         else
             ++it;
-
-        index++;
     }
 }
 
@@ -321,6 +318,7 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
     int bufferSize = this->annotationsBuffer.count()-1;
     if (event->button() == Qt::LeftButton)
     {
+        qDebug() << "mouse released";
         //check if current position is within existing annotation
         int annotationId = this->annotationExists();
         int annotationHoverId = this->annotationExpansionExists();
@@ -336,10 +334,10 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
             this->DragState = DragNone;
 
             if(this->annotationsBuffer[bufferSize].id == -1)
+            {
                 //insert annotation to db
                 this->annotationsBuffer[bufferSize].id = this->db->insertAnnotation(this->annotationsBuffer[bufferSize], this->current_image_id, this->current_class_id);
-            else
-                this->db->updateAnnotation(this->annotationsBuffer[bufferSize], this->annotationsBuffer[bufferSize].id, this->current_class_id);
+            }
         }
 
         else if(this->drawTool == Annotation::draw_line && annotationId == -1 && annotationHoverId == -1)
@@ -367,6 +365,18 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 
+    if(this->drawing == false)
+    {
+        for(int i = 0; i < this->annotationsBuffer.count(); i++)
+        {
+            QStringList class_return = this->db->getClass(this->annotationsBuffer[i].class_name);
+            if(class_return.count() > 0)
+            {
+                QString class_id = class_return[0];
+                this->db->updateAnnotation(this->annotationsBuffer[i], this->annotationsBuffer[i].id, class_id.toInt());
+            }
+        }
+    }
     this->update();
 }
 
@@ -857,7 +867,7 @@ QList<Annotation> ImageView::getAnnotations()
 void ImageView::addAnnotation(Annotation annotation)
 {
     this->annotationsBuffer.append(annotation);
-
+    this->updateAnnotationGeomotry();
 
 //    qDebug() << this->annotationsBuffer.at(0).toRect().x();
 }

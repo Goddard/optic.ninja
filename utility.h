@@ -15,6 +15,7 @@ class utility
 public:
     utility();
     QString createImage(int imgWidth, int imgHeight);
+    bool importDataSet(QString path );
 };
 
 #endif // UTILITY_H
