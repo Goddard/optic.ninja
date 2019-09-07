@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <datalocal.h>
+#include <QPolygon>
 
 class ExportDataSet : public QObject
 {

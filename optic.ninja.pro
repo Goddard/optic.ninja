@@ -4,10 +4,14 @@
 #
 #-------------------------------------------------
 
-USECV3 = 1
+USECV2 = 0
+USECV3 = 0
+USECV4 = 1
 
 DEFINES += APP_VERSION=\\\"1.0.0\\\" \
-            USECV3=1
+            USECV2=0 \
+            USECV3=0 \
+            USECV4=1
 
 #CONFIG += console
 QT       += core gui sql
@@ -25,27 +29,38 @@ unix {
 
 win32 {
     message("Windows Build")
+
+    msvc: LIBS += -luser32
+
+#    win32:CONFIG(release, debug|release): LIBS += -LC:/opencv/build/x64/vc12/lib -lopencv_world300
+#    else:win32:CONFIG(debug, debug|release): LIBS += -LC:/opencv/build/x64/vc12/lib -lopencv_world300d
+
+    equals(USECV4, 1) {
+        message("Using OpenCV 4")
+        INCLUDEPATH +="E:\\Source\\opencv\\build\\install\\include"
+        LIBS +=-L"E:\\Source\\opencv\\build\\install\\x64\\vc15\\lib" \
+            -lopencv_core400d \
+            -lopencv_highgui400d \
+            -lopencv_imgproc400d \
+            -lopencv_imgcodecs400d \
+            -lopencv_features2d400d \
+            -lopencv_calib3d400d \
+            -lopencv_videoio400d \
+            -lopencv_video400d \
+            -lopencv_videostab400d
+    }
+
     equals(USECV3, 1) {
         message("Using OpenCV 3")
-        INCLUDEPATH += C:\opencv\opencv3\build\install\include
-        #LIBS += -L C:\opencv\opencv\build\bin
-        #LIBS += "C:\opencv\opencv\build\lib\/*.dll.a"
-        LIBS += -LC:\\opencv\\opencv3\\build\\bin \
-            libopencv_core300 \
-            libopencv_highgui300 \
-            libopencv_imgproc300 \
-            libopencv_imgcodecs300 \
-            libopencv_features2d300 \
-            libopencv_calib3d300 \
-            libopencv_videoio300 \
-            libopencv_video300 \
-            libopencv_videostab300
-    } else {
+        INCLUDEPATH +=C:\opencv\build\include
+        LIBS +=-L"C:\\opencv\\build\\x64\\vc15\\lib" \
+            -lopencv_world341
+    }
+
+    equals(USECV2, 1) {
         message("Using OpenCV 2")
-        INCLUDEPATH += C:\opencv\opencv\build\install\include
-        #LIBS += -L C:\opencv\opencv\build\bin
-        #LIBS += "C:\opencv\opencv\build\lib\/*.dll.a"
-        LIBS += -LC:\\opencv\\opencv\\build\\bin \
+        INCLUDEPATH +="C:\\opencv\\opencv\\build\\install\\include"
+        LIBS += -L "C:\\opencv\\opencv\\build\\bin" \
             libopencv_core249 \
             libopencv_highgui249 \
             libopencv_imgproc249 \

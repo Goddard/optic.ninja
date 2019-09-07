@@ -71,7 +71,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="sizePolicy">
@@ -534,7 +534,23 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_4"/>
+        <widget class="QWidget" name="page_4">
+         <widget class="QWidget" name="gridLayoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>9</y>
+            <width>2051</width>
+            <height>1041</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -711,7 +727,7 @@ padding: 10px; color: white;
      <x>0</x>
      <y>0</y>
      <width>2183</width>
-     <height>30</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

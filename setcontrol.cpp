@@ -81,6 +81,7 @@ QStringList setControl::checkFileSystem()
 //        qDebug() << "SET NAME FILE SYS " << name;
 //    }
 //    return tempList;
+    return QStringList();
 }
 
 setControl::~setControl()
@@ -337,6 +338,7 @@ bool setControl::setImageStatus(QString setType)
     {
         this->setFiles.at(index)->setImageFileInfo(QFileInfo(newPath));
     }
+    return true;
 }
 
 //saves any changes you may of done
@@ -394,13 +396,13 @@ bool setControl::deleteImage()
 //will get image dimensions and file disk space usage
 QString setControl::getImageSize(QString  filePath)
 {
-
+    return NULL;
 }
 
 //will get the image buffer size..this is usful if making edits and not saving
 QString setControl::getImageBufferSize()
 {
-
+    return NULL;
 }
 
 //generates two files one positive and one negative positive has all details for traincascade negative just has file names and paths

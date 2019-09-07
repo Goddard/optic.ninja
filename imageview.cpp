@@ -645,7 +645,7 @@ void ImageView::setAnnotationsUnselected()
 
 Annotation ImageView::getAnnotationById(int id)
 {
-    this->annotationsBuffer[id];
+    return this->annotationsBuffer[id];
 }
 
 Annotation ImageView::getAnnotationByPosition()
@@ -883,6 +883,7 @@ void ImageView::addBufferFrame(SetImage *setImage)
     qDebug() << " set Image index " << setImage->index;
     for(Annotation annotation: this->db->getAnnotation(setImage->index+1))
     {
+        qDebug() << "found annotation";
         this->addAnnotation(annotation);
     }
 //    this->db->getAnnotationsModel();

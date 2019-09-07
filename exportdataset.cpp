@@ -15,6 +15,15 @@ void ExportDataSet::setBasePath(QString path) {
     this->base_path = path;
 }
 
+//open file function
+//QDesktopServices::openUrl(QUrl("/home/realnc/test.pdf"));
+//#ifdef Q_WS_WIN
+//    if (QFileInfo(path).isDir())
+//        QProcess::startDetached("explorer", QStringList(path));
+//    else
+//#endif
+//        QDesktopServices::openUrl(QUrl(path));
+
 QString ExportDataSet::writeCSVData() {
     QString path = this->base_path;
     path.append(QDir::separator()).append("labels.csv");
@@ -38,10 +47,49 @@ QString ExportDataSet::writeCSVData() {
                 {
                     Annotation &tempAnnotation = *iter2;
 
-                    if(tempAnnotation.shape.type() == QMetaType::QRect)
+                    if(tempAnnotation.tool == Annotation::draw_square)
                     {
                         QRect tempQRect = tempAnnotation.real.toRect();
-                        stream << file_name << " " << tempQRect.topLeft().x() << " " << tempQRect.topLeft().y() << " " << tempQRect.bottomRight().x() << " " << tempQRect.bottomRight().y() << " " << '"' << tempAnnotation.class_name << '"' << endl;
+                        stream << file_name << " "
+
+                               << tempQRect.topLeft().x() << " "
+                               << tempQRect.topLeft().y() << " "
+                               << tempQRect.bottomRight().x() << " "
+                               << tempQRect.bottomRight().y() << " "
+
+                               << '"' << tempAnnotation.class_name << '"' << Annotation::draw_square << endl;
+                    }
+
+                    else if(tempAnnotation.tool == Annotation::draw_circle)
+                    {
+                        QRect tempQRect = tempAnnotation.real.toRect();
+                        stream << file_name << " "
+
+                               << tempQRect.topLeft().x() << " "
+                               << tempQRect.topLeft().y() << " "
+                               << tempQRect.bottomRight().x() << " "
+                               << tempQRect.bottomRight().y() << " "
+
+                               << '"' << tempAnnotation.class_name << '"' << Annotation::draw_circle << endl;
+                    }
+
+                    else if(tempAnnotation.tool == Annotation::draw_line) {
+                        QPolygon tempPolygon = tempAnnotation.real.value<QPolygon>();
+                        QString tempString = file_name;
+                        tempString.append(" ");
+
+                        for(int i = 0; i < tempPolygon.size()-1; i++)
+                        {
+                            qDebug() << "test1 x" << tempPolygon.toList();
+                            tempString
+                                    .append(QString::number(tempPolygon.point(i).x()))
+                                    .append(" ")
+                                    .append(QString::number(tempPolygon.point(i).y()))
+                                    .append(" ");
+                        }
+
+                        tempString.append('"').append(tempAnnotation.class_name).append('"');
+                        stream << tempString << Annotation::draw_line << endl;
                     }
                 }
             }

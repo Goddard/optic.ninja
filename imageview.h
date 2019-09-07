@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QAction>
 
 #include <QToolTip>
 //#include <QRubberBand>

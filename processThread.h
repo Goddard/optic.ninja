@@ -19,8 +19,10 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-#if USECV3 == 0
-    #include <opencv2/ocl/ocl.hpp>
+#if USECV4 ==0
+    #if USECV3 == 0
+        #include <opencv2/ocl/ocl.hpp>
+    #endif
 #endif
 
 #include <opencv2/highgui/highgui_c.h>

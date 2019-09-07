@@ -3,10 +3,10 @@
 
 #include <QObject>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat, Scalar)
+#include <opencv2/imgproc.hpp>  // Gaussian Blur
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>  // OpenCV window I/O
 
 using namespace cv;
 

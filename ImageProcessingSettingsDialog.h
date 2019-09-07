@@ -4,6 +4,9 @@
 // Qt
 #include <QDialog>
 #include <QAbstractButton>
+#include <QRegExp>
+#include <QRegExpValidator>
+
 // Local
 #include "structures.h"
 #include "config.h"

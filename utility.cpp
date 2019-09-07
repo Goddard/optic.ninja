@@ -23,9 +23,12 @@ QString utility::createImage(int imgWidth, int imgHeight)
     #endif
 
 
-    #if USECV3 == 0
-        compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    #if USECV4 == 0
+        #if USECV3 == 0
+            compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+        #endif
     #endif
+
     //specify the compression quality
     compression_params.push_back(98);
 

@@ -30,9 +30,12 @@ void objectDetection::intruderAlarm(cv::Mat& a, cv::Mat& b)
             cv::threshold(channels[i], thresh, 45, 255, THRESH_BINARY);
         #endif
 
-        #if USECV3 == 0
-            cv::threshold(channels[i], thresh, 45, 255, CV_THRESH_BINARY);
+        #if USECV4 == 0
+            #if USECV3 == 0
+                cv::threshold(channels[i], thresh, 45, 255, CV_THRESH_BINARY);
+            #endif
         #endif
+
         d |= thresh;
     }
 
@@ -48,8 +51,10 @@ void objectDetection::intruderAlarm(cv::Mat& a, cv::Mat& b)
         cv::findContours(e.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     #endif
 
-    #if USECV3 == 0
-        cv::findContours(e.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+    #if USECV4 == 0
+        #if USECV3 == 0
+            cv::findContours(e.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+        #endif
     #endif
 
     // Select only large enough contours

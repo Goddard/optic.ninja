@@ -9,11 +9,6 @@
 #include <QDebug>
 
 // OpenCV
-#if USECV3 == 0
-    #include <opencv2/ocl/ocl.hpp>
-    #include <opencv2/highgui/highgui.hpp>
-#endif
-
 #include <opencv2/core.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -21,8 +16,10 @@
 
 #include "MatToQImage.h"
 
-#if USECV3 == 0
-    using namespace cv::ocl;
+#if USECV4 == 0
+    #if USECV3 == 0
+        #include <opencv2/ocl/ocl.hpp>
+    #endif
 #endif
 
 using namespace cv;

@@ -7,7 +7,7 @@ opticRectangle::opticRectangle()
 
 QRectF opticRectangle::boundingRect() const
 {
-
+    return QRectF();
 }
 
 void opticRectangle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

@@ -60,8 +60,10 @@ void camera::createGaussianEdgeWindow()
             cvtColor(frame, camera::mat1, COLOR_BGR2GRAY);
         #endif
 
-        #if USECV3 == 0
-            cvtColor(frame, camera::mat1, CV_BGR2GRAY);
+        #if USECV4 == 0
+            #if USECV3 == 0
+                cvtColor(frame, camera::mat1, CV_BGR2GRAY);
+            #endif
         #endif
 
         GaussianBlur(camera::mat1, camera::mat1, Size(7,7), 1.5, 1.5);

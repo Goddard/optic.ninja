@@ -19,9 +19,11 @@
 #include <QGraphicsProxyWidget>
 
 // OpenCV
-#if USECV3 == 0
-    #include <opencv2/ocl/ocl.hpp>
-    #include <opencv2/highgui/highgui.hpp>
+#if USECV4 ==0
+    #if USECV3 == 0
+        #include <opencv2/ocl/ocl.hpp>
+        #include <opencv2/highgui/highgui.hpp>
+    #endif
 #endif
 
 // Local

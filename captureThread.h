@@ -7,8 +7,10 @@
 #include <QtCore/QString>
 
 // OpenCV
-#if USECV3 == 0
+#if USECV4 ==0
+    #if USECV3 == 0
     #include <opencv2/ocl/ocl.hpp>
+    #endif
 #endif
 
 #include <opencv2/highgui/highgui.hpp>

@@ -549,6 +549,8 @@ int DataLocal::updateObjectPath(int object_id, QString object_path)
     {
         qDebug(qPrintable(update_object_path.lastError().text()));
     }
+
+    return 1;
 }
 
 int DataLocal::updateClass(int class_id, QString class_name, int class_color)
@@ -571,6 +573,8 @@ int DataLocal::updateClass(int class_id, QString class_name, int class_color)
     {
         qDebug(qPrintable(update_class.lastError().text()));
     }
+
+    return 1;
 }
 
 int DataLocal::updateAnnotation(Annotation annotation, int annotation_id, int class_id)
@@ -597,6 +601,7 @@ int DataLocal::updateAnnotation(Annotation annotation, int annotation_id, int cl
     {
         qDebug(qPrintable(update_annotation.lastError().text()));
     }
+    return 1;
 }
 
 bool DataLocal::removeClass(QString class_name)
