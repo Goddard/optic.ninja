@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-04-18T12:49:33
-#
-#-------------------------------------------------
-
 USECV3 = 1
 
 DEFINES += APP_VERSION=\\\"1.0.0\\\" \
@@ -16,8 +10,6 @@ TARGET = optic.ninja
 TEMPLATE = app
 
 unix {
-#INCLUDEPATH += /usr/local/include
-#LIBS += /usr/local/lib
     message("Linux Build")
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig

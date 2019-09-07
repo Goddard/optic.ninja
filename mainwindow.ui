@@ -366,8 +366,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>34</width>
-               <height>16</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
              <widget class="QLabel" name="label">
@@ -640,7 +640,7 @@ padding: 10px; color: white;
      <x>0</x>
      <y>0</y>
      <width>2183</width>
-     <height>37</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -682,6 +682,7 @@ padding: 10px; color: white;
     </property>
     <addaction name="actionCreate_Set"/>
     <addaction name="actionCurrent_Set"/>
+    <addaction name="actiontest"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTrain"/>
@@ -746,6 +747,11 @@ padding: 10px; color: white;
   <action name="actionIcon_View">
    <property name="text">
     <string>Icon View</string>
+   </property>
+  </action>
+  <action name="actiontest">
+   <property name="text">
+    <string>test</string>
    </property>
   </action>
  </widget>

@@ -16,7 +16,11 @@
 #include <QScrollArea>
 
 #include <QGraphicsProxyWidget>
+#include "ui_mainwindow.h"
+// Qt
 
+
+#include "objectdetection.h"
 // OpenCV
 #if USECV3 == 0
     #include <opencv2/ocl/ocl.hpp>
