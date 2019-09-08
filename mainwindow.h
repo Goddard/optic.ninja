@@ -28,9 +28,6 @@
 
 // Local
 #include "appsettings.h"
-#include "CameraConnectDialog.h"
-#include "playvideodialog.h"
-#include "CameraView.h"
 #include "tbuffer.h"
 #include "bufferThread.h"
 #include "createSetDialog.h"
@@ -60,7 +57,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     public:
-        explicit MainWindow(QWidget *parent = 0);
+        explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
         void regenerateOriginalImage(QString newPath);
         void setClassComboBox();
@@ -91,7 +88,7 @@ class MainWindow : public QMainWindow
         QPushButton *connectToCameraButton;
         QPushButton *playVideoButton;
         QMap<int, int> deviceNumberMap;
-        QMap<int, CameraView*> cameraViewMap;
+//        QMap<int, CameraView*> cameraViewMap;
         bufferThread *sharedImageBuffer;
         bool removeFromMapByTabIndex(QMap<int, int>& map, int tabIndex);
         void updateMapValues(QMap<int, int>& map, int tabIndex);
@@ -106,9 +103,6 @@ class MainWindow : public QMainWindow
         qint8 drawTool;
 
     public slots:
-        void connectToCamera();
-        void playVideoFile();
-        void disconnectCamera(int index);
         void showAboutDialog();
         void setFullScreen(bool);
         void recieveSetText(const QString &newText);

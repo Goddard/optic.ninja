@@ -70,19 +70,12 @@ win32 {
 }
 
 SOURCES += main.cpp \
-    camera.cpp \
     mainwindow.cpp \
-    cameraConnectDialog.cpp \
-    CameraView.cpp \
-    ImageProcessingSettingsDialog.cpp \
     MatToQImage.cpp \
     FrameLabel.cpp \
     processThread.cpp \
-    bufferThread.cpp \
-    captureThread.cpp \
     objectdetection.cpp \
     utility.cpp \
-    playvideodialog.cpp \
     detectionThread.cpp \
     setimage.cpp \
     createSetDialog.cpp \
@@ -97,22 +90,16 @@ SOURCES += main.cpp \
     exportdataset.cpp
 
 HEADERS += \
-    camera.h \
     mainwindow.h \
     structures.h \
     tbuffer.h \
     config.h \
-    cameraConnectDialog.h \
-    CameraView.h \
-    ImageProcessingSettingsDialog.h \
     MatToQImage.h \
     FrameLabel.h \
     processThread.h \
-    bufferThread.h \
     captureThread.h \
     objectdetection.h \
     utility.h \
-    playvideodialog.h \
     detectionThread.h \
     setimage.h \
     createSetDialog.h \
@@ -131,10 +118,6 @@ OTHER_FILES += \
 
 FORMS += \
     mainwindow.ui \
-    cameraConnectDialog.ui \
-    CameraView.ui \
-    ImageProcessingSettingsDialog.ui \
-    playvideodialog.ui \
     createsetdialog.ui \
     imageview.ui \
     imagegraphicsview.ui
