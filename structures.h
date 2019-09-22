@@ -34,9 +34,9 @@ struct MouseData{
     bool rightButtonRelease;
 };
 
-struct ThreadStatisticsData{
-    int averageFPS;
-    int nFramesProcessed;
-};
+//struct ThreadStatisticsData{
+//    int averageFPS;
+//    int nFramesProcessed;
+//};
 
 #endif // STRUCTURES_H

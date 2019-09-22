@@ -24,7 +24,7 @@ class setControl : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit setControl(QWidget *parent = 0);
+    explicit setControl(QWidget *parent = nullptr);
     ~setControl();
     void addSetItem(int index);
 
@@ -54,13 +54,11 @@ public:
     ImageView *getImageView();
 //    imageGraphicsView *getImageView();
 
-    struct ThreadStatisticsData statsData;
-
     QPushButton *button;
     void setSetSettingsFile();
     bool USE_GRAPHICS_VIEW = false;
 
-    DataLocal *db = NULL;
+    DataLocal *db = nullptr;
     QStringList sets;
 
 private:
@@ -83,7 +81,6 @@ private:
     appSettings *appSettingsController;
 
 protected:
-//    virtual void currentRowChanged(int currentRow);
     void scrollContentsBy(int dx, int dy);
 
 signals:

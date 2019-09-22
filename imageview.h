@@ -17,10 +17,6 @@
 #include <QToolTip>
 //#include <QRubberBand>
 
-#include "bufferThread.h"
-#include "processThread.h"
-#include "MatToQImage.h"
-
 #include "setimage.h"
 
 #include <datalocal.h>
@@ -34,7 +30,7 @@ class ImageView : public QWidget
     Q_OBJECT
 
 public:
-    explicit ImageView(QWidget *parent = 0);
+    explicit ImageView(QWidget *parent = nullptr);
     ~ImageView();
 
     QList<QImage> imageBuffer;

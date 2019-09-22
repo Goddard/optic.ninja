@@ -1,1 +1,20 @@
-Stuff
+# Optic.Ninja
+
+### Description
+This project aims to make a simple and efficent dataset editor.
+
+### Current Support
+Currently we are targeting image datasets.
+
+### Roadmap
+    - Improve "Lazy Loading List View".  Need to add the ability to unload items.
+    - Improve ListView icon sizing, numbering, and view types.  Also make it resizable.
+    - Add the ability to copy annotations and copy them between dataset items.
+    - Add ability to switch to opengl dataset item view.
+    - Add auto detection after certain number of annotations are added to datset items.
+    - Add Unit tests
+    - Add error correction and catching
+    - Improve loading times and database creation method.
+
+### Pull requests
+Pull requests are welcome.  If you have something to contribute please do.  Trying to stick to Qt framework, but other libraries are also fine if your implementation is useful.

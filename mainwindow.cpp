@@ -40,9 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionFullScreen, SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
 
-    // Create SharedImageBuffer object
-    sharedImageBuffer = new bufferThread();
-
     //set settings
     appSettingsController = new appSettings();
 

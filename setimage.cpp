@@ -35,13 +35,13 @@ QIcon SetImage::getImageQIcon()
 //    return &this->fileIcon;
     Mat src;
     resize(getImageMat(), src, Size(64, 64), CV_INTER_AREA);
-    return QIcon(QPixmap::fromImage(MatToQImage(src)));
+    return QIcon(QPixmap::fromImage(utility::matToQImage(src)));
 //    return QIcon(this->getImageQPixmap());
 }
 
 QImage SetImage::getImageQImage()
 {
-    return MatToQImage(getImageMat());
+    return utility::matToQImage(getImageMat());
 }
 
 QPixmap SetImage::getImageQPixmap()

@@ -470,7 +470,6 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
                 setCursor(Qt::SizeVerCursor);
                 rectZoom.setTopLeft(QPoint(this->annotationsBuffer[annotationHoverId].shape.toRect().topLeft().x(), this->mouseYPosition));
                 rectReal.setTopLeft(QPoint(this->annotationsBuffer[annotationHoverId].real.toRect().topLeft().x(), this->mouseYNoZoom));
-
             }
 
             else if(this->DragState == DragRight)

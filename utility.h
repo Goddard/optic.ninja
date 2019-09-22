@@ -6,6 +6,13 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include <QString>
+// Qt
+#include <QtGui/QImage>
+// OpenCV
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
+#include <QDebug>
 
 using namespace cv;
 using namespace std;
@@ -16,6 +23,7 @@ public:
     utility();
     QString createImage(int imgWidth, int imgHeight);
     bool importDataSet(QString path );
+    static QImage matToQImage(const Mat&);
 };
 
 #endif // UTILITY_H

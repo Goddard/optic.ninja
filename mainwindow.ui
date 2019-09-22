@@ -603,15 +603,7 @@
     <addaction name="actionFullScreen"/>
     <addaction name="menu_Set_View_Types"/>
    </widget>
-   <widget class="QMenu" name="menuTrain">
-    <property name="title">
-     <string>Trai&amp;n</string>
-    </property>
-    <addaction name="actionCreate_Set"/>
-    <addaction name="actionCurrent_Set"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuTrain"/>
    <addaction name="menuOptions"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>

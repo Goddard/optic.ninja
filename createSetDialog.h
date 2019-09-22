@@ -13,7 +13,7 @@ class createSetDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit createSetDialog(QWidget *parent = 0);
+    explicit createSetDialog(QWidget *parent = nullptr);
     ~createSetDialog();
 
 private slots:

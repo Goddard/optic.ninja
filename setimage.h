@@ -14,7 +14,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "MatToQImage.h"
+#include "utility.h"
 
 #if USECV4 == 0
     #if USECV3 == 0
@@ -30,9 +30,7 @@ Q_OBJECT
 
 public:
     SetImage() {}
-    //setImage(const setImage&) {}
-    explicit SetImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent = 0);
-//    setImage& operator=( const setImage& ){}
+    explicit SetImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent = nullptr);
     ~SetImage();
 
     QIcon getImageQIcon();

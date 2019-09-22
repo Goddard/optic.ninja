@@ -32,9 +32,6 @@ win32 {
 
     msvc: LIBS += -luser32
 
-#    win32:CONFIG(release, debug|release): LIBS += -LC:/opencv/build/x64/vc12/lib -lopencv_world300
-#    else:win32:CONFIG(debug, debug|release): LIBS += -LC:/opencv/build/x64/vc12/lib -lopencv_world300d
-
     equals(USECV4, 1) {
         message("Using OpenCV 4")
         INCLUDEPATH +="E:\\Source\\opencv\\build\\install\\include"
@@ -71,9 +68,7 @@ win32 {
 
 SOURCES += main.cpp \
     mainwindow.cpp \
-    MatToQImage.cpp \
     FrameLabel.cpp \
-    processThread.cpp \
     objectdetection.cpp \
     utility.cpp \
     detectionThread.cpp \
@@ -92,12 +87,7 @@ SOURCES += main.cpp \
 HEADERS += \
     mainwindow.h \
     structures.h \
-    tbuffer.h \
-    config.h \
-    MatToQImage.h \
     FrameLabel.h \
-    processThread.h \
-    captureThread.h \
     objectdetection.h \
     utility.h \
     detectionThread.h \

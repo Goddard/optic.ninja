@@ -28,17 +28,15 @@
 
 // Local
 #include "appsettings.h"
-#include "tbuffer.h"
-#include "bufferThread.h"
 #include "createSetDialog.h"
-#include "MatToQImage.h"
 #include "imageview.h"
 #include "setcontrol.h"
 #include "setimage.h"
 #include "exportdataset.h"
-
-#if USECV3 == 0
-    using namespace cv::ocl;
+#if USECV4 == 0
+    #if USECV3 == 0
+        using namespace cv::ocl;
+    #endif
 #endif
 
 namespace Ui {
@@ -88,16 +86,12 @@ class MainWindow : public QMainWindow
         QPushButton *connectToCameraButton;
         QPushButton *playVideoButton;
         QMap<int, int> deviceNumberMap;
-//        QMap<int, CameraView*> cameraViewMap;
-        bufferThread *sharedImageBuffer;
+
         bool removeFromMapByTabIndex(QMap<int, int>& map, int tabIndex);
         void updateMapValues(QMap<int, int>& map, int tabIndex);
         void setTabCloseToolTips(QTabWidget *tabs, QString tooltip);
         void regenerateSetItems();
 
-//        struct ThreadStatisticsData statsData;
-
-//        int SET_IMAGE;
         QMessageBox *tempMessageBox;
 
         qint8 drawTool;
@@ -114,10 +108,6 @@ class MainWindow : public QMainWindow
 //        void on_selectedImageGraphicsView_customContextMenuRequested(const QPoint &pos);
 
         void on_deleteImageButton_clicked();
-
-//        void on_positiveImageRadioButton_clicked();
-
-//        void on_negativeImageRadioButton_clicked();
 
         void on_saveImageButton_clicked();
 
@@ -145,7 +135,6 @@ class MainWindow : public QMainWindow
 
 signals:
         void newFrame(const Mat &matFrame);
-        void updateStatisticsInGUI(struct ThreadStatisticsData);
 };
 
 
