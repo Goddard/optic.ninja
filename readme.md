@@ -5,7 +5,12 @@
 This project aims to make a simple and efficent dataset editor.
 
 ### Current Support
-Currently we are targeting image datasets.
+    - Currently we are targeting image datasets.
+    - Automatic annotation saving
+    - CSV Export
+    - Sqaure annotation marker
+    - Polyline annotation marker
+    - Circle annotation marker
 
 ### Roadmap
     - Improve "Lazy Loading List View".  Need to add the ability to unload items.
@@ -17,6 +22,7 @@ Currently we are targeting image datasets.
     - Add error correction and catching
     - Improve loading times and database creation method.
     - Add support for multi-part images
+    - Common dataset importer
 
 ### Pull requests
 Pull requests are welcome.  If you have something to contribute please do.  Trying to stick to Qt framework, but other libraries are also fine if your implementation is useful.
