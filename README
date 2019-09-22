@@ -18,3 +18,15 @@ Currently we are targeting image datasets.
 
 ### Pull requests
 Pull requests are welcome.  If you have something to contribute please do.  Trying to stick to Qt framework, but other libraries are also fine if your implementation is useful.
+
+
+### Build
+
+#### Linux
+Simple install opencv libraris and it should automatically be detected.  Tested on Debian/Ubuntu.  Then simply build with Qt Creator either from the repos, or download Qt Creator directly from the Qt website.
+
+#### Windows
+Simply clone the repo and build with Qt Creator.  You can use MinGW or MSVC.
+
+#### Mac
+I haven't tested building on Mac yet, but it should work in a similar fashion to Linux.  I will test this soon.
