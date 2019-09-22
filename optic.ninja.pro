@@ -103,8 +103,7 @@ HEADERS += \
     filelistmodel.h \
     exportdataset.h
 
-OTHER_FILES += \
-    README
+OTHER_FILES +=
 
 FORMS += \
     mainwindow.ui \
@@ -116,3 +115,6 @@ QMAKE_CXXFLAGS += -Wall
 
 RESOURCES += \
     irconresource.qrc
+
+DISTFILES += \
+    readme.md
