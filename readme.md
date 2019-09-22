@@ -1,4 +1,5 @@
 # Optic.Ninja
+![alt text](./opticninja.png "Optic Ninja")
 
 ### Description
 This project aims to make a simple and efficent dataset editor.
@@ -15,6 +16,7 @@ Currently we are targeting image datasets.
     - Add Unit tests
     - Add error correction and catching
     - Improve loading times and database creation method.
+    - Add support for multi-part images
 
 ### Pull requests
 Pull requests are welcome.  If you have something to contribute please do.  Trying to stick to Qt framework, but other libraries are also fine if your implementation is useful.
