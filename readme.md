@@ -1,4 +1,7 @@
 # Optic.Ninja
+![alt text](./opticNinja.png "Optic Ninja mascot by my daughter")
+
+# Screenshot
 ![alt text](./opticninja.png "Optic Ninja")
 
 ### Description
