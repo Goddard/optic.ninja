@@ -566,7 +566,7 @@
      <x>0</x>
      <y>0</y>
      <width>2183</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -583,12 +583,6 @@
     <addaction name="actionAbout"/>
     <addaction name="actionHot_Keys"/>
    </widget>
-   <widget class="QMenu" name="menuOptions">
-    <property name="title">
-     <string>Options</string>
-    </property>
-    <addaction name="actionSynchronizeStreams"/>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>&amp;View</string>
@@ -604,7 +598,6 @@
     <addaction name="menu_Set_View_Types"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuOptions"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>

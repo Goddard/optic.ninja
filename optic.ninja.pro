@@ -66,50 +66,50 @@ win32 {
     }
 }
 
-SOURCES += main.cpp \
-    mainwindow.cpp \
-    FrameLabel.cpp \
-    objectdetection.cpp \
-    utility.cpp \
-    detectionThread.cpp \
-    setimage.cpp \
-    createSetDialog.cpp \
-    imageview.cpp \
-    setcontrol.cpp \
-    appsettings.cpp \
-    imagegraphicsview.cpp \
-    imageview/opticrectangle.cpp \
-    datalocal.cpp \
-    annotation.cpp \
-    filelistmodel.cpp \
-    exportdataset.cpp
+SOURCES += src/main.cpp \
+    src/mainwindow.cpp \
+    src/FrameLabel.cpp \
+    src/objectdetection.cpp \
+    src/utility.cpp \
+    src/detectionThread.cpp \
+    src/setimage.cpp \
+    src/createSetDialog.cpp \
+    src/imageview.cpp \
+    src/setcontrol.cpp \
+    src/appsettings.cpp \
+    src/imagegraphicsview.cpp \
+    src/imageview/opticrectangle.cpp \
+    src/datalocal.cpp \
+    src/annotation.cpp \
+    src/filelistmodel.cpp \
+    src/exportdataset.cpp
 
 HEADERS += \
-    mainwindow.h \
-    structures.h \
-    FrameLabel.h \
-    objectdetection.h \
-    utility.h \
-    detectionThread.h \
-    setimage.h \
-    createSetDialog.h \
-    imageview.h \
-    setcontrol.h \
-    appsettings.h \
-    imagegraphicsview.h \
-    imageview/opticrectangle.h \
-    datalocal.h \
-    annotation.h \
-    filelistmodel.h \
-    exportdataset.h
+    src/mainwindow.h \
+    src/structures.h \
+    src/FrameLabel.h \
+    src/objectdetection.h \
+    src/utility.h \
+    src/detectionThread.h \
+    src/setimage.h \
+    src/createSetDialog.h \
+    src/imageview.h \
+    src/setcontrol.h \
+    src/appsettings.h \
+    src/imagegraphicsview.h \
+    src/imageview/opticrectangle.h \
+    src/datalocal.h \
+    src/annotation.h \
+    src/filelistmodel.h \
+    src/exportdataset.h
 
 OTHER_FILES +=
 
 FORMS += \
-    mainwindow.ui \
-    createsetdialog.ui \
-    imageview.ui \
-    imagegraphicsview.ui
+    src/mainwindow.ui \
+    src/createsetdialog.ui \
+    src/imageview.ui \
+    src/imagegraphicsview.ui
 
 QMAKE_CXXFLAGS += -Wall
 
