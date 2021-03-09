@@ -1,5 +1,5 @@
 # Optic.Ninja
-![alt text](./OptictNinja.png "Optic Ninja mascot by my daughter")
+![alt text](./on-128.png "Optic Ninja mascot by my daughter")
 
 # Screenshot
 ![alt text](./opticninja.png "Optic Ninja")
