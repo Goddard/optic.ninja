@@ -22,9 +22,8 @@ TEMPLATE = app
 
 unix {
     message("Linux Build")
-    QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
-    PKGCONFIG += opencv
+    PKGCONFIG += pkg-config opencv4
 }
 
 win32 {
@@ -34,17 +33,16 @@ win32 {
 
     equals(USECV4, 1) {
         message("Using OpenCV 4")
-        INCLUDEPATH +="E:\\Source\\opencv\\build\\install\\include"
-        LIBS +=-L"E:\\Source\\opencv\\build\\install\\x64\\vc15\\lib" \
-            -lopencv_core400d \
-            -lopencv_highgui400d \
-            -lopencv_imgproc400d \
-            -lopencv_imgcodecs400d \
-            -lopencv_features2d400d \
-            -lopencv_calib3d400d \
-            -lopencv_videoio400d \
-            -lopencv_video400d \
-            -lopencv_videostab400d
+        INCLUDEPATH += C:\opencv4\opencv\build\install\include
+        LIBS += -LC:\opencv4\opencv\build\install\x64\mingw\bin \
+            -lopencv_core451 \
+            -lopencv_highgui451 \
+            -lopencv_imgproc451 \
+            -lopencv_imgcodecs451 \
+            -lopencv_features2d451 \
+            -lopencv_calib3d451 \
+            -lopencv_videoio451 \
+            -lopencv_video451
     }
 
     equals(USECV3, 1) {
@@ -52,7 +50,7 @@ win32 {
         INCLUDEPATH +=C:\opencv\build\include
         LIBS +=-L"C:\\opencv\\build\\x64\\vc15\\lib" \
             -lopencv_world341
-    }
+            }
 
     equals(USECV2, 1) {
         message("Using OpenCV 2")
@@ -63,13 +61,14 @@ win32 {
             libopencv_imgproc249 \
             libopencv_features2d249 \
             libopencv_calib3d249
-    }
+            }
 }
 
 SOURCES += src/main.cpp \
     src/mainwindow.cpp \
     src/FrameLabel.cpp \
     src/objectdetection.cpp \
+    src/setannotations.cpp \
     src/utility.cpp \
     src/detectionThread.cpp \
     src/setimage.cpp \
@@ -86,6 +85,7 @@ SOURCES += src/main.cpp \
 
 HEADERS += \
     src/mainwindow.h \
+    src/setannotations.h \
     src/structures.h \
     src/FrameLabel.h \
     src/objectdetection.h \
@@ -113,8 +113,11 @@ FORMS += \
 
 QMAKE_CXXFLAGS += -Wall
 
-RESOURCES += \
-    irconresource.qrc
-
 DISTFILES += \
     readme.md
+
+#win32:CONFIG(release, debug|release): LIBS += -LC:/opencv4/opencv/build/install/x64/mingw/lib/ -llibopencv_core451.dll
+#else:win32:CONFIG(debug, debug|release): LIBS += -LC:/opencv4/opencv/build/install/x64/mingw/lib/ -llibopencv_core451.dlld
+
+#INCLUDEPATH += C:/opencv4/opencv/build/install/x64/mingw
+#DEPENDPATH += C:/opencv4/opencv/build/install/x64/mingw

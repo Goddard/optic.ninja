@@ -1,7 +1,6 @@
 #include "setimage.h"
 
-SetImage::SetImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent) :
-    QObject(parent)
+SetImage::SetImage(QFileInfo fileInfoParm, QString fileSetTypeParm, int index, QObject *parent) : QObject(parent)
 {
     this->fileInfo = fileInfoParm;
     this->index = index;
@@ -22,11 +21,12 @@ SetImage::~SetImage()
 //    delete fileMat;
 //    delete fileImage;
 //    delete filePixmap;
+//    delete this;
 }
 
 Mat SetImage::getImageMat()
 {
-    return imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
+    return imread(this->fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_COLOR);
 }
 
 
@@ -34,7 +34,7 @@ QIcon SetImage::getImageQIcon()
 {
 //    return &this->fileIcon;
     Mat src;
-    resize(getImageMat(), src, Size(64, 64), CV_INTER_AREA);
+    resize(getImageMat(), src, Size(64, 64), cv::INTER_AREA);
     return QIcon(QPixmap::fromImage(utility::matToQImage(src)));
 //    return QIcon(this->getImageQPixmap());
 }
@@ -77,5 +77,5 @@ void SetImage::setImageFileInfo(QFileInfo fileInfoParm)
 
 void SetImage::resetImageMat()
 {
-    this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_COLOR);
+    this->fileMat = imread(this->fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_COLOR);
 }

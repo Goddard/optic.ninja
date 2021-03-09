@@ -42,7 +42,7 @@ appSettings::appSettings()
 
 appSettings::~appSettings()
 {
-
+    delete this->mainSettings;
 }
 
 QSettings *appSettings::getSettings()

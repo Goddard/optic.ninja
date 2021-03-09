@@ -30,7 +30,7 @@ class imageGraphicsView : public QWidget
     Q_OBJECT
 
 public:
-    explicit imageGraphicsView(QWidget *parent = 0);
+    explicit imageGraphicsView(QWidget *parent = nullptr);
     ~imageGraphicsView();
 
     QList<QImage> imageBuffer;
@@ -91,4 +91,4 @@ private slots:
     void zoomChanged(int zoomLevelParm);
 };
 
-#endif // IMAGEGRAPHICSVIEW_H
+#endif

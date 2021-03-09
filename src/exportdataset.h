@@ -2,7 +2,7 @@
 #define EXPORTDATASET_H
 
 #include <QObject>
-#include <datalocal.h>
+#include <src/datalocal.h>
 #include <QPolygon>
 
 class ExportDataSet : public QObject
@@ -18,6 +18,7 @@ private:
     //might not need
     QString base_path;
     DataLocal *db;
+    ~ExportDataSet();
 
 signals:
 

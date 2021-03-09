@@ -108,3 +108,8 @@ QString ExportDataSet::writeCSVData() {
 
     return QString("fail");
 }
+
+ExportDataSet::~ExportDataSet()
+{
+    delete this->db;
+}

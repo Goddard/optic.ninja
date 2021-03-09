@@ -13,7 +13,6 @@ class objectDetection
 {
 public:
     objectDetection();
-    void intruderAlarm(cv::Mat& a, cv::Mat& b);
 };
 
 #endif // OBJECTDETECTION_H

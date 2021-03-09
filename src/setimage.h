@@ -14,13 +14,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "utility.h"
-
-#if USECV4 == 0
-    #if USECV3 == 0
-        #include <opencv2/ocl/ocl.hpp>
-    #endif
-#endif
+#include "src/utility.h"
 
 using namespace cv;
 

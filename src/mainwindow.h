@@ -17,27 +17,15 @@
 #include <QInputDialog>
 #include <QColorDialog>
 #include <QGraphicsProxyWidget>
-
-// OpenCV
-#if USECV4 ==0
-    #if USECV3 == 0
-        #include <opencv2/ocl/ocl.hpp>
-        #include <opencv2/highgui/highgui.hpp>
-    #endif
-#endif
+#include <QTreeWidget>
 
 // Local
-#include "appsettings.h"
-#include "createSetDialog.h"
-#include "imageview.h"
-#include "setcontrol.h"
-#include "setimage.h"
-#include "exportdataset.h"
-#if USECV4 == 0
-    #if USECV3 == 0
-        using namespace cv::ocl;
-    #endif
-#endif
+#include "src/appsettings.h"
+#include "src/createSetDialog.h"
+#include "src/imageview.h"
+#include "src/setcontrol.h"
+#include "src/setimage.h"
+#include "src/exportdataset.h"
 
 namespace Ui {
     class MainWindow;
@@ -83,8 +71,6 @@ class MainWindow : public QMainWindow
         appSettings *appSettingsController;
 
         Ui::MainWindow *ui;
-        QPushButton *connectToCameraButton;
-        QPushButton *playVideoButton;
         QMap<int, int> deviceNumberMap;
 
         bool removeFromMapByTabIndex(QMap<int, int>& map, int tabIndex);
@@ -95,6 +81,9 @@ class MainWindow : public QMainWindow
         QMessageBox *tempMessageBox;
 
         qint8 drawTool;
+
+        QTreeWidget *annotationTreeWidget;
+        QTreeWidget *getAnnotationTree();
 
     public slots:
         void showAboutDialog();

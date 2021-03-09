@@ -18,16 +18,6 @@ QString utility::createImage(int imgWidth, int imgHeight)
     //vector that stores the compression parameters of the image
     vector<int> compression_params;
     //specify the compression technique
-    #if USECV3 == 1
-        compression_params.push_back(IMWRITE_JPEG_QUALITY);
-    #endif
-
-
-    #if USECV4 == 0
-        #if USECV3 == 0
-            compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-        #endif
-    #endif
 
     //specify the compression quality
     compression_params.push_back(98);

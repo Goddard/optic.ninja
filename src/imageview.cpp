@@ -45,7 +45,9 @@ ImageView::ImageView(QWidget *parent) :
 
 ImageView::~ImageView()
 {
-    delete ui;
+    delete this->db;
+    delete this->ui;
+//    delete this->mousePositionLabel;
 }
 
 void ImageView::setDatabase(DataLocal *db)
@@ -265,7 +267,10 @@ void ImageView::mousePressEvent(QMouseEvent *event)
             qDebug("mouse pressed");
         }
 
-        else if(!this->drawing && annotationHoverId != -1 && this->mouseState == HoverTop || this->mouseState == HoverRight || this->mouseState == HoverBottom || this->mouseState == HoverLeft)
+        else if((!this->drawing && annotationHoverId != -1 && this->mouseState == HoverTop)
+                || this->mouseState == HoverRight
+                || this->mouseState == HoverBottom
+                || this->mouseState == HoverLeft)
         {
             qDebug() << "click and hover " << annotationHoverId;
 

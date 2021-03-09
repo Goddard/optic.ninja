@@ -8,9 +8,6 @@
 #include <QString>
 // Qt
 #include <QtGui/QImage>
-// OpenCV
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
 
 #include <QDebug>
 

@@ -14,26 +14,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set start tab as blank
     QLabel *newTab = new QLabel(ui->tabWidget);
-    newTab->setText("No camera connected.");
+//    newTab->setText("No camera connected.");
     newTab->setAlignment(Qt::AlignCenter);
     ui->tabWidget->addTab(newTab, "");
     ui->tabWidget->setTabsClosable(false);
 
-    // Add "Connect to Camera" button to tab
-    connectToCameraButton = new QPushButton();
-    connectToCameraButton->setText("Connect to Camera");
-    ui->tabWidget->setCornerWidget(connectToCameraButton, Qt::TopLeftCorner);
-    connect(connectToCameraButton,SIGNAL(released()),this, SLOT(connectToCamera()));
-
-    // Add "Play Video" button to tab
-    playVideoButton = new QPushButton();
-    playVideoButton->setText("Play Video");
-    ui->tabWidget->setCornerWidget(playVideoButton, Qt::TopRightCorner);
-    connect(playVideoButton,SIGNAL(released()),this, SLOT(playVideoFile()));
-    connect(ui->tabWidget,SIGNAL(tabCloseRequested(int)),this, SLOT(disconnectCamera(int)));
-
-    // Set focus on button
-    connectToCameraButton->setFocus();
+//    connect(ui->tabWidget,SIGNAL(tabCloseRequested(int)),this, SLOT(disconnectCamera(int)));
 
     // Connect other signals/slots
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
@@ -82,6 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //add image view widget to main window
     ui->ImageViewLayout->addWidget(scrollArea);
 
+    ui->AnnotationTreeLayout->addWidget(this->setController->getSetAnnotations());
+//    ui->AnnotationTreeLayout->setGeometry(new QRect())
+
     //setup shortcut keys
     ui->saveImageButton->setShortcut(QKeySequence::fromString("CTRL+S"));
 
@@ -99,7 +88,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete this->ui;
+
+//    delete this->settings;
+//    delete this->setSettings;
+    delete this->setController;
+//    delete this->appSettingsController;
+//    delete this->tempMessageBox;
 }
 
 void MainWindow::setClassComboBox()
@@ -130,7 +125,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
 
 void MainWindow::showAboutDialog()
 {
-    QMessageBox::information(this, "About", QString("Created by Ryein C. Goddard\n\nContact: ryein@goddardlabs.com\nWebsite: www.goddardlabs.com\n\nVersion: %1").arg(APP_VERSION));
+    QMessageBox::information(this, "About", QString("Created by Ryein C. Goddard\n\nContact: ryein@goddardlabs.com\nWebsite: www.ryeingoddard.com\n\nVersion: %1").arg("0.5.2"));
 }
 
 bool MainWindow::removeFromMapByTabIndex(QMap<int, int> &map, int tabIndex)

@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
 //    qInstallMessageHandler(myMessageOutput);
     // Show main window
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon("./images/on6.png"));
     MainWindow w;
     w.show();
     // Start event loop

@@ -10,7 +10,6 @@ FileListModel::FileListModel(QObject *parent)
 {
 }
 
-//![4]
 int FileListModel::rowCount(const QModelIndex & /* parent */) const
 {
     return fileCount;
@@ -35,9 +34,7 @@ QVariant FileListModel::data(const QModelIndex &index, int role) const
     }
     return QVariant();
 }
-//![4]
 
-//![1]
 bool FileListModel::canFetchMore(const QModelIndex & /* index */) const
 {
     if (fileCount < fileList.size())
@@ -45,9 +42,7 @@ bool FileListModel::canFetchMore(const QModelIndex & /* index */) const
     else
         return false;
 }
-//![1]
 
-//![2]
 void FileListModel::fetchMore(const QModelIndex & /* index */)
 {
     int remainder = fileList.size() - fileCount;
@@ -69,9 +64,7 @@ void FileListModel::fetchMore(const QModelIndex & /* index */)
         endRemoveRows();
     }
 }
-//![2]
 
-//![0]
 void FileListModel::setDirPath(const QString &path)
 {
     QDir dir(path);
@@ -81,5 +74,8 @@ void FileListModel::setDirPath(const QString &path)
     fileCount = 0;
     endResetModel();
 }
-//![0]
 
+FileListModel::~FileListModel()
+{
+
+}

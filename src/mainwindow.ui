@@ -306,49 +306,16 @@
           <item row="1" column="0" rowspan="6">
            <layout class="QGridLayout" name="gridLayout_12">
             <property name="sizeConstraint">
-             <enum>QLayout::SetNoConstraint</enum>
+             <enum>QLayout::SetMaximumSize</enum>
             </property>
-            <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_6">
+            <item row="2" column="0">
+             <layout class="QGridLayout" name="AnnotationTreeLayout">
               <property name="sizeConstraint">
                <enum>QLayout::SetMaximumSize</enum>
               </property>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="setComboBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Current Set :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="textFormat">
-                 <enum>Qt::RichText</enum>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
-            <item row="1" column="0">
-             <widget class="setControl" name="SetViewWidget">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
+            <item row="3" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <property name="sizeConstraint">
                <enum>QLayout::SetMaximumSize</enum>
@@ -390,6 +357,46 @@
                </widget>
               </item>
              </layout>
+            </item>
+            <item row="0" column="0">
+             <layout class="QGridLayout" name="gridLayout_6">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetMaximumSize</enum>
+              </property>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="setComboBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Current Set :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <widget class="setControl" name="SetViewWidget">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -566,7 +573,7 @@
      <x>0</x>
      <y>0</y>
      <width>2183</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -671,7 +678,7 @@
   <customwidget>
    <class>setControl</class>
    <extends>QListWidget</extends>
-   <header location="global">setcontrol.h</header>
+   <header location="global">./src/setcontrol.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

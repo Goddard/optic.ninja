@@ -1,4 +1,4 @@
-#include "setcontrol.h"
+#include "src/setcontrol.h"
 
 setControl::setControl(QWidget *parent) :
     QListWidget(parent)
@@ -10,6 +10,12 @@ setControl::setControl(QWidget *parent) :
         this->imgGView = new imageGraphicsView();
     else
         this->imgView = new ImageView();
+
+    this->setAnnotations = new SetAnnotations();
+}
+
+SetAnnotations *setControl::getSetAnnotations() {
+    return this->setAnnotations;
 }
 
 void setControl::initalize(appSettings *appSettingsParm)
@@ -86,7 +92,12 @@ QStringList setControl::checkFileSystem()
 
 setControl::~setControl()
 {
-    delete imgView;
+    delete this->imgView;
+//    delete this->db;
+    delete this->setSettings;
+//    delete this->setListWidget;
+//    delete this->imgGView;
+    delete this->appSettingsController;
 }
 
 void setControl::loadMore()
@@ -111,6 +122,10 @@ void setControl::loadMore()
     }
 }
 
+void setControl::unload() {
+
+}
+
 void setControl::addSetItem(int index)
 {
 //    this->scrollToItem(this->setFiles.at(index)->getImageWidgetItem(), EnsureVisible);
@@ -118,16 +133,17 @@ void setControl::addSetItem(int index)
     this->addItem(this->setFiles.at(index)->getImageWidgetItem());
 }
 
-void setControl::setItemClicked(int currentRow)
-{
-    if(this->setFiles.value(currentRow))
-    {
+void setControl::setItemClicked(int currentRow) {
+    if(this->setFiles.value(currentRow)) {
         this->getImageView()->current_image_id = this->setFiles.value(currentRow)->object_path_id;
         this->getImageView()->clearAnnotationBuffer();
         this->getImageView()->clearImageBuffer();
 //        QImage tempImage = this->setFiles.at(currentRow)->getImageQImage();
         this->getImageView()->addBufferFrame(this->setFiles[currentRow]);
 
+        for(int i = 0; i < this->getImageView()->getAnnotations().count(); i++) {
+            new QListWidgetItem(this->getImageView()->getAnnotations().at(i).class_name, this->getSetAnnotations());
+        }
         //this->sceneContainer->clear();
 
 //        this->sceneContainer->addPixmap(this->setFiles.at(currentRow)->getImageQPixmap());
@@ -163,7 +179,7 @@ void setControl::setSetName(QString setNameParam)
 {
     this->setName = setNameParam;
 
-    if(this->db != NULL && this->db->open())
+    if(this->db != nullptr && this->db->open())
         this->db->close();
 
     this->db = new DataLocal(this, this->setName, this->setPath);
@@ -249,7 +265,7 @@ QList<SetImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     tempFileInfoList = dir.entryInfoList();
     for (int i = 0; i < tempFileInfoList.count(); ++i)
     {
-        SetImage *setImage = new SetImage(tempFileInfoList.value(i), QString("Undefined"), i);
+        SetImage *setImage = new SetImage(tempFileInfoList.value(i), QString("Undefined"), i, this);
         QStringList path_data = this->db->getPath(setImage->getImageFileInfo().absoluteFilePath());
 
         //check if we do not have this image in the db and if not we insert it
@@ -289,6 +305,7 @@ QList<SetImage *> *setControl::getSetFiles() //QString setNameParm, QString view
     }
 
     tempFileInfoList.clear();
+
     return &this->setFiles;
 }
 
@@ -396,13 +413,13 @@ bool setControl::deleteImage()
 //will get image dimensions and file disk space usage
 QString setControl::getImageSize(QString  filePath)
 {
-    return NULL;
+    return nullptr;
 }
 
 //will get the image buffer size..this is usful if making edits and not saving
 QString setControl::getImageBufferSize()
 {
-    return NULL;
+    return nullptr;
 }
 
 //generates two files one positive and one negative positive has all details for traincascade negative just has file names and paths
@@ -454,5 +471,5 @@ void setControl::getSetFileNames(QString setName)
 void setControl::setSetSettingsFile()
 {
     if(!this->setName.isEmpty())
-        this->setSettings = new QSettings(this->setPath + QDir::separator() + this->setName + QDir::separator() + "setSettings.ini", QSettings::IniFormat);
+        this->setSettings = new QSettings(this->setPath + QDir::separator() + this->setName + QDir::separator() + "setSettings.ini", QSettings::IniFormat, this);
 }

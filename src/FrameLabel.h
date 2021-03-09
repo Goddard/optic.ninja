@@ -10,7 +10,7 @@
 #include <QDebug>
 
 // Local
-#include "structures.h"
+#include "src/structures.h"
 
 class FrameLabel : public QLabel
 {

@@ -17,9 +17,9 @@
 #include <QToolTip>
 //#include <QRubberBand>
 
-#include "setimage.h"
+#include "src/setimage.h"
 
-#include <datalocal.h>
+#include <src/datalocal.h>
 
 namespace Ui {
     class ImageView;

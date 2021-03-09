@@ -11,14 +11,15 @@
 #include <QHBoxLayout>
 #include <QScrollBar>
 #include <QDirIterator>
-
 #include <QSqlRecord>
+#include <QPointer>
 
-#include <appsettings.h>
-#include <datalocal.h>
-#include <setimage.h>
-#include <imageview.h>
-#include <imagegraphicsview.h>
+#include <src/appsettings.h>
+#include <src/datalocal.h>
+#include <src/setimage.h>
+#include <src/imageview.h>
+#include <src/imagegraphicsview.h>
+#include <src/setannotations.h>
 
 class setControl : public QListWidget
 {
@@ -36,6 +37,7 @@ public:
     QString getImageSize(QString filePath);
     QString getImageBufferSize();
     void getSetFileNames(QString setName);
+    SetAnnotations *getSetAnnotations();
 
     QString getSetName();
     QString getSetPath();
@@ -48,6 +50,7 @@ public:
     void initalize(appSettings *appSettingsParm);
 
     void loadMore();
+    void unload();
 
     QStringList checkFileSystem();
 
@@ -72,13 +75,14 @@ private:
     QString setPath;
     QString setName;
     QString viewType;
-    QSettings *setSettings;
+    QPointer<QSettings> setSettings;
     QStringList extensionList;
     QList<SetImage *> setFiles;
     QListWidget *setListWidget;
     ImageView *imgView;
     imageGraphicsView *imgGView;
     appSettings *appSettingsController;
+    SetAnnotations *setAnnotations;
 
 protected:
     void scrollContentsBy(int dx, int dy);

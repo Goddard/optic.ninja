@@ -5,14 +5,13 @@
 #include <QList>
 #include <QStringList>
 
-//![0]
 class FileListModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    FileListModel(QObject *parent = 0);
-
+    FileListModel(QObject *parent = nullptr);
+    ~FileListModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
@@ -30,6 +29,5 @@ private:
     QStringList fileList;
     int fileCount;
 };
-//![0]
 
-#endif // FILELISTMODEL_H
+#endif

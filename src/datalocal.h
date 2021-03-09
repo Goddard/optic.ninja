@@ -44,7 +44,7 @@ class DataLocal : public QObject
 {
     Q_OBJECT
 public:
-  explicit DataLocal(QObject *parent = 0, QString set_name = NULL, QString home_path = NULL);
+  explicit DataLocal(QObject *parent = nullptr, QString set_name = nullptr, QString home_path = nullptr);
   ~DataLocal();
   bool open();
   bool destroy();
@@ -87,7 +87,6 @@ private:
   QString set_name;
   QString sets_path;
   void createSchema();
-
 };
 
 #endif // DATA_LOCAL_H
